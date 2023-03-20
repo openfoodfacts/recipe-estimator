@@ -32,9 +32,18 @@ function flattenIngredients(ingredients: any[], depth = 0): any[] {
   return flatIngredients;
 }
 
-function round(num: number){
-  return isNaN(num) ? '-' : Math.round((num + Number.EPSILON) * 100) / 100;
+function round(num: any){
+  return num == null || isNaN(num) ? 'unknown' : parseFloat(num).toPrecision(4);
 }
+
+const PERCENT = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2,style:"percent"});
+const VARIANCE = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2,signDisplay:"always"});
+const QUANTITY = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2});
+
+function format(num: number, formatter: Intl.NumberFormat){
+  return num == null || isNaN(num) ? 'unknown' : formatter.format(num);
+}
+
 
 export default function Recipe({product}: RecipeProps) {
   const [ingredients, setIngredients] = useState<any>();
@@ -64,7 +73,7 @@ export default function Recipe({product}: RecipeProps) {
     let total = 0;
     for(const ingredient of parent) {
       if (!ingredient.ingredients) 
-        total += ingredient.proportion * (nutrient_key ? ingredient.ciqual_ingredient?.[nutrient_key] / 100 : 1);
+        total += ingredient.proportion * (nutrient_key ? ingredient.ciqual_ingredient?.[nutrient_key] : 1) / 100;
       else
         total += getTotalForParent(nutrient_key, ingredient.ingredients);
     }
@@ -122,7 +131,7 @@ export default function Recipe({product}: RecipeProps) {
                   {Object.keys(nutrients).map((nutrient: string) => (
                     <TableCell key={nutrient}>
                       <Typography>{nutrient}</Typography>
-                      <Typography variant="caption">{round(nutrients[nutrient].weighting)}</Typography>
+                      <Typography variant="caption">{format(nutrients[nutrient].weighting, QUANTITY)}</Typography>
                     </TableCell>
                   ))}
                 </TableRow>
@@ -156,8 +165,8 @@ export default function Recipe({product}: RecipeProps) {
                     {Object.keys(product.nutrients).map((nutrient: string) => (
                       <TableCell key={nutrient}>{!ingredient.ingredients &&
                         <>
-                          <Typography variant="caption">{ingredient.ciqual_ingredient?.[nutrient] ?? 'unknown'}</Typography>
-                          <Typography variant="body1">{round(ingredient.proportion * ingredient.ciqual_ingredient?.[nutrient] / 100)}</Typography>
+                          <Typography variant="caption">{format(ingredient.ciqual_ingredient?.[nutrient], QUANTITY)}</Typography>
+                          <Typography variant="body1">{format(ingredient.proportion * ingredient.ciqual_ingredient?.[nutrient] / 100, QUANTITY)}</Typography>
                         </>
                       }
                       </TableCell>
@@ -166,12 +175,10 @@ export default function Recipe({product}: RecipeProps) {
                 ))}
                   <TableRow className='total'>
                     <TableCell colSpan={2}><Typography>Ingredients totals</Typography></TableCell>
-                    <TableCell><Typography>
-                      {round(getTotal(''))} %
-                    </Typography></TableCell>
+                    <TableCell><Typography>{format(getTotal(''), PERCENT)}</Typography></TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
-                        <Typography variant="body1">{round(getTotal(nutrient_key))}</Typography>
+                        <Typography variant="body1">{format(getTotal(nutrient_key), QUANTITY)}</Typography>
                       </TableCell>
                     ))}
                   </TableRow>
@@ -179,24 +186,31 @@ export default function Recipe({product}: RecipeProps) {
                     <TableCell colSpan={3}><Typography>Quoted product nutrients</Typography></TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
-                        <Typography variant="body1">{round(nutrients[nutrient_key].total)}</Typography>
+                        <Typography variant="body1">{format(nutrients[nutrient_key].total, QUANTITY)}</Typography>
                       </TableCell>
                     ))}
                   </TableRow>
                   <TableRow className='total'>
-                    <TableCell><Typography>Variance</Typography></TableCell>
-                    <TableCell><Button variant='contained' onClick={()=>getRecipe(ingredients,nutrients)}>recalculate</Button></TableCell>
-                    <TableCell><Typography>{round(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
+                    <TableCell>
+                      <Typography>Variance</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant='contained' onClick={()=>getRecipe(ingredients,nutrients)}>recalculate</Button>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="caption">Weighted</Typography>
+                      <Typography>{format(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
                       total + (!nutrients[nutrient_key].error 
                         ? nutrients[nutrient_key].weighting * Math.abs(getTotal(nutrient_key)- nutrients[nutrient_key].total) 
-                        : 0), 0))}
-                    </Typography></TableCell>
+                        : 0), 0), VARIANCE)}
+                      </Typography>
+                    </TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
                         {!nutrients[nutrient_key].error 
                           ? <>
-                            <Typography variant="caption">{round(getTotal(nutrient_key) - nutrients[nutrient_key].total)}</Typography>
-                            <Typography>{round(nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].total))}</Typography>
+                            <Typography variant="caption">{format(getTotal(nutrient_key) - nutrients[nutrient_key].total, VARIANCE)}</Typography>
+                            <Typography>{format(nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].total), VARIANCE)}</Typography>
                             </>
                           : <Typography variant="caption">{nutrients[nutrient_key].error}</Typography>
                         }
