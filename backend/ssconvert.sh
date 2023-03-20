@@ -1,2 +1,2 @@
 #!/bin/sh
-ssconvert Ciqual.xls Ciqual.csv -S
+ssconvert -S Ciqual.xls Ciqual.csv
