@@ -64,7 +64,7 @@ export default function Recipe({product}: RecipeProps) {
     let total = 0;
     for(const ingredient of parent) {
       if (!ingredient.ingredients) 
-        total += ingredient.proportion * ingredient.ciqual_ingredient?.[nutrient_key] / 100;
+        total += ingredient.proportion * (nutrient_key ? ingredient.ciqual_ingredient?.[nutrient_key] / 100 : 1);
       else
         total += getTotalForParent(nutrient_key, ingredient.ingredients);
     }
@@ -167,7 +167,7 @@ export default function Recipe({product}: RecipeProps) {
                   <TableRow className='total'>
                     <TableCell colSpan={2}><Typography>Ingredients totals</Typography></TableCell>
                     <TableCell><Typography>
-                      {round(ingredients.reduce((total: number,ingredient: any) => total + (ingredient.ingredients ? 0 : ingredient.proportion), 0))} %
+                      {round(getTotal(''))} %
                     </Typography></TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>

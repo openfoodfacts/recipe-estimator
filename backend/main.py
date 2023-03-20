@@ -1,5 +1,6 @@
 import itertools
 from fastapi import Body, FastAPI, Request
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from ciqual import ciqual_ingredients
@@ -17,6 +18,10 @@ app.add_middleware(
 )
 
 app.mount("/static", StaticFiles(directory="./static",html=True), name="static")
+
+@app.get("/")
+async def redirect():
+    return RedirectResponse("static")
 
 @app.get("/ciqual/{name}")
 async def ciqual(name):
