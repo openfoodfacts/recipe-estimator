@@ -4,7 +4,7 @@ import os
 
 def parse_value(ciqual_nutrient):
     if not ciqual_nutrient or ciqual_nutrient == '-':
-        return None
+        return 0
     return float(ciqual_nutrient.replace(',','.').replace('<','').replace('traces','0'))
 
 # Load Ciqual data
