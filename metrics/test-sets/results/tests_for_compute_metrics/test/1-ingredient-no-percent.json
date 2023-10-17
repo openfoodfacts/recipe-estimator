@@ -1,0 +1,14 @@
+{
+    "ingredients": [
+        {
+            "id": "en:sugar",
+            "text": "sugar"
+        }
+    ],
+    "ingredients_text": "sugar",
+    "lc": "en",
+    "ingredients_metrics": {
+        "total_specified_input_percent": 0,
+        "total_difference": 0
+    }
+}

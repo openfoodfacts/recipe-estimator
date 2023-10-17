@@ -1,0 +1,11 @@
+{
+    "ingredients": [
+        {
+            "id": "en:sugar",
+            "text": "sugar",
+            "percent": 100
+        }
+    ],
+    "ingredients_text": "sugar",
+    "lc": "en"
+}
