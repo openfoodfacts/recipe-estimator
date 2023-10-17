@@ -8,7 +8,7 @@ The model executable must:
 - write the resulting product JSON to STDOUT
 
 This script will go through each product JSON file of the specified input test sets to:
-- Remove any specified "percent" fields from the ingredients
+- Remove any specified "percent" or "percent_estimate" fields from the input ingredients
 - Run the specified model on the product
 - Save the resulting products in [path to store results]/[input test set name]/
 """
@@ -16,6 +16,16 @@ This script will go through each product JSON file of the specified input test s
 import json
 import sys
 import os
+import subprocess
+
+def remove_percent_fields(ingredients):
+    for ingredient in ingredients:
+        # remove percent, percent_min, percent_max, percent_estimate
+        fields_to_remove = ["percent", "percent_min", "percent_max", "percent_estimate"]
+        for field in fields_to_remove:
+            if field in ingredient:
+                del ingredient[field]
+    return ingredients
 
 # Check input parameters (existing model executable, and specified results path + at least 1 input test set), otherwise print usage
 if len(sys.argv) < 4:
@@ -50,9 +60,26 @@ for test_set_path in sys.argv[3:]:
         # test name is the last component of the path
         test_name = path.split("/")[-1]
 
-        # Call the model executable with the product as input to STDIN and save the result from STDOUT
+        with open(path, "r") as f:
+            input_product = json.load(f)
+        
+        # Remove any specified "percent" fields from the ingredients
+        input_product["ingredients"] = remove_percent_fields(input_product["ingredients"])
+
         print("Running model on product " + path)
-        result_json = os.popen(model + " < " + path).read()
+
+        # Define the command to be executed
+        command = [model]
+
+        # Create a Popen object
+        p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+        # Pass the input to the command
+        stdout, stderr = p.communicate(input=json.dumps(input_product))
+
+        # Get the output
+        result_json = stdout.strip()
+
         # convert json to object
         result = json.loads(result_json)
 
