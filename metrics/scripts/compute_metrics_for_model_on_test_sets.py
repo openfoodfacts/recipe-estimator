@@ -26,7 +26,7 @@ def compare_input_ingredients_to_resulting_ingredients(input_ingredients, result
             # If the resulting ingredient does not have a percent_estimate, we set it to 0 for metrics computation
             if "percent_estimate" in resulting_ingredient:
                 resulting_percent_estimate = resulting_ingredient["percent_estimate"]
-            else
+            else:
                 resulting_percent_estimate = 0
                 
             difference = abs(resulting_percent_estimate - input_percent)
@@ -44,14 +44,25 @@ def compare_input_ingredients_to_resulting_ingredients(input_ingredients, result
 
 def compare_input_product_to_resulting_product(input_product, resulting_product):
     
-    compare_input_ingredients_to_resulting_ingredients(input_ingredients, resulting_ingredients)
+    if not isinstance(input_product, dict) or not isinstance(resulting_product, dict):
+        raise ValueError("Input product and resulting product must be dictionaries")
+        
+    total_difference = compare_input_ingredients_to_resulting_ingredients(input_product["ingredients"], resulting_product["ingredients"])
 
-    resulting_product["ingredients_metrics"] = ["total_difference": total_difference]
+    resulting_product["ingredients_metrics"] = {"total_difference": total_difference}
 
     pass
 
+
+# Check input parameters (specified results path + at least 1 input test set), otherwise print usage
+if len(sys.argv) < 2:
+    print("Usage: compute_metrics_for_model_on_test_sets [path of model results] [paths of one or more input test sets]")
+    sys.exit(1)
+
+results_path = sys.argv[1]
+
 # Go through each input test set directory
-for test_set_path in sys.argv[3:]:
+for test_set_path in sys.argv[2:]:
 
     # Test set name is the last component of the test set path
     test_set_name = test_set_path.split("/")[-1]
@@ -75,6 +86,7 @@ for test_set_path in sys.argv[3:]:
 
         # Compute accuracy metrics comparing the estimated "percent_estimate" field in the resulting product
         # to the "percent" field in the input product
+        print("Computing metrics for " + result_path)
         compare_input_product_to_resulting_product(input_product, resulting_product)
 
         # Store product level metrics in the resulting product
