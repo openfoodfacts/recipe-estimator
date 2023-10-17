@@ -21,9 +21,9 @@ if len(sys.argv) < 2:
 # If we need to add a field later on, we can always fetch it back with its barcode
 # use * as wildcard
 def filter_fields(data):
-    whitelist = ['ingredients', 'ingredient_lc', 'lc', 'nutriments', 'categories_tags', 'labels_tags', 'countries_tags']
-    if "lc" in data and "ingredients_text_" + data["lc"] in data:
-        whitelist.append("ingredients_text_" + data["lc"])
+    # Note: we keep the ingredients structure as-is if it exists
+    # if it doesn't exit, we will also need to run analyze_ingredients_for_input_test_sets
+    whitelist = ['ingredients', 'ingredients_text', 'ingredients_lc', 'lc', 'nutriments', 'categories_tags', 'labels_tags', 'countries_tags']
     return {k: v for k, v in data.items() if k in whitelist}
 
 # Go through each input test set directory

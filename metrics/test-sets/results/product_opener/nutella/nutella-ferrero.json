@@ -54,7 +54,8 @@
             "percent_min": 0,
             "text": "huile de NOISETTES",
             "vegan": "yes",
-            "vegetarian": "yes"
+            "vegetarian": "yes",
+            "difference": 2.0625
         },
         {
             "id": "en:fat-reduced-cocoa",
@@ -63,7 +64,8 @@
             "percent_min": 0,
             "text": "cacao maigre",
             "vegan": "yes",
-            "vegetarian": "yes"
+            "vegetarian": "yes",
+            "difference": 1.9312500000000004
         },
         {
             "ciqual_food_code": "19054",
@@ -73,7 +75,8 @@
             "percent_min": 0,
             "text": "LAIT \u00e9cr\u00e9m\u00e9 en poudre",
             "vegan": "no",
-            "vegetarian": "yes"
+            "vegetarian": "yes",
+            "difference": 3.8656249999999996
         },
         {
             "id": "en:whey-powder",
@@ -198,5 +201,10 @@
         "sugars_serving": 8.44,
         "sugars_unit": "g",
         "sugars_value": 56.3
+    },
+    "ingredients_metrics": {
+        "total_specified_input_percent": 27.0,
+        "total_difference": 7.859375,
+        "relative_difference": 0.29108796296296297
     }
 }

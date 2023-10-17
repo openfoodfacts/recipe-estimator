@@ -17,12 +17,14 @@ def compare_input_ingredients_to_resulting_ingredients(input_ingredients, result
     # Compute difference metrics for each ingredient and nested sub ingredient comparing the input percent to the resulting percent_estimate
 
     total_difference = 0
+    total_specified_input_percent = 0
 
     for i, input_ingredient in enumerate(input_ingredients):
         resulting_ingredient = resulting_ingredients[i]
         # We compute metrics for known percent in the input product
         if "percent" in input_ingredient:
             input_percent = input_ingredient["percent"]
+            total_specified_input_percent += input_percent
             # If the resulting ingredient does not have a percent_estimate, we set it to 0 for metrics computation
             if "percent_estimate" in resulting_ingredient:
                 resulting_percent_estimate = resulting_ingredient["percent_estimate"]
@@ -38,18 +40,26 @@ def compare_input_ingredients_to_resulting_ingredients(input_ingredients, result
         if "ingredients" in input_ingredients:
             input_sub_ingredients = input_ingredient["ingredients"]
             resulting_sub_ingredients = resulting_ingredient["ingredients"]
-            total_difference += compare_input_ingredients_to_resulting_ingredients(input_sub_ingredients, resulting_sub_ingredients)
+            (total_specified_input_percent, total_difference) = [x + y for x, y in zip(
+                [total_specified_input_percent, total_difference],
+                compare_input_ingredients_to_resulting_ingredients(input_sub_ingredients, resulting_sub_ingredients))]
 
-    return total_difference
+    return (total_specified_input_percent, total_difference)
 
 def compare_input_product_to_resulting_product(input_product, resulting_product):
     
     if not isinstance(input_product, dict) or not isinstance(resulting_product, dict):
         raise ValueError("Input product and resulting product must be dictionaries")
         
-    total_difference = compare_input_ingredients_to_resulting_ingredients(input_product["ingredients"], resulting_product["ingredients"])
+    (total_specified_input_percent, total_difference) = compare_input_ingredients_to_resulting_ingredients(input_product["ingredients"], resulting_product["ingredients"])
 
-    resulting_product["ingredients_metrics"] = {"total_difference": total_difference}
+    resulting_product["ingredients_metrics"] = {
+        "total_specified_input_percent": total_specified_input_percent,
+        "total_difference": total_difference
+    }
+    # If we have some specified input percent, compute the relative difference
+    if (total_specified_input_percent > 0):
+        resulting_product["ingredients_metrics"]["relative_difference"] = total_difference / total_specified_input_percent
 
     pass
 
