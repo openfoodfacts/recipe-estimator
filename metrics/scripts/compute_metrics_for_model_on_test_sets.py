@@ -74,7 +74,9 @@ results_path = sys.argv[1]
 # Go through each input test set directory
 for test_set_path in sys.argv[2:]:
 
-    # Test set name is the last component of the test set path
+    # Test set name is the last component of the test set path, remove trailing / if any
+    if test_set_path.endswith("/"):
+        test_set_path = test_set_path[:-1]
     test_set_name = test_set_path.split("/")[-1]
 
     # Go through each JSON file in the input test set directory
