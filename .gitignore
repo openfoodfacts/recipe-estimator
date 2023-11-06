@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # Built static pages
-backend/static
+static

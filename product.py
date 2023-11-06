@@ -1,57 +1,7 @@
-from ciqual.nutrients import ciqual_ingredients, nutrient_map, ingredients_taxonomy
+from ciqual.nutrients import nutrient_map
 import requests
 
-def get_ciqual_code(ingredient_id):
-    ingredient = ingredients_taxonomy.get(ingredient_id, None)
-    if ingredient is None:
-        print(ingredient_id + ' not found')
-        return None
-
-    ciqual_code = ingredient.get('ciqual_food_code', None)
-    if ciqual_code:
-        return ciqual_code['en']
-
-    parents = ingredient.get('parents', None)
-    if parents:
-        for parent_id in parents:
-            ciqual_code = get_ciqual_code(parent_id)
-            if ciqual_code:
-                print('Obtained ciqual_code from ' + parent_id)
-                return ciqual_code
-
-    return None
-
-def setup_ingredients(off_ingredients):
-    ingredients = []
-    
-    for off_ingredient in off_ingredients:
-        ingredient = {}
-        ingredients.append(ingredient)
-        ingredient['text'] = off_ingredient['text']
-    
-        if ('ingredients' in off_ingredient):
-            # Child ingredients
-            child_ingredients = setup_ingredients(off_ingredient['ingredients'])
-            if (child_ingredients is None):
-                return
-
-            ingredient['ingredients'] = child_ingredients
-            #ingredients = ingredients + child_ingredients
-        else:
-            ciqual_code = get_ciqual_code(off_ingredient['id'])
-            if (ciqual_code is None):
-                print(off_ingredient['id'] + ' has no ciqual_food_code')
-                continue
-
-            ciqual_ingredient = ciqual_ingredients.get(ciqual_code, None)
-            if (ciqual_ingredient is None):
-                print(off_ingredient['id'] + ' has unknown ciqual_food_code: ' + ciqual_code)
-                continue
-
-            ingredient['ciqual_ingredient'] = ciqual_ingredient
-
-    return ingredients
-
+from ciqual.nutrients import setup_ingredients
 
 def prepare_ingredients(ingredients, nutrients):
     count = 0
