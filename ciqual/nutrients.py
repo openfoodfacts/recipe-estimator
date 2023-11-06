@@ -70,36 +70,46 @@ def get_ciqual_code(ingredient_id):
     return None
 
 
-def setup_ingredients(ingredients):
+def setup_ingredients(ingredients, nutrients):
+    count = 0
     for ingredient in ingredients:
         if ('ingredients' in ingredient):
             # Child ingredients
-            child_ingredients = setup_ingredients(ingredient['ingredients'])
-            if (child_ingredients is None):
-                return
+            child_count = setup_ingredients(ingredient['ingredients'], nutrients)
+            if child_count == 0:
+                return 0
+            count = count + child_count
 
         else:
-            ciqual_code = ingredient['ciqual_food_code']
+            count = count + 1
+            ciqual_code = ingredient.get('ciqual_food_code')
             if (ciqual_code is None):
                 ciqual_code = get_ciqual_code(ingredient['id'])
 
             if (ciqual_code is None):
-                print(ingredient['id'] + ' has no ciqual_food_code')
-                continue
+                raise Exception(ingredient['id'] + ' has no ciqual_food_code')
 
             ciqual_ingredient = ciqual_ingredients.get(ciqual_code, None)
             if (ciqual_ingredient is None):
-                print(ingredient['id'] + ' has unknown ciqual_food_code: ' + ciqual_code)
-                continue
+                raise Exception(ingredient['id'] + ' has unknown ciqual_food_code: ' + ciqual_code)
 
             # Convert CIQUAL nutrient codes back to OFF
-            nutrients = {}
+            ingredient_nutrients = {}
             for ciqual_key in ciqual_ingredient:
                 nutrient = ciqual_to_off.get(ciqual_key)
                 if (nutrient is not None):
-                    nutrients[nutrient['off_id']] = ciqual_ingredient[ciqual_key] / nutrient['factor']
+                    off_id = nutrient['off_id']
+                    factor = nutrient['factor']
+                    ingredient_nutrients[off_id] = ciqual_ingredient[ciqual_key] / factor
+                    existing_nutrient = nutrients.get(off_id)
+                    if (existing_nutrient is None):
+                         nutrients[off_id] = {'ciqual_nutient_code': ciqual_key, 'conversion_factor': factor, 'ingredient_count': 1}
+                    else:
+                        existing_nutrient['ingredient_count'] = existing_nutrient['ingredient_count'] + 1
 
-            ingredient['nutrients'] = nutrients
+            ingredient['nutrients'] = ingredient_nutrients
+
+    return count
 
 
 def prepare_product(product):
@@ -127,9 +137,12 @@ def prepare_product(product):
     #             'weighting' : float(ciqual_nutrient.get('weighting',1) or 1)
     #         }
     # #print(nutrients)
-    setup_ingredients(ingredients)
+    count = setup_ingredients(ingredients, nutrients)
 
-    return {'ingredients': ingredients, 'recipe_estimator': {'nutrients':nutrients}}
+    product['recipe_estimator'] = {'nutrients':nutrients, 'metrics': {'ingredient_count': count}}
+
+    return count
+
 
 # Dump ingredients
 #with open(filename, "w", encoding="utf-8") as ingredients_file:
