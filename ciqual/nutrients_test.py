@@ -23,6 +23,11 @@ def test_prepare_product_populates_nutrients():
 
     assert product['recipe_estimator']['metrics']['ingredient_count'] == 1
 
+    # Includes water content
+    assert ingredient_nutrients.get('water') > 90
+    assert nutrients.get('water') is not None
+
+
 
 def test_prepare_product_looks_up_ciqual_code():
     product = {'ingredients': [{'id':'en:tomato'}]}
