@@ -1,4 +1,4 @@
-from ciqual.nutrients import nutrient_map
+from ciqual.nutrients import off_to_ciqual
 import requests
 
 from ciqual.nutrients import setup_ingredients
@@ -67,8 +67,8 @@ def get_product(id):
 
     nutrients = {}
     for off_nutrient_key in off_nutrients:
-        if off_nutrient_key in nutrient_map:
-            ciqual_nutrient = nutrient_map[off_nutrient_key]
+        if off_nutrient_key in off_to_ciqual:
+            ciqual_nutrient = off_to_ciqual[off_nutrient_key]
             ciqual_unit = ciqual_nutrient['ciqual_unit']
             # Normalise units. OFF units are generally g so need to convert to the
             # Ciqual unit for comparison

@@ -23,14 +23,25 @@ with open(filename, newline="", encoding="utf8") as csvfile:
 
 # print(ciqual_ingredients['42501'])
 
-# Load OFF Ciqual Nitrient mapping
-nutrient_map = {}
+# Load OFF Ciqual Nutrient mapping
+off_to_ciqual = {}
+ciqual_to_off = {}
 filename = os.path.join(os.path.dirname(__file__), "nutrient_map.csv")
 with open(filename, newline="", encoding="utf8") as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
         if row["ciqual_id"]:
-            nutrient_map[row["off_id"]] = row
+            # Normalise units. OFF units are generally g so need to convert to the
+            # Ciqual unit for comparison
+            factor = 1.0
+            ciqual_unit = row['ciqual_unit']
+            if ciqual_unit == 'mg':
+                factor = 1000.0
+            elif ciqual_unit == 'µg':
+                factor = 1000000.0
+            row['factor'] = factor
+            off_to_ciqual[row["off_id"]] = row
+            ciqual_to_off[row["ciqual_id"]] = row
 
 # Load ingredients
 filename = os.path.join(os.path.dirname(__file__), "ingredients.json")
@@ -81,7 +92,14 @@ def setup_ingredients(ingredients):
                 print(ingredient['id'] + ' has unknown ciqual_food_code: ' + ciqual_code)
                 continue
 
-            ingredient['nutrients'] = ciqual_ingredient
+            # Convert CIQUAL nutrient codes back to OFF
+            nutrients = {}
+            for ciqual_key in ciqual_ingredient:
+                nutrient = ciqual_to_off.get(ciqual_key)
+                if (nutrient is not None):
+                    nutrients[nutrient['off_id']] = ciqual_ingredient[ciqual_key] / nutrient['factor']
+
+            ingredient['nutrients'] = nutrients
 
 
 def prepare_product(product):
