@@ -123,22 +123,18 @@ recipe_estimator: {
   nutrients: {
     calcium: {
       product_value: 0.06,
-      estimated_value: 0.054,
-      difference: -0.006,
       weighting: 1000,
       ciqual_id: "Calcium (mg/100g)"
     },
     vitamin-b2: {
-      estimated_value: 0.0023,
-      ciqual_id: "Vitamin B2 or Riboflavin (mg/100g)"
+      ciqual_id: "Vitamin B2 or Riboflavin (mg/100g)",
+      notes: "Not listed on product"
     },
     ...
-  }
-  metrics: {
-    iterations: 35,
-    time: 0.2,
-    weighted_variance: 1.45
-  }
+  },
+  ingredients_count: 3,
+  iterations: 35,
+  time: 0.2
 }
 ```
 

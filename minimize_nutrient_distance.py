@@ -1,3 +1,4 @@
+import time  
 from ortools.linear_solver import pywraplp
 
 precision = 0.01
@@ -76,8 +77,10 @@ def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint,
 
 
 def estimate_recipe(product):
+    current = time.perf_counter()
     ingredients = product['ingredients']
-    nutrients = product['recipe_estimator']['nutrients']
+    recipe_estimator = product['recipe_estimator']
+    nutrients = recipe_estimator['nutrients']
     
     """Linear programming sample."""
     # Instantiate a Glop solver, naming it LinearExample.
@@ -158,5 +161,9 @@ def estimate_recipe(product):
             return status
 
     set_solution_results(ingredient_numvars)
+    end = time.perf_counter()
+    recipe_estimator['time'] = end - current
+    recipe_estimator['status'] = status
+    recipe_estimator['iterations'] = solver.iterations()
 
     return status
