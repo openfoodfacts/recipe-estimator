@@ -60,7 +60,7 @@ export default function Recipe({product}: RecipeProps) {
     if (!product || !product.ingredients)
       return;
     async function fetchData() {
-      const results = await (await fetch(`${API_PATH}recipe`, {method: 'POST', body: JSON.stringify(product)})).json();
+      const results = await (await fetch(`${API_PATH}api/v3/estimate_recipe`, {method: 'POST', body: JSON.stringify(product)})).json();
       setIngredients(results.ingredients);
       setNutrients(results.recipe_estimator.nutrients);
     }

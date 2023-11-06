@@ -33,7 +33,7 @@ async def product(id):
     product = get_product(id)
     return product
 
-@app.post("/recipe")
+@app.post("/api/v3/estimate_recipe")
 async def recipe(request: Request):
     product = await request.json()
     prepare_product(product)
