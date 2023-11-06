@@ -3,7 +3,7 @@ from fastapi import Body, FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from ciqual import ciqual_ingredients
+from ciqual.nutrients import ciqual_ingredients
 from product import get_product, prepare_product
 from minimize_nutrient_distance import estimate_recipe
 

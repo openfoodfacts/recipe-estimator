@@ -1,4 +1,4 @@
-from ciqual import ciqual_ingredients, nutrient_map, ingredients_taxonomy
+from ciqual.nutrients import ciqual_ingredients, nutrient_map, ingredients_taxonomy
 import requests
 
 def get_ciqual_code(ingredient_id):
