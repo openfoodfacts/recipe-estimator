@@ -26,7 +26,7 @@ def add_ingredients_to_solver(ingredients, solver, total_ingredients):
             # ingredient * water ratio / 100 - water_loss >= 0
             #print(ingredient['text'], ingredient['water_content'])
             ingredient_numvar['lost_water'] = solver.NumVar(0, solver.infinity(), '')
-            water_ratio = ingredient['water_content']
+            water_ratio = ingredient['nutrients']['water']
 
             water_loss_ratio_constraint = solver.Constraint(0, solver.infinity(),  '')
             water_loss_ratio_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.01 * water_ratio)
@@ -77,7 +77,7 @@ def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint,
 
 def estimate_recipe(product):
     ingredients = product['ingredients']
-    nutrients = product['nutrients']
+    nutrients = product['recipe_estimator']['nutrients']
     
     """Linear programming sample."""
     # Instantiate a Glop solver, naming it LinearExample.
@@ -99,7 +99,10 @@ def estimate_recipe(product):
     objective = solver.Objective()
     for nutrient_key in nutrients:
         nutrient = nutrients[nutrient_key]
-        if 'error' in nutrient:
+
+        weighting = nutrient.get('weighting')
+        # Skip nutrients that don't have a weighting
+        if weighting is None:
             continue
 
         # We want to minimise the absolute difference between the sum of the ingredient nutients and the total nutrients
@@ -113,8 +116,7 @@ def estimate_recipe(product):
         #    sum(Ni) - Ndist <= Ntot 
         #    sum(Ni) + Ndist >= Ntot
 
-        nutrient_total = nutrient['total']
-        weighting = nutrient['weighting']
+        nutrient_total = nutrient['product_total']
         #weighting = 1
 
         nutrient_distance = solver.NumVar(0, solver.infinity(), nutrient_key)

@@ -4,7 +4,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from ciqual.nutrients import ciqual_ingredients, prepare_product
-from product import get_product
+from product import assign_weightings, get_product
 from minimize_nutrient_distance import estimate_recipe
 
 app = FastAPI()
@@ -36,6 +36,7 @@ async def product(id):
 @app.post("/recipe")
 async def recipe(request: Request):
     product = await request.json()
-    if prepare_product(product):
-        estimate_recipe(product)
+    prepare_product(product)
+    assign_weightings(product)
+    estimate_recipe(product)
     return product

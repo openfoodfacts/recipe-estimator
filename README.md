@@ -110,7 +110,7 @@ An example return structure is shown below:
 ingredients: [
   {
     id: "en:tomato",
-    percent_estimate2: 67.2,
+    proportion: 67.2,
     nutrients: {
       calcium: 0.024,
       carbohydrates: 3.45,
@@ -144,7 +144,7 @@ recipe_estimator: {
 
 ### Ingredients
 
-The original ingredients map will be returned with additional percent_estimate2 field and a nutrients map with the expected nutrient values in g per 100 g/ml of that ingredient.
+The original ingredients map will be returned with additional proportion field and a nutrients map with the expected nutrient values in g per 100 g/ml of that ingredient.
 
 ### Recipe Estimator
 

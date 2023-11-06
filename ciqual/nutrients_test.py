@@ -20,8 +20,10 @@ def test_prepare_product_populates_nutrients():
     assert carbs.get('ciqual_nutient_code') == 'Carbohydrate (g/100g)'
     assert carbs.get('conversion_factor') == 1
     assert carbs.get('ingredient_count') == 1
+    assert carbs.get('unweighted_total') > 1
+    
 
-    assert product['recipe_estimator']['metrics']['ingredient_count'] == 1
+    assert product['recipe_estimator']['ingredient_count'] == 1
 
     # Includes water content
     assert ingredient_nutrients.get('water') > 90

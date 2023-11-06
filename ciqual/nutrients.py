@@ -100,12 +100,14 @@ def setup_ingredients(ingredients, nutrients):
                 if (nutrient is not None):
                     off_id = nutrient['off_id']
                     factor = nutrient['factor']
-                    ingredient_nutrients[off_id] = ciqual_ingredient[ciqual_key] / factor
+                    proportion = ciqual_ingredient[ciqual_key] / factor
+                    ingredient_nutrients[off_id] = proportion
                     existing_nutrient = nutrients.get(off_id)
                     if (existing_nutrient is None):
-                         nutrients[off_id] = {'ciqual_nutient_code': ciqual_key, 'conversion_factor': factor, 'ingredient_count': 1}
+                         nutrients[off_id] = {'ciqual_nutient_code': ciqual_key, 'conversion_factor': factor, 'ingredient_count': 1, 'unweighted_total': proportion}
                     else:
                         existing_nutrient['ingredient_count'] = existing_nutrient['ingredient_count'] + 1
+                        existing_nutrient['unweighted_total'] = existing_nutrient['unweighted_total'] + proportion
 
             ingredient['nutrients'] = ingredient_nutrients
 
@@ -139,7 +141,7 @@ def prepare_product(product):
     # #print(nutrients)
     count = setup_ingredients(ingredients, nutrients)
 
-    product['recipe_estimator'] = {'nutrients':nutrients, 'metrics': {'ingredient_count': count}}
+    product['recipe_estimator'] = {'nutrients':nutrients, 'ingredient_count': count}
 
     return count
 

@@ -6,13 +6,20 @@ interface RecipeProps {
   product: any
 }
 
-function ciqualDisplayName(ciqualIngredient: any): string {
-  return ciqualIngredient?.alim_nom_eng ? `${ciqualIngredient.alim_nom_eng} (${ciqualIngredient.alim_code})` : ''
+function ingredientDisplayName(ingredient: any): string {
+  return ingredient?.text ? `${ingredient.text} (${ingredient.ciqual_food_code})` : ''
 }
 function addFirstOption(ingredient: any) {
   ingredient.options ??= [];
-  if (ingredient.ciqual_ingredient && !(ingredient.options.find((i:any) => i.alim_code === ingredient.ciqual_ingredient.alim_code)))
-    ingredient.options.push(ingredient.ciqual_ingredient);
+  if (ingredient && !(ingredient.options.find((i:any) => i.id === ingredient.id))) {
+    ingredient.options.push({
+      ciqual_food_code: ingredient.ciqual_food_code,
+      text: ingredient.text,
+      id: ingredient.id,
+      searchTerm: ingredientDisplayName(ingredient),
+      nutrients: ingredient.nutrients,
+    });
+  }
 }
 
 function flattenIngredients(ingredients: any[], depth = 0): any[] {
@@ -25,8 +32,8 @@ function flattenIngredients(ingredients: any[], depth = 0): any[] {
       flatIngredients.push(...flattenIngredients(ingredient.ingredients, depth + 1));
     } else {
       addFirstOption(ingredient);
-      if (ingredient.searchTerm == null)
-        ingredient.searchTerm =  ciqualDisplayName(ingredient.ciqual_ingredient);
+      if (!ingredient.searchTerm)
+        ingredient.searchTerm =  ingredientDisplayName(ingredient);
     }
   }
   return flatIngredients;
@@ -49,20 +56,19 @@ export default function Recipe({product}: RecipeProps) {
   const [ingredients, setIngredients] = useState<any>();
   const [nutrients, setNutrients] = useState<any>();
 
-  const getRecipe = useCallback((ingredients: any[], nutrients: any[]) => {
-    if (!ingredients || !nutrients)
+  const getRecipe = useCallback((product: any) => {
+    if (!product || !product.ingredients)
       return;
     async function fetchData() {
-      const newProduct = {ingredients: ingredients, nutrients: nutrients};
-      const results = await (await fetch(`${API_PATH}recipe`, {method: 'POST', body: JSON.stringify(newProduct)})).json();
+      const results = await (await fetch(`${API_PATH}recipe`, {method: 'POST', body: JSON.stringify(product)})).json();
       setIngredients(results.ingredients);
-      setNutrients(results.nutrients);
+      setNutrients(results.recipe_estimator.nutrients);
     }
     fetchData();
   }, []);
 
   useEffect(()=>{
-    getRecipe(product.ingredients, product.nutrients);
+    getRecipe(product);
   }, [product, getRecipe]);
 
   function getTotal(nutrient_key: string) {
@@ -73,7 +79,7 @@ export default function Recipe({product}: RecipeProps) {
     let total = 0;
     for(const ingredient of parent) {
       if (!ingredient.ingredients) 
-        total += ingredient.proportion * (nutrient_key ? ingredient.ciqual_ingredient?.[nutrient_key] : 1) / 100;
+        total += ingredient.proportion * (nutrient_key ? ingredient.nutrients?.[nutrient_key] : 1) / 100;
       else
         total += getTotalForParent(nutrient_key, ingredient.ingredients);
     }
@@ -102,25 +108,29 @@ export default function Recipe({product}: RecipeProps) {
   };
   
   function onInputChange(ingredient:any, value: string, reason: string) {
-    ingredient.searchTerm = value;
-    addFirstOption(ingredient);
-    setIngredients([...ingredients]);
-    if (reason === 'input' && value) {
-      getData(value, ingredient);
+    if (value) {
+      addFirstOption(ingredient);
+      setIngredients([...ingredients]);
+      if (reason === 'input' && value) {
+        getData(value, ingredient);
+      }
     }
   };
   
   function ingredientChange(ingredient: any, value: any) {
     if (value) {
-      ingredient.ciqual_ingredient = value;
-      ingredient.searchTerm = ciqualDisplayName(value);
+      ingredient.id = value.id;
+      ingredient.ciqual_food_code = value.ciqual_food_code;
+      ingredient.text = value.text;
+      ingredient.nutrients = value.nutrients;
+      ingredient.searchTerm = ingredientDisplayName(value);
       setIngredients([...ingredients]);
     }
   }
 
   return (
     <div>
-      {product.nutrients && ingredients &&
+      {nutrients && ingredients &&
         <div>
             <Table size='small'>
               <TableHead>
@@ -146,10 +156,10 @@ export default function Recipe({product}: RecipeProps) {
                         options={ingredient.options}
                         onInputChange={(_event,value,reason) => onInputChange(ingredient,value,reason)}
                         onChange={(_event,value) => ingredientChange(ingredient,value)}
-                        value={ingredient.ciqual_ingredient || null}
+                        value={ingredient.id || null}
                         inputValue={ingredient.searchTerm || ''}
-                        getOptionLabel={(option:any) => ciqualDisplayName(option)}
-                        isOptionEqualToValue={(option:any, value:any) => option.alim_code === value.alim_code}
+                        getOptionLabel={(option:any) => ingredientDisplayName(option)}
+                        isOptionEqualToValue={(option:any, value:any) => option.id === value.id}
                         style={{ width: 300 }}
                         renderInput={(params) => (
                           <TextField {...params} size='small'/>
@@ -162,11 +172,11 @@ export default function Recipe({product}: RecipeProps) {
                       <TextField type="number" size='small' value={parseFloat(ingredient.proportion) || ''} onChange={(e) => {ingredient.proportion = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
                     }
                     </TableCell>
-                    {Object.keys(product.nutrients).map((nutrient: string) => (
+                    {Object.keys(product.recipe_estimator.nutrients).map((nutrient: string) => (
                       <TableCell key={nutrient}>{!ingredient.ingredients &&
                         <>
-                          <Typography variant="caption">{format(ingredient.ciqual_ingredient?.[nutrient], QUANTITY)}</Typography>
-                          <Typography variant="body1">{format(ingredient.proportion * ingredient.ciqual_ingredient?.[nutrient] / 100, QUANTITY)}</Typography>
+                          <Typography variant="caption">{format(ingredient.nutrients?.[nutrient], QUANTITY)}</Typography>
+                          <Typography variant="body1">{format(ingredient.proportion * ingredient.nutrients?.[nutrient] / 100, QUANTITY)}</Typography>
                         </>
                       }
                       </TableCell>
@@ -186,7 +196,7 @@ export default function Recipe({product}: RecipeProps) {
                     <TableCell colSpan={3}><Typography>Quoted product nutrients</Typography></TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
-                        <Typography variant="body1">{format(nutrients[nutrient_key].total, QUANTITY)}</Typography>
+                        <Typography variant="body1">{format(nutrients[nutrient_key].product_total, QUANTITY)}</Typography>
                       </TableCell>
                     ))}
                   </TableRow>
@@ -195,24 +205,24 @@ export default function Recipe({product}: RecipeProps) {
                       <Typography>Variance</Typography>
                     </TableCell>
                     <TableCell>
-                      <Button variant='contained' onClick={()=>getRecipe(ingredients,nutrients)}>recalculate</Button>
+                      <Button variant='contained' onClick={()=>getRecipe(product)}>recalculate</Button>
                     </TableCell>
                     <TableCell>
                       <Typography variant="caption">Weighted</Typography>
                       <Typography>{format(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
-                      total + (!nutrients[nutrient_key].error 
-                        ? nutrients[nutrient_key].weighting * Math.abs(getTotal(nutrient_key)- nutrients[nutrient_key].total) 
+                      total + (!nutrients[nutrient_key].notes 
+                        ? nutrients[nutrient_key].weighting * Math.abs(getTotal(nutrient_key)- nutrients[nutrient_key].product_total) 
                         : 0), 0), VARIANCE)}
                       </Typography>
                     </TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
-                        {!nutrients[nutrient_key].error 
+                        {!nutrients[nutrient_key].notes 
                           ? <>
-                            <Typography variant="caption">{format(getTotal(nutrient_key) - nutrients[nutrient_key].total, VARIANCE)}</Typography>
-                            <Typography>{format(nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].total), VARIANCE)}</Typography>
+                            <Typography variant="caption">{format(getTotal(nutrient_key) - nutrients[nutrient_key].product_total, VARIANCE)}</Typography>
+                            <Typography>{format(nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total), VARIANCE)}</Typography>
                             </>
-                          : <Typography variant="caption">{nutrients[nutrient_key].error}</Typography>
+                          : <Typography variant="caption">{nutrients[nutrient_key].notes}</Typography>
                         }
                       </TableCell>
                     ))}
