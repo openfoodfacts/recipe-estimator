@@ -84,7 +84,7 @@ export default function Recipe({product}: RecipeProps) {
     let total = 0;
     for(const ingredient of parent) {
       if (!ingredient.ingredients) 
-        total += ingredient.percent_estimate * (nutrient_key ? ingredient.nutrients?.[nutrient_key] : 1) / 100;
+        total += ingredient.percent_estimate * (nutrient_key ? ingredient.nutrients?.[nutrient_key].percent_max : 1) / 100;
       else
         total += getTotalForParent(nutrient_key, ingredient.ingredients);
     }
@@ -180,8 +180,8 @@ export default function Recipe({product}: RecipeProps) {
                     {Object.keys(nutrients).map((nutrient: string) => (
                       <TableCell key={nutrient}>{!ingredient.ingredients &&
                         <>
-                          <Typography variant="caption">{format(ingredient.nutrients?.[nutrient], QUANTITY)}</Typography>
-                          <Typography variant="body1">{format(ingredient.percent_estimate * ingredient.nutrients?.[nutrient] / 100, QUANTITY)}</Typography>
+                          <Typography variant="caption">{format(ingredient.nutrients?.[nutrient].percent_max, QUANTITY)}</Typography>
+                          <Typography variant="body1">{format(ingredient.percent_estimate * ingredient.nutrients?.[nutrient].percent_max / 100, QUANTITY)}</Typography>
                         </>
                       }
                       </TableCell>
