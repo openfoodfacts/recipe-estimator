@@ -130,8 +130,15 @@ def estimate_recipe(product):
         #    Ndist >= (Sum(Ni) - Ntot) 
         #    Ndist >= -(Sum(Ni) - Ntot) 
         # or
-        #    sum(Ni) - Ndist <= Ntot 
-        #    sum(Ni) + Ndist >= Ntot
+        #    Negative constraint:  -infinity < ( sum(Ni) - Ndist ) <= Ntot 
+        #    Positive constraint:  +infinity > ( sum(Ni) + Ndist ) >= Ntot
+        #
+        # If the nutrition information about the ingredient is a range of value then use the higher value
+        # on the positive constraint and the lower value on the negative constraint as this will make it "easier"
+        # to meet these constraints
+        #
+        # Conversely, if the product nutrition value (Ntot) has a range then use the higher value on the negative
+        # constraint and a lower value on the positive constraint
 
         nutrient_total = nutrient['product_total']
         #weighting = 1
