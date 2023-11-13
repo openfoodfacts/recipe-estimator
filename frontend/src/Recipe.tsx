@@ -26,7 +26,7 @@ function flattenIngredients(ingredients: any[], depth = 0): any[] {
   const flatIngredients = [];
   for (const ingredient of ingredients) {
     ingredient.depth = depth;
-    ingredient.proportion = round(ingredient.proportion);
+    ingredient.percent_estimate = round(ingredient.percent_estimate);
     flatIngredients.push(ingredient);
     if (ingredient.ingredients) {
       flatIngredients.push(...flattenIngredients(ingredient.ingredients, depth + 1));
@@ -79,7 +79,7 @@ export default function Recipe({product}: RecipeProps) {
     let total = 0;
     for(const ingredient of parent) {
       if (!ingredient.ingredients) 
-        total += ingredient.proportion * (nutrient_key ? ingredient.nutrients?.[nutrient_key] : 1) / 100;
+        total += ingredient.percent_estimate * (nutrient_key ? ingredient.nutrients?.[nutrient_key] : 1) / 100;
       else
         total += getTotalForParent(nutrient_key, ingredient.ingredients);
     }
@@ -169,14 +169,14 @@ export default function Recipe({product}: RecipeProps) {
                     }
                     </TableCell>
                     <TableCell>{!ingredient.ingredients &&
-                      <TextField type="number" size='small' value={parseFloat(ingredient.proportion) || ''} onChange={(e) => {ingredient.proportion = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
+                      <TextField type="number" size='small' value={parseFloat(ingredient.percent_estimate) || ''} onChange={(e) => {ingredient.percent_estimate = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
                     }
                     </TableCell>
                     {Object.keys(product.recipe_estimator.nutrients).map((nutrient: string) => (
                       <TableCell key={nutrient}>{!ingredient.ingredients &&
                         <>
                           <Typography variant="caption">{format(ingredient.nutrients?.[nutrient], QUANTITY)}</Typography>
-                          <Typography variant="body1">{format(ingredient.proportion * ingredient.nutrients?.[nutrient] / 100, QUANTITY)}</Typography>
+                          <Typography variant="body1">{format(ingredient.percent_estimate * ingredient.nutrients?.[nutrient] / 100, QUANTITY)}</Typography>
                         </>
                       }
                       </TableCell>

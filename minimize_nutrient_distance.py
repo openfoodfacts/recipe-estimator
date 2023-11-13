@@ -53,7 +53,7 @@ def add_to_relative_constraint(solver, relative_constraint, ingredient_numvar, c
 
 def set_solution_results(ingredient_numvars):
     for ingredient_numvar in ingredient_numvars:
-        ingredient_numvar['ingredient']['proportion'] = ingredient_numvar['numvar'].solution_value()
+        ingredient_numvar['ingredient']['percent_estimate'] = ingredient_numvar['numvar'].solution_value()
         if ('child_numvars' in ingredient_numvar):
             set_solution_results(ingredient_numvar['child_numvars'])
         else:

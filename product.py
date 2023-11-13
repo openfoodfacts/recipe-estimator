@@ -8,7 +8,7 @@ def print_recipe(ingredients, indent = ''):
         lost_water = ingredient.get('evaporation', '')
         if type(lost_water) == float:
             lost_water = '(' + str(lost_water) + ')'
-        print(indent, '-', ingredient['text'], ingredient['proportion'], lost_water)
+        print(indent, '-', ingredient['text'], ingredient['percent_estimate'], lost_water)
         if 'ingredients' in ingredient:
             print_recipe(ingredient['ingredients'], indent + ' ')
 
