@@ -164,6 +164,13 @@ This will contain the calculated value based on the new estimate and will also p
 This will provide details of the computation performed, such as time taken and number of iterations.
 
 
+# TODO
+
+ - Event though the order of ingredients is before processing, the percent estimate is after processing so evaporation needs to be subtracted from this
+ - Need to return a more formal error object
+ - Cope with some ingredients not having CIQUAL codes
+
+
 # Background Info
 
 To get nutrient types for nutrient_map.csv I used:
