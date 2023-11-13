@@ -119,8 +119,8 @@ ingredients: [
     percent_estimate: 67.2,
     evaporation: 4,
     nutrients: {
-      calcium: 0.024,
-      carbohydrates: 3.45,
+      calcium: {percent_min: 0.023, percent_max: 0.024},
+      carbohydrates: {percent_min: 3.45, percent_max: 3.45},
       ...
     }
   },
@@ -147,9 +147,9 @@ recipe_estimator: {
 
 ### Ingredients
 
-The original ingredients map will be returned with additional percent_estimate field and a nutrients map with the expected nutrient values in g per 100 g/ml of that ingredient.
+The original ingredients map will be returned with additional percent_estimate field and a nutrients map with the expected nutrient value ranges in g per 100 g/ml of that ingredient.
 
-An evaporation field also show the estimated water loss.
+A quantity_estimate field is also provided which shows the amount of the ingredient needed to make 100 g/ml of the product. Note this may be higher than the percent_estimate because of evaporation during the product preparation / processing. An evaporation field shows the estimated water loss during processing.
 
 ### Recipe Estimator
 
