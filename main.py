@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from ciqual.nutrients import ciqual_ingredients, prepare_product
 from product import assign_weightings, get_product
-from minimize_nutrient_distance import estimate_recipe
+from recipe_estimator import estimate_recipe
 
 app = FastAPI()
 

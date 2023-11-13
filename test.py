@@ -1,7 +1,7 @@
 from ortools.linear_solver import pywraplp
 import sys
 from product import get_product, print_recipe
-from minimize_nutrient_distance import estimate_recipe
+from recipe_estimator import estimate_recipe
 
 
 #query = {"ingredients_without_ciqual_codes_n": 0,"ingredients_n":{"$gt": 4}}
