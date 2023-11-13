@@ -29,7 +29,14 @@ def test_prepare_product_looks_up_ciqual_code():
     assert nutrients is not None
 
 
-def test_prepare_product_raises_exception_if_ingredient_not_found():
-    with pytest.raises(Exception, match=r'.*en:does_not_exist.*'):
-        prepare_product({'ingredients': [{'id':'en:does_not_exist'}]})
+def test_prepare_product_creates_a_max_range_entry_if_ingredient_not_found():
+    product = {'ingredients': [{'id':'en:does_not_exist'}]};
+    prepare_product(product)
+    nutrients = product['ingredients'][0].get('nutrients')
+    assert nutrients is not None
+    carbs = nutrients.get('carbohydrates')
+    assert carbs is not None
+    assert carbs['percent_min'] >= 0
+    assert carbs['percent_max'] <= 100
+
 

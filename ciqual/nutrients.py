@@ -81,22 +81,22 @@ def setup_ingredients(ingredients):
             if (ciqual_code is None):
                 ciqual_code = get_ciqual_code(ingredient['id'])
 
-            if (ciqual_code is None):
-                raise Exception(ingredient['id'] + ' has no ciqual_food_code')
-
-            ciqual_ingredient = ciqual_ingredients.get(ciqual_code, None)
-            if (ciqual_ingredient is None):
-                raise Exception(ingredient['id'] + ' has unknown ciqual_food_code: ' + ciqual_code)
-
             # Convert CIQUAL nutrient codes back to OFF
             ingredient_nutrients = {}
-            for ciqual_key in ciqual_ingredient:
-                nutrient = ciqual_to_off.get(ciqual_key)
-                if (nutrient is not None):
-                    value = ciqual_ingredient[ciqual_key] / nutrient['factor']
-                    ingredient_nutrients[nutrient['off_id']] = {'percent_min': value, 'percent_max': value}
+            ciqual_ingredient = ciqual_ingredients.get(ciqual_code, None)
+            if (ciqual_ingredient is None):
+                # Invent a dummy set of nutrients with maximum ranges
+                # TODO: Could use max values that occur in acual data
+                for off_id in off_to_ciqual:
+                    ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_max': 100}
+            else:
+                for ciqual_key in ciqual_ingredient:
+                    nutrient = ciqual_to_off.get(ciqual_key)
+                    if (nutrient is not None):
+                        value = ciqual_ingredient[ciqual_key] / nutrient['factor']
+                        # TODO Get range data from CIQUAL values
+                        ingredient_nutrients[nutrient['off_id']] = {'percent_min': value, 'percent_max': value}
 
-            # TODO add range support
             ingredient['nutrients'] = ingredient_nutrients
 
 
