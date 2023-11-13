@@ -1,49 +1,40 @@
-from recipe_estimator import prepare_nutrients
+from recipe_estimator import estimate_recipe
 
 
-def test_prepare_nutrients():
+def test_estimate_recipe_accounts_for_evaporation():
     product = {
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
                 'carbohydrates': 2.5,
-                'energy': 80,
                 'water': 90,
             }
         }],
         'nutriments': {
             'carbohydrates': 5,
-            'protien': 4,
-            'energy': 160,
         }}
 
-    prepare_nutrients(product)
+    estimate_recipe(product)
 
     metrics = product.get('recipe_estimator')
     assert metrics is not None
 
-    # Ingredient count is calculated
-    assert metrics['ingredient_count'] == 1
+    # Status is valid
+    assert metrics['status'] == 0
 
-    nutrients = metrics.get('nutrients')
-    assert nutrients is not None
-    nutrient = nutrients.get('carbohydrates')
-    assert nutrient is not None
+    ingredient = product['ingredients'][0]
+    # Percent estimate is relative to total ingredient quantities
+    percent_estimate = ingredient.get('percent_estimate')
+    assert percent_estimate > 99
+    assert percent_estimate < 101
 
-    # Nutrient information is calculated
-    assert nutrient.get('ingredient_count') == 1
-    assert nutrient.get('unweighted_total') == 2.5
-    # Weighting assigned based on proportion in product
-    assert nutrient.get('weighting') == 0.2
+    # Quantity estimate gives original quantity of ingredient per 100g/ml of product
+    quantity_estimate = ingredient.get('quantity_estimate')
+    assert quantity_estimate > 199
+    assert quantity_estimate < 201
 
-    # Nutrients not on any ingredient are not included
-    assert nutrients.get('protien') is None
-
-    # Water is included
-    assert nutrients.get('water') is not None
-
-    # Enery is not weighted
-    energy = nutrients.get('energy')
-    assert energy.get('weighting') is None
+    evaporation = ingredient.get('evaporation')
+    assert evaporation > 99
+    assert evaporation < 101
 
 

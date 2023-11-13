@@ -1,6 +1,8 @@
 import time  
 from ortools.linear_solver import pywraplp
 
+from prepare_nutrients import prepare_nutrients
+
 precision = 0.01
 
 
@@ -51,15 +53,26 @@ def add_to_relative_constraint(solver, relative_constraint, ingredient_numvar, c
         #print(relative_constraint.name(), ingredient_numvar['ingredient']['text'], coefficient)
         relative_constraint.SetCoefficient(ingredient_numvar['numvar'], coefficient)
 
-def set_solution_results(ingredient_numvars):
+def get_quantity_estimate(ingredient_numvars):
+    total_quantity = 0
     for ingredient_numvar in ingredient_numvars:
-        ingredient_numvar['ingredient']['percent_estimate'] = ingredient_numvar['numvar'].solution_value()
         if ('child_numvars' in ingredient_numvar):
-            set_solution_results(ingredient_numvar['child_numvars'])
+            total_quantity += get_quantity_estimate(ingredient_numvar['child_numvars'])
         else:
+            quantity_estimate = ingredient_numvar['numvar'].solution_value()
+            ingredient_numvar['ingredient']['quantity_estimate'] = quantity_estimate
             ingredient_numvar['ingredient']['evaporation'] = ingredient_numvar['lost_water'].solution_value()
+            total_quantity += quantity_estimate
 
-    return
+    return total_quantity
+
+
+def set_percent_estimate(ingredients, total_quantity):
+    for ingredient in ingredients:
+        if ('ingredients' in ingredient):
+            set_percent_estimate(ingredient['ingredients'], total_quantity)
+        else:
+            ingredient['percent_estimate'] = 100 * ingredient['quantity_estimate'] / total_quantity
 
 
 def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint, negative_constraint, weighting):
@@ -74,76 +87,6 @@ def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint,
             #print(ingredient['indent'] + ' - ' + ingredient['text'] + ' (' + ingredient['ciqual_code'] + ') : ' + str(ingredient_nutrient))
             negative_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient / 100)
             positive_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient / 100)
-
-# Works out which nutrients we can use for analysis
-def prepare_nutrients(product):
-    nutrients = {}
-    count = count_ingredients(product['ingredients'], nutrients)
-    product['recipe_estimator'] = {'nutrients':nutrients, 'ingredient_count': count}
-    assign_weightings(product)
-    return
-
-def count_ingredients(ingredients, nutrients):
-    count = 0
-    for ingredient in ingredients:
-        if ('ingredients' in ingredient):
-            # Child ingredients
-            child_count = count_ingredients(ingredient['ingredients'], nutrients)
-            if child_count == 0:
-                return 0
-            count = count + child_count
-
-        else:
-            count = count + 1
-            ingredient_nutrients = ingredient.get('nutrients')
-            if (ingredient_nutrients is not None):
-                for off_id in ingredient_nutrients:
-                    proportion = ingredient_nutrients[off_id]
-                    existing_nutrient = nutrients.get(off_id)
-                    if (existing_nutrient is None):
-                         nutrients[off_id] = {'ingredient_count': 1, 'unweighted_total': proportion}
-                    else:
-                        existing_nutrient['ingredient_count'] = existing_nutrient['ingredient_count'] + 1
-                        existing_nutrient['unweighted_total'] = existing_nutrient['unweighted_total'] + proportion
-
-    return count
-
-def assign_weightings(product):
-    # Determine which nutrients will be used in the analysis by assigning a weighting
-    product_nutrients = product['nutriments']
-    count = product['recipe_estimator']['ingredient_count']
-    computed_nutrients = product['recipe_estimator']['nutrients']
-
-    for nutrient_key in computed_nutrients:
-        computed_nutrient = computed_nutrients[nutrient_key]
-        product_nutrient = product_nutrients.get(nutrient_key)
-        if product_nutrient is None:
-            computed_nutrient['notes'] = 'Not listed on product'
-            continue
-
-        computed_nutrient['product_total'] = product_nutrient
-        if nutrient_key == 'energy':
-            computed_nutrient['notes'] = 'Energy not used for calculation'
-            continue
-
-        if product_nutrient == 0 and computed_nutrient['unweighted_total'] == 0:
-            computed_nutrient['notes'] = 'All zero values'
-            continue
-
-        if computed_nutrient['ingredient_count'] != count:
-            computed_nutrient['notes'] = 'Not available for all ingredients'
-            continue
-
-        # Weighting based on size of ingredient, i.e. percentage based
-        # Comment out this code to use weighting specified in nutrient_map.csv
-        if product_nutrient > 0:
-            computed_nutrient['weighting'] = 1 / product_nutrient
-        else:
-            computed_nutrient['weighting'] = min(0.01, count / computed_nutrient['unweighted_total']) # Weighting below 0.01 causes bad performance, although it isn't that simple as just multiplying all weights doesn't help
-
-        # Favor Sodium over salt if both are present
-        #if not 'error' in nutrients.get('Sodium (mg/100g)',{}) and not 'error' in nutrients.get('Salt (g/100g)', {}):
-        #    nutrients['Salt (g/100g)']['error'] = 'Prefer sodium where both present'
 
 
 def estimate_recipe(product):
@@ -231,7 +174,9 @@ def estimate_recipe(product):
             print('The solver could not solve the problem.')
             return status
 
-    set_solution_results(ingredient_numvars)
+    total_quantity = get_quantity_estimate(ingredient_numvars)
+    set_percent_estimate(ingredients, total_quantity)
+
     end = time.perf_counter()
     recipe_estimator['time'] = end - current
     recipe_estimator['status'] = status
