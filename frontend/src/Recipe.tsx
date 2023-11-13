@@ -75,6 +75,11 @@ export default function Recipe({product}: RecipeProps) {
     return getTotalForParent(nutrient_key, ingredients);
   }
 
+  function recalculateRecipe() {
+    product.ingredients = ingredients;
+    getRecipe(product);
+  }
+
   function getTotalForParent(nutrient_key: string, parent: any[]) {
     let total = 0;
     for(const ingredient of parent) {
@@ -172,7 +177,7 @@ export default function Recipe({product}: RecipeProps) {
                       <TextField type="number" size='small' value={parseFloat(ingredient.percent_estimate) || ''} onChange={(e) => {ingredient.percent_estimate = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
                     }
                     </TableCell>
-                    {Object.keys(product.recipe_estimator.nutrients).map((nutrient: string) => (
+                    {Object.keys(nutrients).map((nutrient: string) => (
                       <TableCell key={nutrient}>{!ingredient.ingredients &&
                         <>
                           <Typography variant="caption">{format(ingredient.nutrients?.[nutrient], QUANTITY)}</Typography>
@@ -205,7 +210,7 @@ export default function Recipe({product}: RecipeProps) {
                       <Typography>Variance</Typography>
                     </TableCell>
                     <TableCell>
-                      <Button variant='contained' onClick={()=>getRecipe(product)}>recalculate</Button>
+                      <Button variant='contained' onClick={recalculateRecipe}>recalculate</Button>
                     </TableCell>
                     <TableCell>
                       <Typography variant="caption">Weighted</Typography>

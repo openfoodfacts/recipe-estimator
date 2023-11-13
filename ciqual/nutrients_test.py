@@ -14,21 +14,8 @@ def test_prepare_product_populates_nutrients():
     assert calcium > 0.006
     assert calcium < 0.010
 
-    # The basic list of nutrients should be created
-    nutrients = product['recipe_estimator']['nutrients']
-    carbs = nutrients.get('carbohydrates')
-    assert carbs.get('ciqual_nutient_code') == 'Carbohydrate (g/100g)'
-    assert carbs.get('conversion_factor') == 1
-    assert carbs.get('ingredient_count') == 1
-    assert carbs.get('unweighted_total') > 1
-    
-
-    assert product['recipe_estimator']['ingredient_count'] == 1
-
     # Includes water content
     assert ingredient_nutrients.get('water') > 90
-    assert nutrients.get('water') is not None
-
 
 
 def test_prepare_product_looks_up_ciqual_code():
