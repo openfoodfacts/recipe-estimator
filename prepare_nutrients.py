@@ -15,7 +15,7 @@ def count_ingredients(ingredients, nutrients):
             ingredient_nutrients = ingredient.get('nutrients')
             if (ingredient_nutrients is not None):
                 for off_id in ingredient_nutrients:
-                    proportion = ingredient_nutrients[off_id]
+                    proportion = ingredient_nutrients[off_id]['percent_max'] # Use the maximum in a range for weighting
                     existing_nutrient = nutrients.get(off_id)
                     if (existing_nutrient is None):
                          nutrients[off_id] = {'ingredient_count': 1, 'unweighted_total': proportion}

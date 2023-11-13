@@ -7,15 +7,19 @@ def test_prepare_product_populates_nutrients():
     
     ingredient_nutrients = product['ingredients'][0].get('nutrients')
     assert ingredient_nutrients is not None
-    assert ingredient_nutrients.get('carbohydrates') is not None
+    carbs = ingredient_nutrients.get('carbohydrates')
+    assert carbs is not None
+    assert carbs['percent_min'] > 2.4
+    assert carbs['percent_max'] < 2.6
 
     # Check that units are normalised
     calcium = ingredient_nutrients.get('calcium')
-    assert calcium > 0.006
-    assert calcium < 0.010
+    assert calcium['percent_min'] > 0.006
+    assert calcium['percent_max'] < 0.010
 
     # Includes water content
-    assert ingredient_nutrients.get('water') > 90
+    water = ingredient_nutrients.get('water')
+    assert water['percent_min'] > 90
 
 
 def test_prepare_product_looks_up_ciqual_code():

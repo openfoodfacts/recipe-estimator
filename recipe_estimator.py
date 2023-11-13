@@ -29,10 +29,11 @@ def add_ingredients_to_solver(ingredients, solver, total_ingredients):
             # ingredient * water ratio / 100 - water_loss >= 0
             #print(ingredient['text'], ingredient['water_content'])
             ingredient_numvar['lost_water'] = solver.NumVar(0, solver.infinity(), '')
-            water_ratio = ingredient['nutrients'].get('water', 0)
+            water = ingredient['nutrients'].get('water', {})
+            maximum_water_content = water.get('percent_max', 0)
 
             water_loss_ratio_constraint = solver.Constraint(0, solver.infinity(),  '')
-            water_loss_ratio_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.01 * water_ratio)
+            water_loss_ratio_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.01 * maximum_water_content)
             water_loss_ratio_constraint.SetCoefficient(ingredient_numvar['lost_water'], -1.0)
 
             total_ingredients.SetCoefficient(ingredient_numvar['numvar'], 1)
@@ -85,8 +86,8 @@ def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint,
             # TODO: Figure out whether to do anything special with < ...
             ingredient_nutrient =  ingredient['nutrients'][nutrient_key]
             #print(ingredient['indent'] + ' - ' + ingredient['text'] + ' (' + ingredient['ciqual_code'] + ') : ' + str(ingredient_nutrient))
-            negative_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient / 100)
-            positive_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient / 100)
+            negative_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_min'] / 100)
+            positive_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_max'] / 100)
 
 
 def estimate_recipe(product):

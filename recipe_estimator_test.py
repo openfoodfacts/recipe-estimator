@@ -6,8 +6,8 @@ def test_estimate_recipe_accounts_for_evaporation():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'carbohydrates': 2.5,
-                'water': 90,
+                'carbohydrates': {'percent_min': 2.5,'percent_max': 2.5},
+                'water': {'percent_min': 90,'percent_max': 90},
             }
         }],
         'nutriments': {
@@ -40,8 +40,8 @@ def test_estimate_recipe_evaporation_is_constrained():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'carbohydrates': 2.5,
-                'water': 10,
+                'carbohydrates': {'percent_min': 2.5,'percent_max': 2.5},
+                'water': {'percent_min': 10,'percent_max': 10},
             }
         }],
         'nutriments': {
@@ -75,13 +75,13 @@ def test_estimate_recipe_simple_recipe():
             {
                 'id':'one',
                 'nutrients': {
-                    'carbohydrates': 15,
+                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
                 }
             },
             {
                 'id':'two',
                 'nutrients': {
-                    'carbohydrates': 3,
+                    'carbohydrates': {'percent_min': 3,'percent_max': 3},
                 }
             }
         ],

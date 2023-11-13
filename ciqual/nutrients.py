@@ -93,8 +93,10 @@ def setup_ingredients(ingredients):
             for ciqual_key in ciqual_ingredient:
                 nutrient = ciqual_to_off.get(ciqual_key)
                 if (nutrient is not None):
-                    ingredient_nutrients[nutrient['off_id']] = ciqual_ingredient[ciqual_key] / nutrient['factor']
+                    value = ciqual_ingredient[ciqual_key] / nutrient['factor']
+                    ingredient_nutrients[nutrient['off_id']] = {'percent_min': value, 'percent_max': value}
 
+            # TODO add range support
             ingredient['nutrients'] = ingredient_nutrients
 
 

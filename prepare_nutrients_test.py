@@ -6,9 +6,9 @@ def test_prepare_nutrients():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'carbohydrates': 2.5,
-                'energy': 80,
-                'water': 90,
+                'carbohydrates': {'percent_min': 2.5,'percent_max': 2.5},
+                'energy': {'percent_min': 80,'percent_max': 80},
+                'water': {'percent_min': 90,'percent_max': 90},
             }
         }],
         'nutriments': {
