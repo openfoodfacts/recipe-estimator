@@ -29,7 +29,7 @@ def add_ingredients_to_solver(ingredients, solver, total_ingredients):
             # ingredient * water ratio / 100 - water_loss >= 0
             #print(ingredient['text'], ingredient['water_content'])
             ingredient_numvar['lost_water'] = solver.NumVar(0, solver.infinity(), '')
-            water_ratio = ingredient['nutrients']['water']
+            water_ratio = ingredient['nutrients'].get('water', 0)
 
             water_loss_ratio_constraint = solver.Constraint(0, solver.infinity(),  '')
             water_loss_ratio_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.01 * water_ratio)
@@ -46,7 +46,7 @@ def add_to_relative_constraint(solver, relative_constraint, ingredient_numvar, c
         for i,child_numvar in enumerate(child_numvars):
             add_to_relative_constraint(solver, relative_constraint, child_numvar, coefficient)
             if i < (len(child_numvars) - 1):
-                child_constraint = solver.Constraint(0, solver.infinity(), child_numvar['ingredient']['text'])
+                child_constraint = solver.Constraint(0, solver.infinity())
                 add_to_relative_constraint(solver, child_constraint, child_numvar, 1.0)
                 add_to_relative_constraint(solver, child_constraint, child_numvars[i+1], -1.0)
     else:
@@ -109,7 +109,7 @@ def estimate_recipe(product):
     # Make sure nth ingredient > n+1 th ingredient
     for i,ingredient_numvar in enumerate(ingredient_numvars):
         if i < (len(ingredient_numvars) - 1):
-            relative_constraint = solver.Constraint(0, solver.infinity(), ingredient_numvar['ingredient']['text'])
+            relative_constraint = solver.Constraint(0, solver.infinity())
             add_to_relative_constraint(solver, relative_constraint, ingredient_numvar, 1.0)
             add_to_relative_constraint(solver, relative_constraint, ingredient_numvars[i+1], -1.0)
 
