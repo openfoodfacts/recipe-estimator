@@ -77,7 +77,7 @@ docker build --tag recipe-estimator .
 ```
 And to run:
 ```
-docker run -dp 5520:80 recipe-estimator
+docker run --name recipe_estimator -dp 5520:80 recipe-estimator
 ```
 
 # Processing Steps
@@ -86,7 +86,13 @@ docker run -dp 5520:80 recipe-estimator
 
 For each ingredient we need to obtain the expected nutrient breakdown. This currently comes from the CIQUAL database, but other databases could be used, e.g. based on a regional preference.
 
-This process adds a nutrient map to each ingredient. Only the "main" nutrient is used (one without an underscore suffix).
+If the ingredient on the product doesn't currently have a CIQUAL code then attempt to look this up is made using ingredients.json. To refresh the ingredients taxonomy you can use the followng script. I have currently formatted the JSON before committing:
+
+```
+curl https://static.openfoodfacts.org/data/taxonomies/ingredients.json --output ciqual/ingredients.json
+```
+
+Having found the ingredient in CIQUAL a nutrient map is added to each ingredient. Only the "main" nutrient is used (one without an underscore suffix).
 
 A separate map is also returned providing the CIQUAL database identifier for each OFF nutrient.
 
@@ -111,6 +117,7 @@ ingredients: [
   {
     id: "en:tomato",
     percent_estimate: 67.2,
+    evaporation: 4,
     nutrients: {
       calcium: 0.024,
       carbohydrates: 3.45,
@@ -141,6 +148,8 @@ recipe_estimator: {
 ### Ingredients
 
 The original ingredients map will be returned with additional percent_estimate field and a nutrients map with the expected nutrient values in g per 100 g/ml of that ingredient.
+
+An evaporation field also show the estimated water loss.
 
 ### Recipe Estimator
 
