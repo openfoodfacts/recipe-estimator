@@ -164,3 +164,30 @@ def test_estimate_recipe_simple_recipe_with_no_matched_ingredients():
     assert round(product['ingredients'][1]['percent_estimate']) <= 50
     assert round(product['ingredients'][0]['percent_estimate'] + product['ingredients'][1]['percent_estimate']) == 100
 
+def test_estimate_recipe_simple_recipe_with_no_nutriments():
+    product = {
+        'ingredients': [
+            {
+                'id':'one',
+                'nutrients': {
+                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
+                }
+            },
+            {
+                'id':'two',
+                'nutrients': {
+                    'carbohydrates': {'percent_min': 3,'percent_max': 3},
+                }
+            }
+        ]}
+
+    estimate_recipe(product)
+
+    metrics = product.get('recipe_estimator')
+    assert metrics is not None
+
+    # Status is valid
+    assert metrics['status'] == 0
+
+    assert round(product['ingredients'][0]['percent_estimate']) >= 50
+    assert round(product['ingredients'][1]['percent_estimate']) <= 50

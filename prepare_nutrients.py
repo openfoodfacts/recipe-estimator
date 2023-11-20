@@ -27,7 +27,7 @@ def count_ingredients(ingredients, nutrients):
 
 def assign_weightings(product):
     # Determine which nutrients will be used in the analysis by assigning a weighting
-    product_nutrients = product['nutriments']
+    product_nutrients = product.get('nutriments', {})
     count = product['recipe_estimator']['ingredient_count']
     computed_nutrients = product['recipe_estimator']['nutrients']
 

@@ -47,3 +47,32 @@ def test_prepare_nutrients():
     assert energy.get('weighting') is None
 
 
+def test_prepare_nutrients_copes_with_no_product_nutrients():
+    product = {
+        'ingredients': [{
+            'id':'en:tomato',
+            'nutrients': {
+                'carbohydrates': {'percent_min': 2.5,'percent_max': 2.5},
+                'energy': {'percent_min': 80,'percent_max': 80},
+                'water': {'percent_min': 90,'percent_max': 90},
+            }
+        }]}
+
+    prepare_nutrients(product)
+
+    metrics = product.get('recipe_estimator')
+    assert metrics is not None
+
+    # Ingredient count is calculated
+    assert metrics['ingredient_count'] == 1
+
+    nutrients = metrics.get('nutrients')
+    assert nutrients is not None
+    nutrient = nutrients.get('carbohydrates')
+    assert nutrient is not None
+
+    # Nutrient information flagged
+    assert nutrient.get('notes') is not None
+    assert nutrient.get('weighting') is None
+
+
