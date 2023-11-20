@@ -166,9 +166,9 @@ This will provide details of the computation performed, such as time taken and n
 
 # TODO
 
- - Event though the order of ingredients is before processing, the percent estimate is after processing so evaporation needs to be subtracted from this
  - Need to return a more formal error object
- - Cope with some ingredients not having CIQUAL codes
+ - Use min and max from CIQUAL for unmatched ingredients
+ - Cope with min and max on product nutrients (e.g. if we had to get from a category)
 
 
 # Background Info
