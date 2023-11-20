@@ -20,7 +20,6 @@ This is using Python3.
 
 Create a virtualenv.
 ```
-cd ./backend
 python -m venv venv 
 ```
 
@@ -43,7 +42,6 @@ pip install -r requirements.txt
 To run the API server:
 
 ```
-cd ./backend
 uvicorn main:app --reload
 ```
 
@@ -94,8 +92,6 @@ curl https://static.openfoodfacts.org/data/taxonomies/ingredients.json --output 
 
 Having found the ingredient in CIQUAL a nutrient map is added to each ingredient. Only the "main" nutrient is used (one without an underscore suffix).
 
-A separate map is also returned providing the CIQUAL database identifier for each OFF nutrient.
-
 ## Determine nutrients for computation
 
 Only nutrients that occur on every ingredient can be used. Energy is also eliminated as this combines multiple nutrients.
@@ -112,7 +108,7 @@ The estimation attempts to find the proportion of each ingredient that minimises
 
 An example return structure is shown below:
 
-```
+```json
 ingredients: [
   {
     id: "en:tomato",
@@ -129,18 +125,17 @@ ingredients: [
 recipe_estimator: {
   nutrients: {
     calcium: {
-      product_value: 0.06,
+      product_total: 0.06,
       weighting: 1000,
-      ciqual_id: "Calcium (mg/100g)"
     },
     vitamin-b2: {
-      ciqual_id: "Vitamin B2 or Riboflavin (mg/100g)",
       notes: "Not listed on product"
     },
     ...
   },
-  ingredients_count: 3,
+  ingredient_count: 3,
   iterations: 35,
+  status: 0,
   time: 0.2
 }
 ```
@@ -167,6 +162,7 @@ This will provide details of the computation performed, such as time taken and n
 # TODO
 
  - Need to return a more formal error object
+ - Use min and max for ingredient nutrient when stated as "< ..." in CIQUAL
  - Use min and max from CIQUAL for unmatched ingredients
  - Cope with min and max on product nutrients (e.g. if we had to get from a category)
 
