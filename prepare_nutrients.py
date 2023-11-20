@@ -57,10 +57,13 @@ def assign_weightings(product):
 
         # Weighting based on size of ingredient, i.e. percentage based
         # Comment out this code to use weighting specified in nutrient_map.csv
-        if product_nutrient > 0:
-            computed_nutrient['weighting'] = 1 / product_nutrient
-        else:
-            computed_nutrient['weighting'] = min(0.01, count / computed_nutrient['unweighted_total']) # Weighting below 0.01 causes bad performance, although it isn't that simple as just multiplying all weights doesn't help
+        try:
+            if product_nutrient > 0:
+                computed_nutrient['weighting'] = 1 / product_nutrient
+            else:
+                computed_nutrient['weighting'] = min(0.01, count / computed_nutrient['unweighted_total']) # Weighting below 0.01 causes bad performance, although it isn't that simple as just multiplying all weights doesn't help
+        except Exception as e:
+            computed_nutrient['notes'] = e
 
 
 def prepare_nutrients(product):
