@@ -1,5 +1,5 @@
 import pytest
-from ciqual.nutrients import prepare_product
+from ciqual.nutrients import prepare_product, round_to_n
 
 def test_prepare_product_populates_nutrients():
     product = {'ingredients': [{'id':'en:tomato', 'ciqual_food_code': '20047'}]}
@@ -34,9 +34,13 @@ def test_prepare_product_creates_a_max_range_entry_if_ingredient_not_found():
     prepare_product(product)
     nutrients = product['ingredients'][0].get('nutrients')
     assert nutrients is not None
-    carbs = nutrients.get('carbohydrates')
-    assert carbs is not None
-    assert carbs['percent_min'] >= 0
-    assert carbs['percent_max'] <= 100
+    fiber = nutrients.get('fiber')
+    assert fiber is not None
+    assert fiber['percent_min'] >= 0
+    assert fiber['percent_max'] <= 80 # Maximum fiber percent on any ingredient is 79%
 
 
+def test_round_to_n():
+    assert round_to_n(1.6666666666, 3) == 1.67
+    assert round_to_n(1 / 3, 4) == 0.3333
+    assert round_to_n(5 / 3, 4) == 1.667

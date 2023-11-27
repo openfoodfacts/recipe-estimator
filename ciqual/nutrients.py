@@ -1,7 +1,9 @@
 import csv
 import json
 import os
+import math
 
+round_to_n = lambda x, n: x if x == 0 else round(x, -int(math.floor(math.log10(abs(x)))) + (n - 1))
 
 def parse_value(ciqual_nutrient):
     if not ciqual_nutrient or ciqual_nutrient == '-':
@@ -9,6 +11,7 @@ def parse_value(ciqual_nutrient):
     return float(ciqual_nutrient.replace(',','.').replace('<','').replace('traces','0'))
 
 # Load Ciqual data
+max_values = {}
 ciqual_ingredients = {}
 filename = os.path.join(os.path.dirname(__file__), "Ciqual.csv.0")
 with open(filename, newline="", encoding="utf8") as csvfile:
@@ -19,6 +22,7 @@ with open(filename, newline="", encoding="utf8") as csvfile:
         for i in range(9,len(values)):
             value = parse_value(values[i])
             row[keys[i]] = value
+            max_values[keys[i]] = max(max_values.get(keys[i], 0), value)
         ciqual_ingredients[row["alim_code"]] = row
 
 # print(ciqual_ingredients['42501'])
@@ -86,9 +90,10 @@ def setup_ingredients(ingredients):
             ciqual_ingredient = ciqual_ingredients.get(ciqual_code, None)
             if (ciqual_ingredient is None):
                 # Invent a dummy set of nutrients with maximum ranges
-                # TODO: Could use max values that occur in acual data
+                # Use max values that occur in acual data
                 for off_id in off_to_ciqual:
-                    ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_max': 100}
+                    max_value = max_values[off_to_ciqual[off_id]['ciqual_id']]
+                    ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_max': max_value}
             else:
                 for ciqual_key in ciqual_ingredient:
                     nutrient = ciqual_to_off.get(ciqual_key)
