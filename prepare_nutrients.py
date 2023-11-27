@@ -1,4 +1,6 @@
+import math
 
+round_to_n = lambda x, n: x if x == 0 else round(x, -int(math.floor(math.log10(abs(x)))) + (n - 1))
 
 def count_ingredients(ingredients, nutrients):
     count = 0
@@ -21,7 +23,7 @@ def count_ingredients(ingredients, nutrients):
                          nutrients[off_id] = {'ingredient_count': 1, 'unweighted_total': proportion}
                     else:
                         existing_nutrient['ingredient_count'] = existing_nutrient['ingredient_count'] + 1
-                        existing_nutrient['unweighted_total'] = existing_nutrient['unweighted_total'] + proportion
+                        existing_nutrient['unweighted_total'] = round_to_n(existing_nutrient['unweighted_total'] + proportion, 3)
 
     return count
 
@@ -59,9 +61,9 @@ def assign_weightings(product):
         # Comment out this code to use weighting specified in nutrient_map.csv
         try:
             if product_nutrient > 0:
-                computed_nutrient['weighting'] = 1 / product_nutrient
+                computed_nutrient['weighting'] = round_to_n(1 / product_nutrient, 3)
             else:
-                computed_nutrient['weighting'] = min(0.01, count / computed_nutrient['unweighted_total']) # Weighting below 0.01 causes bad performance, although it isn't that simple as just multiplying all weights doesn't help
+                computed_nutrient['weighting'] = round_to_n(min(0.01, count / computed_nutrient['unweighted_total']), 3) # Weighting below 0.01 causes bad performance, although it isn't that simple as just multiplying all weights doesn't help
         except Exception as e:
             computed_nutrient['notes'] = e
 

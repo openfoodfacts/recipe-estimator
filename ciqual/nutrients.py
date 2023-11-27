@@ -1,14 +1,15 @@
 import csv
 import json
 import os
-import math
 
-round_to_n = lambda x, n: x if x == 0 else round(x, -int(math.floor(math.log10(abs(x)))) + (n - 1))
+from prepare_nutrients import round_to_n
 
 def parse_value(ciqual_nutrient):
     if not ciqual_nutrient or ciqual_nutrient == '-':
-        return 0
-    return float(ciqual_nutrient.replace(',','.').replace('<','').replace('traces','0'))
+        return [0,0]
+    value = float(ciqual_nutrient.replace(',','.').replace('<','').replace('traces','0'))
+    min_value = 0 if '<' in ciqual_nutrient else value
+    return [min_value, value]
 
 # Load Ciqual data
 max_values = {}
@@ -22,7 +23,7 @@ with open(filename, newline="", encoding="utf8") as csvfile:
         for i in range(9,len(values)):
             value = parse_value(values[i])
             row[keys[i]] = value
-            max_values[keys[i]] = max(max_values.get(keys[i], 0), value)
+            max_values[keys[i]] = max(max_values.get(keys[i], 0), value[1])
         ciqual_ingredients[row["alim_code"]] = row
 
 # print(ciqual_ingredients['42501'])
@@ -92,15 +93,15 @@ def setup_ingredients(ingredients):
                 # Invent a dummy set of nutrients with maximum ranges
                 # Use max values that occur in acual data
                 for off_id in off_to_ciqual:
-                    max_value = max_values[off_to_ciqual[off_id]['ciqual_id']]
+                    nutrient = off_to_ciqual[off_id]
+                    max_value = round_to_n(max_values[nutrient['ciqual_id']] / nutrient['factor'], 3)
                     ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_max': max_value}
             else:
                 for ciqual_key in ciqual_ingredient:
                     nutrient = ciqual_to_off.get(ciqual_key)
                     if (nutrient is not None):
-                        value = ciqual_ingredient[ciqual_key] / nutrient['factor']
-                        # TODO Get range data from CIQUAL values
-                        ingredient_nutrients[nutrient['off_id']] = {'percent_min': value, 'percent_max': value}
+                        values = [round_to_n(value / nutrient['factor'], 3) for value in ciqual_ingredient[ciqual_key]]
+                        ingredient_nutrients[nutrient['off_id']] = {'percent_min': values[0], 'percent_max': values[1]}
 
             ingredient['nutrients'] = ingredient_nutrients
 

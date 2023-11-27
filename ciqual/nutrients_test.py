@@ -39,8 +39,3 @@ def test_prepare_product_creates_a_max_range_entry_if_ingredient_not_found():
     assert fiber['percent_min'] >= 0
     assert fiber['percent_max'] <= 80 # Maximum fiber percent on any ingredient is 79%
 
-
-def test_round_to_n():
-    assert round_to_n(1.6666666666, 3) == 1.67
-    assert round_to_n(1 / 3, 4) == 0.3333
-    assert round_to_n(5 / 3, 4) == 1.667

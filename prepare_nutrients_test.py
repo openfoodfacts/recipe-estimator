@@ -1,4 +1,4 @@
-from prepare_nutrients import prepare_nutrients
+from prepare_nutrients import prepare_nutrients, round_to_n
 
 
 def test_prepare_nutrients():
@@ -75,4 +75,8 @@ def test_prepare_nutrients_copes_with_no_product_nutrients():
     assert nutrient.get('notes') is not None
     assert nutrient.get('weighting') is None
 
+def test_round_to_n():
+    assert round_to_n(1.6666666666, 3) == 1.67
+    assert round_to_n(1 / 3, 4) == 0.3333
+    assert round_to_n(5 / 3, 4) == 1.667
 

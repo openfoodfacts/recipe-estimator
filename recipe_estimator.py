@@ -1,7 +1,7 @@
 import time  
 from ortools.linear_solver import pywraplp
 
-from prepare_nutrients import prepare_nutrients
+from prepare_nutrients import prepare_nutrients, round_to_n
 
 precision = 0.01
 
@@ -61,8 +61,8 @@ def get_quantity_estimate(ingredient_numvars):
             total_quantity += get_quantity_estimate(ingredient_numvar['child_numvars'])
         else:
             quantity_estimate = ingredient_numvar['numvar'].solution_value()
-            ingredient_numvar['ingredient']['quantity_estimate'] = quantity_estimate
-            ingredient_numvar['ingredient']['evaporation'] = ingredient_numvar['lost_water'].solution_value()
+            ingredient_numvar['ingredient']['quantity_estimate'] = round_to_n(quantity_estimate, 3)
+            ingredient_numvar['ingredient']['evaporation'] = round_to_n(ingredient_numvar['lost_water'].solution_value(), 3)
             total_quantity += quantity_estimate
 
     return total_quantity
@@ -73,7 +73,7 @@ def set_percent_estimate(ingredients, total_quantity):
         if ('ingredients' in ingredient):
             set_percent_estimate(ingredient['ingredients'], total_quantity)
         else:
-            ingredient['percent_estimate'] = 100 * ingredient['quantity_estimate'] / total_quantity
+            ingredient['percent_estimate'] = round_to_n(100 * ingredient['quantity_estimate'] / total_quantity, 3)
 
 
 def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint, negative_constraint, weighting):
@@ -186,7 +186,7 @@ def estimate_recipe(product):
     set_percent_estimate(ingredients, total_quantity)
 
     end = time.perf_counter()
-    recipe_estimator['time'] = end - current
+    recipe_estimator['time'] = round_to_n(end - current, 3)
     recipe_estimator['status'] = status
     recipe_estimator['iterations'] = solver.iterations()
 
