@@ -3,7 +3,7 @@ from fastapi import Body, FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from ciqual.nutrients import ciqual_ingredients, prepare_product
+from ciqual.nutrients import ciqual_ingredients, prepare_product, set_ingredient_nutrients
 from product import get_product
 from recipe_estimator import estimate_recipe
 
@@ -26,7 +26,17 @@ async def redirect():
 @app.get("/ciqual/{name}")
 async def ciqual(name):
     search_terms = name.casefold().split()
-    return list(itertools.islice(filter(lambda i: (all(search_term in i['alim_nom_eng'].casefold() for search_term in search_terms)), ciqual_ingredients.values()),20))
+    matches = itertools.islice(filter(lambda i: (all(search_term in i['alim_nom_eng'].casefold() for search_term in search_terms)), ciqual_ingredients.values()),20)
+    items = []
+    for match in matches:
+        ingredient = {
+            'id': match['alim_code'],
+            'ciqual_food_code': match['alim_code'],
+            'text': match['alim_nom_eng']
+        }
+        set_ingredient_nutrients(ingredient)
+        items.append(ingredient)
+    return items
 
 @app.get("/product/{id}")
 async def product(id):

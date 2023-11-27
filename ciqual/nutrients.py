@@ -74,6 +74,29 @@ def get_ciqual_code(ingredient_id):
 
     return None
 
+def set_ingredient_nutrients(ingredient):
+    ciqual_code = ingredient.get('ciqual_food_code')
+    if (ciqual_code is None):
+        ciqual_code = get_ciqual_code(ingredient['id'])
+
+    # Convert CIQUAL nutrient codes back to OFF
+    ingredient_nutrients = {}
+    ciqual_ingredient = ciqual_ingredients.get(ciqual_code, None)
+    if (ciqual_ingredient is None):
+        # Invent a dummy set of nutrients with maximum ranges
+        # Use max values that occur in acual data
+        for off_id in off_to_ciqual:
+            nutrient = off_to_ciqual[off_id]
+            max_value = round_to_n(max_values[nutrient['ciqual_id']] / nutrient['factor'], 3)
+            ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_max': max_value}
+    else:
+        for ciqual_key in ciqual_ingredient:
+            nutrient = ciqual_to_off.get(ciqual_key)
+            if (nutrient is not None):
+                values = [round_to_n(value / nutrient['factor'], 3) for value in ciqual_ingredient[ciqual_key]]
+                ingredient_nutrients[nutrient['off_id']] = {'percent_min': values[0], 'percent_max': values[1]}
+
+    ingredient['nutrients'] = ingredient_nutrients
 
 def setup_ingredients(ingredients):
     for ingredient in ingredients:
@@ -82,29 +105,7 @@ def setup_ingredients(ingredients):
             setup_ingredients(ingredient['ingredients'])
 
         else:
-            ciqual_code = ingredient.get('ciqual_food_code')
-            if (ciqual_code is None):
-                ciqual_code = get_ciqual_code(ingredient['id'])
-
-            # Convert CIQUAL nutrient codes back to OFF
-            ingredient_nutrients = {}
-            ciqual_ingredient = ciqual_ingredients.get(ciqual_code, None)
-            if (ciqual_ingredient is None):
-                # Invent a dummy set of nutrients with maximum ranges
-                # Use max values that occur in acual data
-                for off_id in off_to_ciqual:
-                    nutrient = off_to_ciqual[off_id]
-                    max_value = round_to_n(max_values[nutrient['ciqual_id']] / nutrient['factor'], 3)
-                    ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_max': max_value}
-            else:
-                for ciqual_key in ciqual_ingredient:
-                    nutrient = ciqual_to_off.get(ciqual_key)
-                    if (nutrient is not None):
-                        values = [round_to_n(value / nutrient['factor'], 3) for value in ciqual_ingredient[ciqual_key]]
-                        ingredient_nutrients[nutrient['off_id']] = {'percent_min': values[0], 'percent_max': values[1]}
-
-            ingredient['nutrients'] = ingredient_nutrients
-
+            set_ingredient_nutrients(ingredient)
 
 def prepare_product(product):
     setup_ingredients(product['ingredients'])
