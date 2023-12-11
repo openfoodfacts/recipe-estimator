@@ -1,5 +1,4 @@
-import pytest
-from ciqual.nutrients import prepare_product
+from ciqual.nutrients import get_ciqual_code, prepare_product
 
 def test_prepare_product_populates_nutrients():
     product = {'ingredients': [{'id':'en:tomato', 'ciqual_food_code': '20047'}]}
@@ -39,4 +38,6 @@ def test_prepare_product_creates_a_max_range_entry_if_ingredient_not_found():
     assert carbs['percent_min'] >= 0
     assert carbs['percent_max'] <= 100
 
-
+def test_get_ciqual_code_should_use_proxy_if_no_main_code():
+    ciqual_code = get_ciqual_code('en:tomato-sauce')
+    assert ciqual_code == '11107'
