@@ -52,10 +52,10 @@ with open(filename, "r", encoding="utf-8") as ingredients_file:
 def get_ciqual_code(ingredient_id):
     ingredient = ingredients_taxonomy.get(ingredient_id, None)
     if ingredient is None:
-        print(ingredient_id + ' not found')
+        print(ingredient_id + ' not found')        
         return None
 
-    ciqual_code = ingredient.get('ciqual_food_code', None)
+    ciqual_code = ingredient.get('ciqual_food_code', ingredient.get('ciqual_proxy_food_code', None))
     if ciqual_code:
         return ciqual_code['en']
 
@@ -77,7 +77,7 @@ def setup_ingredients(ingredients):
             setup_ingredients(ingredient['ingredients'])
 
         else:
-            ciqual_code = ingredient.get('ciqual_food_code')
+            ciqual_code = ingredient.get('ciqual_food_code', ingredient.get('ciqual_proxy_food_code', None))
             if (ciqual_code is None):
                 ciqual_code = get_ciqual_code(ingredient['id'])
 
@@ -98,6 +98,7 @@ def setup_ingredients(ingredients):
                         ingredient_nutrients[nutrient['off_id']] = {'percent_min': value, 'percent_max': value}
 
             ingredient['nutrients'] = ingredient_nutrients
+            ingredient['ciqual_food_code_used'] = ciqual_code
 
 
 def prepare_product(product):
