@@ -86,9 +86,9 @@ def setup_ingredients(ingredients):
             ciqual_ingredient = ciqual_ingredients.get(ciqual_code, None)
             if (ciqual_ingredient is None):
                 # Invent a dummy set of nutrients with maximum ranges
-                # TODO: Could use max values that occur in acual data
+                # TODO: Could use max values that occur in actual data
                 for off_id in off_to_ciqual:
-                    ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_max': 100}
+                    ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_max': 0}
             else:
                 for ciqual_key in ciqual_ingredient:
                     nutrient = ciqual_to_off.get(ciqual_key)
