@@ -54,16 +54,20 @@ def add_to_relative_constraint(solver, relative_constraint, ingredient_numvar, c
         #print(relative_constraint.name(), ingredient_numvar['ingredient']['text'], coefficient)
         relative_constraint.SetCoefficient(ingredient_numvar['numvar'], coefficient)
 
+# For each ingredient, get the quantity estimate from the solver (for leaf ingredients)
+# or sum the quantity estimates of the child ingredients (for non-leaf ingredients)
 def get_quantity_estimate(ingredient_numvars):
     total_quantity = 0
+    quantity_estimate = 0
     for ingredient_numvar in ingredient_numvars:
         if ('child_numvars' in ingredient_numvar):
-            total_quantity += get_quantity_estimate(ingredient_numvar['child_numvars'])
+            quantity_estimate = get_quantity_estimate(ingredient_numvar['child_numvars'])
         else:
             quantity_estimate = ingredient_numvar['numvar'].solution_value()
-            ingredient_numvar['ingredient']['quantity_estimate'] = quantity_estimate
             ingredient_numvar['ingredient']['evaporation'] = ingredient_numvar['lost_water'].solution_value()
-            total_quantity += quantity_estimate
+        
+        ingredient_numvar['ingredient']['quantity_estimate'] = quantity_estimate
+        total_quantity += quantity_estimate
 
     return total_quantity
 
@@ -72,8 +76,8 @@ def set_percent_estimate(ingredients, total_quantity):
     for ingredient in ingredients:
         if ('ingredients' in ingredient):
             set_percent_estimate(ingredient['ingredients'], total_quantity)
-        else:
-            ingredient['percent_estimate'] = 100 * ingredient['quantity_estimate'] / total_quantity
+
+        ingredient['percent_estimate'] = 100 * ingredient['quantity_estimate'] / total_quantity
 
 
 def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint, negative_constraint, weighting):
@@ -89,7 +93,8 @@ def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint,
             negative_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_min'] / 100)
             positive_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_max'] / 100)
 
-
+# estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
+# The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
 def estimate_recipe(product):
     current = time.perf_counter()
     prepare_nutrients(product)
@@ -103,7 +108,7 @@ def estimate_recipe(product):
     if not solver:
         return
     
-    # Total of top level ingredients must add up to at least 100
+    # Total of leaf level ingredients must add up to at least 100
     total_ingredients = solver.Constraint(100 - precision, 100 + precision, '')
     ingredient_numvars = add_ingredients_to_solver(ingredients, solver, total_ingredients)
 
@@ -123,10 +128,10 @@ def estimate_recipe(product):
         if weighting is None:
             continue
 
-        # We want to minimise the absolute difference between the sum of the ingredient nutients and the total nutrients
+        # We want to minimise the absolute difference between the sum of the ingredient nutrients and the total nutrients
         # i.e. minimize(abs(sum(Ni) - Ntot))
         # However we can't do absolute as it isn't linear
-        # We get around this by introducing a nutrient distance varaible that has to be positive
+        # We get around this by introducing a nutrient distance variable that has to be positive
         # This is achieved by setting the following constraints:
         #    Ndist >= (Sum(Ni) - Ntot) 
         #    Ndist >= -(Sum(Ni) - Ntot) 
@@ -142,7 +147,6 @@ def estimate_recipe(product):
         # constraint and a lower value on the positive constraint
 
         nutrient_total = nutrient['product_total']
-        #weighting = 1
 
         nutrient_distance = solver.NumVar(0, solver.infinity(), nutrient_key)
 
@@ -152,9 +156,9 @@ def estimate_recipe(product):
         negative_constraint.SetCoefficient(nutrient_distance, -1)
         positive_constraint = solver.Constraint(nutrient_total, solver.infinity())
         positive_constraint.SetCoefficient(nutrient_distance, 1)
-        #print(nutrient_key, nutrient_total, weighting)
         add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint, negative_constraint, weighting)
 
+        print(nutrient_key, nutrient_total, weighting)
         objective.SetCoefficient(nutrient_distance, weighting)
 
     objective.SetMinimization()
