@@ -70,11 +70,11 @@ def get_ciqual_code(ingredient_id):
     return None
 
 
-def setup_ingredients(ingredients):
+def setup_ingredients(ingredients, nutrients):
     for ingredient in ingredients:
         if ('ingredients' in ingredient):
             # Child ingredients
-            setup_ingredients(ingredient['ingredients'])
+            setup_ingredients(ingredient['ingredients'], nutrients)
 
         else:
             ciqual_code = ingredient.get('ciqual_food_code', ingredient.get('ciqual_proxy_food_code', None))
@@ -88,6 +88,10 @@ def setup_ingredients(ingredients):
                 # Invent a dummy set of nutrients with maximum ranges
                 # TODO: Could use max values that occur in actual data
                 for off_id in off_to_ciqual:
+                    product_nutrient_value = nutrients.get(off_id + '_100g', 0)
+                    # using the average product nutrient values for unknown ingredients does not give good results      
+                    # ingredient_nutrients[off_id] = {'percent_min': product_nutrient_value, 'percent_max': product_nutrient_value}
+                    # set the nutrient contribution from unknown ingredients to 0
                     ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_max': 0}
             else:
                 for ciqual_key in ciqual_ingredient:
@@ -102,7 +106,7 @@ def setup_ingredients(ingredients):
 
 
 def prepare_product(product):
-    setup_ingredients(product['ingredients'])
+    setup_ingredients(product['ingredients'], product.get('nutriments', {}))
 
 
 

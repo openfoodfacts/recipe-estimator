@@ -7,13 +7,14 @@ interface RecipeProps {
 }
 
 function ingredientDisplayName(ingredient: any): string {
-  return ingredient?.text ? `${ingredient.text} (${ingredient.ciqual_food_code})` : ''
+  return ingredient?.text ? `${ingredient.text} (${ingredient.ciqual_food_code} - ${ingredient.ciqual_proxy_food_code})` : ''
 }
 function addFirstOption(ingredient: any) {
   ingredient.options ??= [];
   if (ingredient && !(ingredient.options.find((i:any) => i.id === ingredient.id))) {
     ingredient.options.push({
       ciqual_food_code: ingredient.ciqual_food_code,
+      ciqual_proxy_food_code: ingredient.ciqual_proxy_food_code,
       text: ingredient.text,
       id: ingredient.id,
       searchTerm: ingredientDisplayName(ingredient),
@@ -84,7 +85,6 @@ export default function Recipe({product}: RecipeProps) {
     let total = 0;
     for(const ingredient of parent) {
       if (!ingredient.ingredients) {
-        console.log(nutrient_key);
         if (ingredient.nutrients?.[nutrient_key])
           total += ingredient.percent_estimate * (nutrient_key ? ingredient.nutrients?.[nutrient_key].percent_max : 1) / 100;
       }
@@ -127,8 +127,11 @@ export default function Recipe({product}: RecipeProps) {
   
   function ingredientChange(ingredient: any, value: any) {
     if (value) {
+      // print ingredient to console
+      console.log(value);
       ingredient.id = value.id;
       ingredient.ciqual_food_code = value.ciqual_food_code;
+      ingredient.ciqual_proxy_food_code = value.ciqual_proxy_food_code;
       ingredient.text = value.text;
       ingredient.nutrients = value.nutrients;
       ingredient.searchTerm = ingredientDisplayName(value);

@@ -1,5 +1,7 @@
 
-
+# count the number of leaf ingredients in the product
+# for each nutrient, store in nutrients the number of leaf ingredients that have a nutrient value
+# and the sum of the percent_max of the corresponding ingredients
 def count_ingredients(ingredients, nutrients):
     count = 0
     for ingredient in ingredients:
@@ -73,7 +75,13 @@ def assign_weightings(product):
         except Exception as e:
             computed_nutrient['notes'] = e
 
+        if nutrient_key == 'salt':
+            computed_nutrient['weighting'] = 100
+            continue
+         
+
         computed_nutrient['weighting'] = 1
+
 
 def prepare_nutrients(product):
     nutrients = {}
