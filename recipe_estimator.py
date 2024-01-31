@@ -119,29 +119,29 @@ def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint,
             positive_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_max'] / 100)
 
 
-# Add an objective to minimise the difference between the quantity of each ingredient and the next ingredient (and 0 for the last ingredient)
-def add_minimum_distance_between_ingredients_objective(solver, objective, weighting, ingredient_numvars):
+# Add an objective to minimize the difference between the quantity of each ingredient and the next ingredient (and 0 for the last ingredient)
+def add_objective_to_minimize_maximum_distance_between_ingredients(solver, objective, weighting, ingredient_numvars):
     
-    min_ingredients_distance = solver.NumVar(0, solver.infinity(), "min_ingredients_distance")
+    max_ingredients_distance = solver.NumVar(0, solver.infinity(), "max_ingredients_distance")
 
     for i,ingredient_numvar in enumerate(ingredient_numvars):
         
-        # constraint: ingredient(i) - ingredient(i+1) <= min_distance
-        # can be expressed as: ingredient(i) - ingredient(i+1) - min_distance <= 0
+        # constraint: ingredient(i) - ingredient(i+1) <= max_ingredients_distance
+        # can be expressed as: ingredient(i) - ingredient(i+1) - max_ingredients_distance <= 0
         constraint = solver.Constraint(-solver.infinity(), 0)
         constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
         if i < (len(ingredient_numvars) - 1):
             constraint.SetCoefficient(ingredient_numvars[i+1]['numvar'], -1)
             # for the last ingredient, we look at its distance to 0
-            # so the constraint is only ingredient(i) < min_distance
+            # so the constraint is only ingredient(i) < max_ingredients_distance
             # and we don't need add it to the constraint
-        constraint.SetCoefficient(min_ingredients_distance, -1)
+        constraint.SetCoefficient(max_ingredients_distance, -1)
 
         # Apply recursively to child ingredients
         if 'child_numvars' in ingredient_numvar:
-            add_minimum_distance_between_ingredients_objective(solver, objective, weighting, ingredient_numvar['child_numvars'])
+            add_objective_to_minimize_maximum_distance_between_ingredients(solver, objective, weighting, ingredient_numvar['child_numvars'])
 
-    objective.SetCoefficient(min_ingredients_distance, weighting)
+    objective.SetCoefficient(max_ingredients_distance, weighting)
 
 # estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
 # The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
@@ -211,7 +211,7 @@ def estimate_recipe(product):
         print("nutrient_key:", nutrient_key, "nutrient_total:", nutrient_total, "weighting:", weighting)
         objective.SetCoefficient(nutrient_distance, weighting)
 
-    add_minimum_distance_between_ingredients_objective(solver, objective, 0.1, ingredient_numvars)
+    add_objective_to_minimize_maximum_distance_between_ingredients(solver, objective, 0.05, ingredient_numvars)
 
     objective.SetMinimization()
 
