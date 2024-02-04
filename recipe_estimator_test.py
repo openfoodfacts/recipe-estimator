@@ -11,7 +11,7 @@ def test_estimate_recipe_accounts_for_evaporation():
             }
         }],
         'nutriments': {
-            'carbohydrates': 5,
+            'carbohydrates_100g': 5,
         }}
 
     estimate_recipe(product)
@@ -45,7 +45,7 @@ def test_estimate_recipe_evaporation_is_constrained():
             }
         }],
         'nutriments': {
-            'carbohydrates': 5,
+            'carbohydrates_100g': 5,
         }}
 
     estimate_recipe(product)
@@ -86,7 +86,7 @@ def test_estimate_recipe_simple_recipe():
             }
         ],
         'nutriments': {
-            'carbohydrates': 10,
+            'carbohydrates_100g': 10,
         }}
 
     estimate_recipe(product)
@@ -117,7 +117,7 @@ def test_estimate_recipe_simple_recipe_with_one_unmatched_ingredient():
             }
         ],
         'nutriments': {
-            'carbohydrates': 10,
+            'carbohydrates_100g': 10,
         }}
 
     estimate_recipe(product)
@@ -149,7 +149,7 @@ def test_estimate_recipe_simple_recipe_with_no_matched_ingredients():
             }
         ],
         'nutriments': {
-            'carbohydrates': 10,
+            'carbohydrates_100g': 10,
         }}
 
     estimate_recipe(product)
