@@ -13,7 +13,7 @@ def test_prepare_nutrients():
         }],
         'nutriments': {
             'carbohydrates_100g': 5,
-            'protien_100g': 4,
+            'proteins_100g': 4,
             'energy_100g': 160,
         }}
 
@@ -38,7 +38,7 @@ def test_prepare_nutrients():
     # assert nutrient.get('weighting') == 0.2
 
     # Nutrients not on any ingredient are not included
-    assert nutrients.get('protien') is None
+    assert nutrients.get('proteins') is None
 
     # Water is included
     assert nutrients.get('water') is not None

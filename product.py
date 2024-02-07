@@ -12,7 +12,7 @@ def print_recipe(ingredients, indent = ''):
 
 
 def get_product(id):
-    response = requests.get("https://world.openfoodfacts.org/api/v3/product/" + id).json()
+    response = requests.get("http://world.openfoodfacts.org/api/v3/product/" + id).json()
     if not 'product' in response:
         return {}
 

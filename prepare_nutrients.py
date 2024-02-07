@@ -75,10 +75,9 @@ def assign_weightings(product):
         except Exception as e:
             computed_nutrient['notes'] = e
 
-        if nutrient_key == 'salt':
+        if nutrient_key == 'xsalt':
             computed_nutrient['weighting'] = 100
             continue
-         
 
         computed_nutrient['weighting'] = 1
 
