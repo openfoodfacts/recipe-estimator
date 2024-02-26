@@ -20,7 +20,7 @@ Jinja2==3.1.2
 MarkupSafe==2.1.2
 mypy-extensions==1.0.0
 numpy==1.24.1
-orjson==3.8.6
+orjson==3.9.15
 ortools==9.5.2237
 packaging==23.0
 pathspec==0.11.0
