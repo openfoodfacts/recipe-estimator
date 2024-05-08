@@ -7,13 +7,14 @@ interface RecipeProps {
 }
 
 function ingredientDisplayName(ingredient: any): string {
-  return ingredient?.text ? `${ingredient.text} (${ingredient.ciqual_food_code})` : ''
+  return ingredient?.text ? `${ingredient.text} (${ingredient.ciqual_food_code} - ${ingredient.ciqual_proxy_food_code})` : ''
 }
 function addFirstOption(ingredient: any) {
   ingredient.options ??= [];
   if (ingredient && !(ingredient.options.find((i:any) => i.id === ingredient.id))) {
     ingredient.options.push({
       ciqual_food_code: ingredient.ciqual_food_code,
+      ciqual_proxy_food_code: ingredient.ciqual_proxy_food_code,
       text: ingredient.text,
       id: ingredient.id,
       searchTerm: ingredientDisplayName(ingredient),
@@ -83,8 +84,10 @@ export default function Recipe({product}: RecipeProps) {
   function getTotalForParent(nutrient_key: string, parent: any[]) {
     let total = 0;
     for(const ingredient of parent) {
-      if (!ingredient.ingredients) 
-        total += ingredient.percent_estimate * (nutrient_key ? ingredient.nutrients?.[nutrient_key].percent_max : 1) / 100;
+      if (!ingredient.ingredients) {
+        if (ingredient.nutrients?.[nutrient_key])
+          total += ingredient.percent_estimate * (nutrient_key ? ingredient.nutrients?.[nutrient_key].percent_max : 1) / 100;
+      }
       else
         total += getTotalForParent(nutrient_key, ingredient.ingredients);
     }
@@ -124,8 +127,11 @@ export default function Recipe({product}: RecipeProps) {
   
   function ingredientChange(ingredient: any, value: any) {
     if (value) {
+      // print ingredient to console
+      console.log(value);
       ingredient.id = value.id;
       ingredient.ciqual_food_code = value.ciqual_food_code;
+      ingredient.ciqual_proxy_food_code = value.ciqual_proxy_food_code;
       ingredient.text = value.text;
       ingredient.nutrients = value.nutrients;
       ingredient.searchTerm = ingredientDisplayName(value);
@@ -178,7 +184,7 @@ export default function Recipe({product}: RecipeProps) {
                     }
                     </TableCell>
                     {Object.keys(nutrients).map((nutrient: string) => (
-                      <TableCell key={nutrient}>{!ingredient.ingredients &&
+                      <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] && ingredient.nutrients?.[nutrient].percent_max &&
                         <>
                           <Typography variant="caption">{format(ingredient.nutrients?.[nutrient].percent_max, QUANTITY)}</Typography>
                           <Typography variant="body1">{format(ingredient.percent_estimate * ingredient.nutrients?.[nutrient].percent_max / 100, QUANTITY)}</Typography>
