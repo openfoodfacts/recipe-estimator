@@ -1,4 +1,4 @@
-from ciqual.nutrients import get_ciqual_code, prepare_product
+from nutrients import get_ciqual_code, prepare_product
 
 def test_prepare_product_populates_nutrients():
     product = {'ingredients': [{'id':'en:tomato', 'ciqual_food_code': '20047'}]}
