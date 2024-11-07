@@ -67,6 +67,12 @@ e.g.
 
 http://localhost:3000/#0677294998025
 
+# Running Unit Tests
+
+The server unit tests can be run with `pytest` at the command line or using the Testing panel in the Python VSCode plugin.
+
+There are currently no frontend unit tests.
+
 # Building the Docker Image
 
 From the project root folder:

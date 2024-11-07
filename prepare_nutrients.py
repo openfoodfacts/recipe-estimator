@@ -1,5 +1,7 @@
 
-
+# count the number of leaf ingredients in the product
+# for each nutrient, store in nutrients the number of leaf ingredients that have a nutrient value
+# and the sum of the percent_max of the corresponding ingredients
 def count_ingredients(ingredients, nutrients):
     count = 0
     for ingredient in ingredients:
@@ -33,14 +35,22 @@ def assign_weightings(product):
 
     for nutrient_key in computed_nutrients:
         computed_nutrient = computed_nutrients[nutrient_key]
-        product_nutrient = product_nutrients.get(nutrient_key)
+        # Get nutrient value per 100g of product
+        product_nutrient = product_nutrients.get(nutrient_key + '_100g', None)
         if product_nutrient is None:
             computed_nutrient['notes'] = 'Not listed on product'
             continue
 
         computed_nutrient['product_total'] = product_nutrient
+
+        # Energy is derived from other nutrients, so don't use it
         if nutrient_key == 'energy':
             computed_nutrient['notes'] = 'Energy not used for calculation'
+            continue
+
+        # Sodium is computed from salt, so don't use it, to avoid double counting
+        if nutrient_key == 'sodium':
+            computed_nutrient['notes'] = 'Sodium not used for calculation'
             continue
 
         if product_nutrient == 0 and computed_nutrient['unweighted_total'] == 0:
@@ -64,6 +74,12 @@ def assign_weightings(product):
                 computed_nutrient['weighting'] = min(0.01, count / computed_nutrient['unweighted_total']) # Weighting below 0.01 causes bad performance, although it isn't that simple as just multiplying all weights doesn't help
         except Exception as e:
             computed_nutrient['notes'] = e
+
+        if nutrient_key == 'xsalt':
+            computed_nutrient['weighting'] = 100
+            continue
+
+        computed_nutrient['weighting'] = 1
 
 
 def prepare_nutrients(product):

@@ -1,7 +1,8 @@
+import json
 from recipe_estimator import estimate_recipe
 
 
-def test_estimate_recipe_accounts_for_evaporation():
+def test_estimate_recipe_accounts_for_lost_water():
     product = {
         'ingredients': [{
             'id':'en:tomato',
@@ -11,10 +12,13 @@ def test_estimate_recipe_accounts_for_evaporation():
             }
         }],
         'nutriments': {
-            'carbohydrates': 5,
+            'carbohydrates_100g': 5,
         }}
 
     estimate_recipe(product)
+
+    # Print the resulting product structure
+    print(product)
 
     metrics = product.get('recipe_estimator')
     assert metrics is not None
@@ -31,11 +35,11 @@ def test_estimate_recipe_accounts_for_evaporation():
     quantity_estimate = ingredient.get('quantity_estimate')
     assert round(quantity_estimate) == 200
 
-    evaporation = ingredient.get('evaporation')
-    assert round(evaporation) == 100
+    lost_water = ingredient.get('lost_water')
+    assert round(lost_water) == 100
 
 
-def test_estimate_recipe_evaporation_is_constrained():
+def test_estimate_recipe_lost_water_is_constrained():
     product = {
         'ingredients': [{
             'id':'en:tomato',
@@ -45,7 +49,7 @@ def test_estimate_recipe_evaporation_is_constrained():
             }
         }],
         'nutriments': {
-            'carbohydrates': 5,
+            'carbohydrates_100g': 5,
         }}
 
     estimate_recipe(product)
@@ -62,8 +66,8 @@ def test_estimate_recipe_evaporation_is_constrained():
     quantity_estimate = ingredient.get('quantity_estimate')
     assert round(quantity_estimate) == 111
 
-    evaporation = ingredient.get('evaporation')
-    assert round(evaporation) == 11
+    lost_water = ingredient.get('lost_water')
+    assert round(lost_water) == 11
 
 def test_estimate_recipe_simple_recipe():
     # A x 15 + B x 3 = 10
@@ -86,7 +90,7 @@ def test_estimate_recipe_simple_recipe():
             }
         ],
         'nutriments': {
-            'carbohydrates': 10,
+            'carbohydrates_100g': 10,
         }}
 
     estimate_recipe(product)
@@ -117,7 +121,7 @@ def test_estimate_recipe_simple_recipe_with_one_unmatched_ingredient():
             }
         ],
         'nutriments': {
-            'carbohydrates': 10,
+            'carbohydrates_100g': 10,
         }}
 
     estimate_recipe(product)
@@ -149,7 +153,7 @@ def test_estimate_recipe_simple_recipe_with_no_matched_ingredients():
             }
         ],
         'nutriments': {
-            'carbohydrates': 10,
+            'carbohydrates_100g': 10,
         }}
 
     estimate_recipe(product)
@@ -191,3 +195,107 @@ def test_estimate_recipe_simple_recipe_with_no_nutriments():
 
     assert round(product['ingredients'][0]['percent_estimate']) >= 50
     assert round(product['ingredients'][1]['percent_estimate']) <= 50
+
+def test_estimate_recipe_subingredients():
+    product = {
+        'ingredients': [{
+            'id':'en:tomato',
+            'nutrients': {
+                'carbohydrates': {'percent_min': 2.5,'percent_max': 2.5},
+                'water': {'percent_min': 90,'percent_max': 90},
+                'sugars': {'percent_min': 0,'percent_max': 0},
+                'salt': {'percent_min': 0,'percent_max': 0},
+            }
+        },
+        {
+            'id':'en:sugar-and-salt',
+            'ingredients': [{
+                'id':'en:sugar',
+                'nutrients': {
+                    'sugars': {'percent_min': 100,'percent_max': 100},
+                    'carbohydrates': {'percent_min': 0,'percent_max': 0},
+                    'salt': {'percent_min': 0,'percent_max': 0},
+                }
+            },
+            {
+                'id':'en:salt',
+                'nutrients': {
+                    'salt': {'percent_min': 100,'percent_max': 100},
+                    'carbohydrates': {'percent_min': 0,'percent_max': 0},
+                    'sugars': {'percent_min': 0,'percent_max': 0},
+                }
+            }
+            ]
+        }],
+        'nutriments': {
+            'carbohydrates_100g': 5,
+            'sugars_100g': 10,
+            'salt_100g': 5
+        }}
+
+    estimate_recipe(product)
+
+    # Print the resulting product structure
+    print(product)
+
+    metrics = product.get('recipe_estimator')
+    assert metrics is not None
+
+    # Status is valid
+    assert metrics['status'] == 0
+
+    sugar = product['ingredients'][1]['ingredients'][0]
+    # Percent estimate is relative to total ingredient quantities
+    assert round(sugar.get('percent_estimate')) == 5
+
+    # Quantity estimate gives original quantity of ingredient per 100g/ml of product
+    assert round(sugar.get('quantity_estimate')) == 10
+
+
+def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
+    product = {
+        'ingredients': [
+            {
+                'id':'one',
+                'nutrients': {
+                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
+                }
+            },
+            {
+                'id':'two',
+                'nutrients': {
+                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
+                }
+            },
+            {
+                'id':'three',
+                'nutrients': {
+                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
+                }
+            },
+            {
+                'id':'four',
+                'nutrients': {
+                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
+                }
+            }
+        ],
+        'nutriments': {
+            'carbohydrates_100g': 60,
+        }}
+
+    estimate_recipe(product)
+
+    # Pretty print with indents the resulting product structure
+    print(json.dumps(product, indent=4))
+
+    metrics = product.get('recipe_estimator')
+    assert metrics is not None
+
+    # Status is valid
+    assert metrics['status'] == 0
+
+    assert round(product['ingredients'][0]['percent_estimate']) == 40
+    assert round(product['ingredients'][1]['percent_estimate']) == 30
+    assert round(product['ingredients'][2]['percent_estimate']) == 20
+    assert round(product['ingredients'][3]['percent_estimate']) == 10
