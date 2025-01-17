@@ -15,7 +15,7 @@ def add_ingredients_to_solver(ingredients, solver, total_ingredients):
         ingredient_numvars.append(ingredient_numvar)
         # TODO: Known percentage or stated range
 
-        if ('ingredients' in ingredient):
+        if ingredient.get('ingredients'):
             # Child ingredients
             child_numvars = add_ingredients_to_solver(ingredient['ingredients'], solver, total_ingredients)
 
@@ -103,7 +103,7 @@ def get_quantity_estimate(ingredient_numvars):
 
 def set_percent_estimate(ingredients, total_quantity):
     for ingredient in ingredients:
-        if ('ingredients' in ingredient):
+        if ingredient.get('ingredients'):
             set_percent_estimate(ingredient['ingredients'], total_quantity)
 
         ingredient['percent_estimate'] = 100 * ingredient['quantity_estimate'] / total_quantity
