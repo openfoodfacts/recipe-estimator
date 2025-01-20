@@ -1,6 +1,5 @@
 import json
-from recipe_estimator import estimate_recipe, ingredient_order_constraint, water_constraint
-from scipy.optimize import minimize
+from recipe_estimator import estimate_recipe
 
 def test_estimate_recipe_accounts_for_lost_water():
     product = {
