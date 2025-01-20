@@ -120,7 +120,7 @@ def estimate_recipe(product):
 
         return nutrient_difference
 
-    solution = minimize(objective,x,method='COBYQA',bounds=bounds,constraints=cons)
+    solution = minimize(objective,x,method='SLSQP',bounds=bounds,constraints=cons)
 
     total_quantity = sum(solution.x[0::2])
 
