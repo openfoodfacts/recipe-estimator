@@ -180,8 +180,16 @@ def estimate_recipe(product):
     cons = []
     bound = (0, None)
     bounds = []
+
+    # Initial estimate of ingredients is a geometric progression where each is half the previous one
+    # Sum of a  geometric progression is Sn = a(1 - r^n) / (1 - r)
+    # In our case Sn = 100 and r = 0.5 so our first ingredient (a) will be
+    # 50 / (1 - 0.5 ^ n)
+    a = 50 / (1 - 0.5 ** len(ingredients))
     for i,ingredient in enumerate(ingredients):
-        x.append(100 / len(ingredients))
+        x.append(a)
+        a /= 2
+
         bounds.append(bound)
         x.append(0)
         bounds.append(bound)

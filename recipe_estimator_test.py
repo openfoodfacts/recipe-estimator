@@ -338,6 +338,10 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
             'carbohydrates_100g': 60,
         }}
 
+    # For 4 ingredients in the absence of anything better we want
+    # the first ingredient to be 50 / (1 - 0.5 ^ 4) = 53.3
+    # Each subsequent one half that, so 26.7, 13.3, 6.7
+
     estimate_recipe(product)
 
     # Pretty print with indents the resulting product structure
@@ -349,7 +353,7 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
     # Status is valid
     assert metrics['status'] == 0
 
-    assert round(product['ingredients'][0]['percent_estimate']) == 40
-    assert round(product['ingredients'][1]['percent_estimate']) == 30
-    assert round(product['ingredients'][2]['percent_estimate']) == 20
-    assert round(product['ingredients'][3]['percent_estimate']) == 10
+    assert round(product['ingredients'][0]['percent_estimate']) == 53
+    assert round(product['ingredients'][1]['percent_estimate']) == 27
+    assert round(product['ingredients'][2]['percent_estimate']) == 13
+    assert round(product['ingredients'][3]['percent_estimate']) == 7
