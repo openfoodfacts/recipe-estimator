@@ -52,7 +52,7 @@ def estimate_recipe(product):
 
         # Skip nutrients that don't have a weighting
         if weighting is None or weighting == 0:
-            print("Skipping nutrient without weight:", nutrient_key)
+            #print("Skipping nutrient without weight:", nutrient_key)
             continue
         nutrient_names.append(nutrient_key)
         product_nutrients.append(nutrient['product_total'])
@@ -71,7 +71,7 @@ def estimate_recipe(product):
         for i,ingredient in enumerate(ingredients):
             this_start = start + i * 2
 
-            if ('ingredients' in ingredient):
+            if ('ingredients' in ingredient and len(ingredient['ingredients']) > 0):
                 ingredients_added = add_ingredients(a, ingredient['ingredients'])
             else:
                 # Initial estimate. 0.5 of previous ingredient

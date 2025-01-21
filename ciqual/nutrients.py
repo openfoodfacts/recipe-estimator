@@ -72,7 +72,7 @@ def get_ciqual_code(ingredient_id):
 
 def setup_ingredients(ingredients, nutrients):
     for ingredient in ingredients:
-        if ('ingredients' in ingredient):
+        if ('ingredients' in ingredient and len(ingredient['ingredients']) > 0):
             # Child ingredients
             setup_ingredients(ingredient['ingredients'], nutrients)
 
