@@ -93,12 +93,12 @@ def add_maximum_quantity_constraints(solver, ingredient_numvars):
             if ingredient['id'] == 'en:salt' or ingredient['id'] == 'en:sea-salt':
                 salt_constraint = solver.Constraint(0, 5)
                 salt_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
-            if ingredient['id'] == 'en:flavouring':
-                flavouring_constraint = solver.Constraint(0, 1)
+            if ingredient['id'] == 'en:flavouring' or ingredient['id'] == 'en:natural-flavouring':
+                flavouring_constraint = solver.Constraint(0, 2)
                 flavouring_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
             # if the ingredient is an additive (id starts with "en:e" + digits) then we set a maximum quantity of 1g
             if ingredient['id'].startswith('en:e'):
-                additive_constraint = solver.Constraint(0, 1)
+                additive_constraint = solver.Constraint(0, 2)
                 additive_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
 
 # add max limits on ingredients en:salt and en:sugar based on the sugars and salt nutrition facts of the product
