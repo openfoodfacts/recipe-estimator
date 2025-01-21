@@ -83,6 +83,46 @@ def add_to_relative_constraint(solver, relative_constraint, ingredient_numvar, c
         print("relative_constraint:", relative_constraint.name(), ingredient_numvar['ingredient']['id'], coefficient)
         relative_constraint.SetCoefficient(ingredient_numvar['numvar'], coefficient)
 
+# add maximum quantity constraints on some ingredients like en:salt (5g) and en:flavouring (1g)
+def add_maximum_quantity_constraints(solver, ingredient_numvars):
+    for ingredient_numvar in ingredient_numvars:
+        ingredient = ingredient_numvar['ingredient']
+        if ('child_numvars' in ingredient_numvar):
+            add_maximum_quantity_constraints(solver, ingredient_numvar['child_numvars'])
+        else:
+            if ingredient['id'] == 'en:salt' or ingredient['id'] == 'en:sea-salt':
+                salt_constraint = solver.Constraint(0, 5)
+                salt_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+            if ingredient['id'] == 'en:flavouring' or ingredient['id'] == 'en:natural-flavouring':
+                flavouring_constraint = solver.Constraint(0, 2)
+                flavouring_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+            # if the ingredient is an additive (id starts with "en:e" + digits) then we set a maximum quantity of 1g
+            if ingredient['id'].startswith('en:e'):
+                additive_constraint = solver.Constraint(0, 2)
+                additive_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+
+# add max limits on ingredients en:salt and en:sugar based on the sugars and salt nutrition facts of the product
+def add_maximum_limits_on_salt_and_sugar(solver, ingredient_numvars, salt_constraint, sugars_constraint, fat_constraint):
+    for ingredient_numvar in ingredient_numvars:
+        ingredient = ingredient_numvar['ingredient']
+        if ('child_numvars' in ingredient_numvar):
+            add_maximum_limits_on_salt_and_sugar(solver, ingredient_numvar['child_numvars'], salt_constraint, sugars_constraint, fat_constraint)
+        else:
+            if ingredient['id'] == 'en:salt' or ingredient['id'] == 'en:sea-salt':
+                salt_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+            if ingredient['id'] == 'en:sugar' or ingredient['id'] == 'en:cane-sugar':
+                sugars_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+            # oils: ingredient id ending with -oil, en:cocoa-butter
+            if ingredient['id'].endswith('-oil') or ingredient['id'] == 'en:cocoa-butter':
+                fat_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+            # butter: min 80% fat
+            if ingredient['id'] == 'en:butter':
+                fat_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.8)
+            # butterfat: 90% fat
+            if ingredient['id'] == 'en:butterfat':
+                fat_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.9)
+
+
 # For each ingredient, get the quantity estimate from the solver (for leaf ingredients)
 # or sum the quantity estimates of the child ingredients (for non-leaf ingredients)
 def get_quantity_estimate(ingredient_numvars):
@@ -170,6 +210,19 @@ def estimate_recipe(product):
     # add_relative_constraints_on_ingredients(solver, ingredient_numvars)
 
     add_relative_constraints_on_ingredients(solver, None, ingredient_numvars)
+
+    add_maximum_quantity_constraints(solver, ingredient_numvars)
+
+    salt = product['nutriments'].get('salt_100g', 0)
+    salt_constraint = solver.Constraint(0, salt)
+
+    sugar = product['nutriments'].get('sugars_100g', 0)
+    sugar_constraint = solver.Constraint(0, sugar)
+    
+    fat = product['nutriments'].get('fat_100g', 0)
+    fat_constraint = solver.Constraint(0, fat)
+
+    add_maximum_limits_on_salt_and_sugar(solver, ingredient_numvars, salt_constraint, sugar_constraint, fat_constraint)
 
     objective = solver.Objective()
     for nutrient_key in nutrients:
