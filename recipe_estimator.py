@@ -144,6 +144,7 @@ def estimate_recipe(product):
     end = time.perf_counter()
     recipe_estimator['time'] = end - current
     recipe_estimator['status'] = solution.status
+    recipe_estimator['status_message'] = solution.message
     recipe_estimator['iterations'] = solution.nit
 
     print('Time spent in solver: ', recipe_estimator['time'], 'seconds')
