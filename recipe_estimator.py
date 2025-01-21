@@ -132,7 +132,7 @@ def estimate_recipe(product):
                 index = ingredient['index']
                 ingredient['quantity_estimate'] = solution.x[index]
                 ingredient['lost_water'] = solution.x[index + 1]
-                ingredient['percent_estimate'] = 100 * solution.x[index] / total_quantity
+                ingredient['percent_estimate'] = round(100 * solution.x[index] / total_quantity, 2)
 
     set_percentages(ingredients)
     end = time.perf_counter()
