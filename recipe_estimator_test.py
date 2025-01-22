@@ -202,7 +202,7 @@ def test_estimate_recipe_subingredients():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'carbohydrates': {'percent_min': 2.5,'percent_max': 2.5},
+                'carbohydrates': {'percent_min': 5,'percent_max': 5},
                 'water': {'percent_min': 90,'percent_max': 90},
                 'sugars': {'percent_min': 0,'percent_max': 0},
                 'salt': {'percent_min': 0,'percent_max': 0},
@@ -234,6 +234,9 @@ def test_estimate_recipe_subingredients():
             'salt_100g': 5
         }}
 
+    # For the above there must by 5g of Salt and 10g of Sugar.
+    # In order to make 5g of carbohydrate we need 100g of tomatoes, so there will be 15g of lost water
+    # Percentages will be quantities * (100 / 115) = 4.3, 8.7 and 87
     estimate_recipe(product)
 
     # Print the resulting product structure
@@ -245,12 +248,21 @@ def test_estimate_recipe_subingredients():
     # Status is valid
     #assert metrics['status'] == 0
 
-    sugar = product['ingredients'][1]['ingredients'][0]
-    # Percent estimate is relative to total ingredient quantities
-    assert round(sugar.get('percent_estimate')) == 5
 
+    tomatoes = product['ingredients'][0]
+    # Percent estimate is relative to total ingredient quantities
+    assert round(tomatoes.get('percent_estimate')) == 87
     # Quantity estimate gives original quantity of ingredient per 100g/ml of product
+    assert round(tomatoes.get('quantity_estimate')) == 100
+    assert round(tomatoes.get('lost_water')) == 15
+
+    sugar = product['ingredients'][1]['ingredients'][0]
+    assert round(sugar.get('percent_estimate')) == 9
     assert round(sugar.get('quantity_estimate')) == 10
+
+    salt = product['ingredients'][1]['ingredients'][1]
+    assert round(salt.get('percent_estimate')) == 4
+    assert round(salt.get('quantity_estimate')) == 5
 
 
 def test_estimate_recipe_minimize_maximum_distance_between_ingredients():

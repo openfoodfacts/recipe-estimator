@@ -35,10 +35,10 @@ def estimate_recipe(product):
     bounds = []
 
     def water_constraint(i, maximum_water_content):
-        #return { 'type': 'ineq', 'fun': lambda x: x[i * 2] * maximum_water_content * 0.01 - x[i * 2 + 1]}
+        # return { 'type': 'ineq', 'fun': lambda x: x[i] * maximum_water_content * 0.01 - x[i + 1]}
         A = [0] * leaf_ingredient_count * 2
-        A[i * 2] = maximum_water_content * 0.01
-        A[i * 2 + 1] = -1
+        A[i] = maximum_water_content * 0.01
+        A[i + 1] = -1
         return LinearConstraint(A, lb = 0)
 
     def ingredient_order_constraint(previous_start, this_start, this_count):
@@ -97,7 +97,7 @@ def estimate_recipe(product):
                 # Set lost water constraint
                 water = ingredient['nutrients'].get('water', {})
                 maximum_water_content = water.get('percent_max', 0)
-                cons.append(water_constraint(i, maximum_water_content))
+                cons.append(water_constraint(this_start, maximum_water_content))
 
                 ingredient['index'] = this_start
                 ingredients_added = 1
@@ -129,17 +129,16 @@ def estimate_recipe(product):
 
         return nutrient_difference
 
+    # For COBYLA can't use eq constraint
     A = [0] * leaf_ingredient_count * 2
     for i in range(0, leaf_ingredient_count * 2):
         A[i] = -1 if i % 2 else 1
     cons.append(LinearConstraint(A, lb = 99.9, ub = 100.1))
-
-    # For COBYLA can't use eq constraint
-    #cons.append({ 'type': 'ineq', 'fun': lambda x: sum(x[0::2]) - sum(x[1::2]) - 99.9})
-    #cons.append({ 'type': 'ineq', 'fun': lambda x: 100.1 - (sum(x[0::2]) - sum(x[1::2]))})
+    # cons.append({ 'type': 'ineq', 'fun': lambda x: sum(x[0::2]) - sum(x[1::2]) - 99.9})
+    # cons.append({ 'type': 'ineq', 'fun': lambda x: 100.1 - (sum(x[0::2]) - sum(x[1::2]))})
 
     # COBYQA is very slow
-    solution = minimize(objective,x,method='trust-constr',bounds=bounds,constraints=cons)
+    solution = minimize(objective,x,method='COBYLA',bounds=bounds,constraints=cons,options={'maxiter': 10000})
 
     total_quantity = sum(solution.x[0::2])
 
