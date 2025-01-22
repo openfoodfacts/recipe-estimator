@@ -5,11 +5,9 @@
 def count_ingredients(ingredients, nutrients):
     count = 0
     for ingredient in ingredients:
-        if ('ingredients' in ingredient):
+        if ('ingredients' in ingredient and len(ingredient['ingredients']) > 0):
             # Child ingredients
             child_count = count_ingredients(ingredient['ingredients'], nutrients)
-            if child_count == 0:
-                return 0
             count = count + child_count
 
         else:
@@ -87,4 +85,4 @@ def prepare_nutrients(product):
     count = count_ingredients(product['ingredients'], nutrients)
     product['recipe_estimator'] = {'nutrients':nutrients, 'ingredient_count': count}
     assign_weightings(product)
-    return
+    return count

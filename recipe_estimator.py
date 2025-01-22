@@ -1,19 +1,13 @@
 import time  
-from scipy.optimize import minimize
+from scipy.optimize import minimize, LinearConstraint
 
 from prepare_nutrients import prepare_nutrients
-
-def water_constraint(i, maximum_water_content):
-    return { 'type': 'ineq', 'fun': lambda x: x[i * 2] * maximum_water_content * 0.01 - x[i * 2 + 1]}
-
-def ingredient_order_constraint(previous_start, this_start, this_count):
-    return { 'type': 'ineq', 'fun': lambda x: sum(x[previous_start : this_start : 2]) - sum(x[this_start : this_start + this_count * 2 : 2])}
 
 # estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
 # The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
 def estimate_recipe(product):
     current = time.perf_counter()
-    prepare_nutrients(product)
+    leaf_ingredient_count = prepare_nutrients(product)
     ingredients = product['ingredients']
     recipe_estimator = product['recipe_estimator']
     nutrients = recipe_estimator['nutrients']
@@ -39,6 +33,23 @@ def estimate_recipe(product):
     cons = []
     bound = (0, None)
     bounds = []
+
+    def water_constraint(i, maximum_water_content):
+        #return { 'type': 'ineq', 'fun': lambda x: x[i * 2] * maximum_water_content * 0.01 - x[i * 2 + 1]}
+        A = [0] * leaf_ingredient_count * 2
+        A[i * 2] = maximum_water_content * 0.01
+        A[i * 2 + 1] = -1
+        return LinearConstraint(A, lb = 0)
+
+    def ingredient_order_constraint(previous_start, this_start, this_count):
+        # return { 'type': 'ineq', 'fun': lambda x: sum(x[previous_start : this_start : 2]) - sum(x[this_start : this_start + this_count * 2 : 2])}
+        A = [0] * leaf_ingredient_count * 2
+        for i in range(0, leaf_ingredient_count * 2, 2):
+            if i >= previous_start and i < this_start:
+                A[i] = 1
+            if i >= this_start and i < this_start + this_count * 2:
+                A[i] = -1
+        return LinearConstraint(A, lb = 0)
 
     # Prepare nutrients information in arrays for fast objective function
     nutrient_names = []
@@ -118,11 +129,17 @@ def estimate_recipe(product):
 
         return nutrient_difference
 
-    # For COBYLA can't use eq constraint
-    cons.append({ 'type': 'ineq', 'fun': lambda x: sum(x[0::2]) - sum(x[1::2]) - 99.9})
-    cons.append({ 'type': 'ineq', 'fun': lambda x: 100.1 - (sum(x[0::2]) - sum(x[1::2]))})
+    A = [0] * leaf_ingredient_count * 2
+    for i in range(0, leaf_ingredient_count * 2):
+        A[i] = -1 if i % 2 else 1
+    cons.append(LinearConstraint(A, lb = 99.9, ub = 100.1))
 
-    solution = minimize(objective,x,method='COBYLA',bounds=bounds,constraints=cons,options={'maxiter': 10000})
+    # For COBYLA can't use eq constraint
+    #cons.append({ 'type': 'ineq', 'fun': lambda x: sum(x[0::2]) - sum(x[1::2]) - 99.9})
+    #cons.append({ 'type': 'ineq', 'fun': lambda x: 100.1 - (sum(x[0::2]) - sum(x[1::2]))})
+
+    # COBYQA is very slow
+    solution = minimize(objective,x,method='trust-constr',bounds=bounds,constraints=cons)
 
     total_quantity = sum(solution.x[0::2])
 
@@ -145,7 +162,7 @@ def estimate_recipe(product):
     set_percentages(ingredients)
     end = time.perf_counter()
     recipe_estimator['time'] = end - current
-    recipe_estimator['status'] = solution.status if solution.status > 2 else 0
+    recipe_estimator['status'] = solution.status
     recipe_estimator['status_message'] = solution.message
     #recipe_estimator['iterations'] = solution.nit
 
