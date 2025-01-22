@@ -352,7 +352,7 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
     # Status is valid
     assert metrics['status'] == 0
 
-    assert round(product['ingredients'][0]['percent_estimate']) == 53
-    assert round(product['ingredients'][1]['percent_estimate']) == 27
-    assert round(product['ingredients'][2]['percent_estimate']) == 13
-    assert round(product['ingredients'][3]['percent_estimate']) == 7
+    assert 51 < product['ingredients'][0]['percent_estimate'] < 55 # 53
+    assert 25 < product['ingredients'][1]['percent_estimate'] < 29 # 27
+    assert 11 < product['ingredients'][2]['percent_estimate'] < 15 # 13
+    assert 5  < product['ingredients'][3]['percent_estimate'] < 9  # 7

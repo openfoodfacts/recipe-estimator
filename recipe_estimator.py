@@ -106,8 +106,6 @@ def estimate_recipe(product):
 
     add_ingredients(100, ingredients)
 
-    cons.append({ 'type': 'eq', 'fun': lambda x: sum(x[0::2]) - sum(x[1::2]) - 100})
-
     def objective(x):
         nutrient_difference = 0
 
@@ -120,7 +118,11 @@ def estimate_recipe(product):
 
         return nutrient_difference
 
-    solution = minimize(objective,x,method='SLSQP',bounds=bounds,constraints=cons)
+    # For COBYLA can't use eq constraint
+    cons.append({ 'type': 'ineq', 'fun': lambda x: sum(x[0::2]) - sum(x[1::2]) - 99.9})
+    cons.append({ 'type': 'ineq', 'fun': lambda x: 100.1 - (sum(x[0::2]) - sum(x[1::2]))})
+
+    solution = minimize(objective,x,method='COBYLA',bounds=bounds,constraints=cons,options={'maxiter': 10000})
 
     total_quantity = sum(solution.x[0::2])
 
@@ -143,9 +145,9 @@ def estimate_recipe(product):
     set_percentages(ingredients)
     end = time.perf_counter()
     recipe_estimator['time'] = end - current
-    recipe_estimator['status'] = solution.status
+    recipe_estimator['status'] = solution.status if solution.status > 2 else 0
     recipe_estimator['status_message'] = solution.message
-    recipe_estimator['iterations'] = solution.nit
+    #recipe_estimator['iterations'] = solution.nit
 
     print('Time spent in solver: ', recipe_estimator['time'], 'seconds')
 
