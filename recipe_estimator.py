@@ -1,5 +1,5 @@
 import time  
-from scipy.optimize import minimize, LinearConstraint
+from scipy.optimize import minimize, LinearConstraint, shgo
 
 from prepare_nutrients import prepare_nutrients
 
@@ -31,13 +31,12 @@ def estimate_recipe(product):
     # Total of leaf level ingredients must add up to at least 100
     x = []
     cons = []
-    bound = (0, None)
     bounds = []
 
     def water_constraint(i, maximum_water_content):
-        # return { 'type': 'ineq', 'fun': lambda x: x[i] * maximum_water_content * 0.01 - x[i + 1]}
+        # return { 'type': 'ineq', 'fun': lambda x: x[i] * maximum_water_content - x[i + 1]}
         A = [0] * leaf_ingredient_count * 2
-        A[i] = maximum_water_content * 0.01
+        A[i] = maximum_water_content
         A[i + 1] = -1
         return LinearConstraint(A, lb = 0)
 
@@ -85,19 +84,20 @@ def estimate_recipe(product):
             if ('ingredients' in ingredient and len(ingredient['ingredients']) > 0):
                 ingredients_added = add_ingredients(a, ingredient['ingredients'])
             else:
+                # Set lost water constraint
+                water = ingredient['nutrients'].get('water', {})
+                maximum_water_content = water.get('percent_max', 0) * 0.01
+                cons.append(water_constraint(this_start, maximum_water_content))
+
                 # Initial estimate. 0.5 of previous ingredient
                 x.append(a)
                 a /= 2
-                bounds.append(bound)
+                maximum_weight = None if maximum_water_content == 1 else 100 / (1 - maximum_water_content)
+                bounds.append((100 / len(ingredients) if this_start == 0 else 0, maximum_weight))
  
                 # Water loss
                 x.append(0)
-                bounds.append(bound)
-
-                # Set lost water constraint
-                water = ingredient['nutrients'].get('water', {})
-                maximum_water_content = water.get('percent_max', 0)
-                cons.append(water_constraint(this_start, maximum_water_content))
+                bounds.append((0, None if maximum_water_content == 1 else maximum_water_content * maximum_weight))
 
                 ingredient['index'] = this_start
                 ingredients_added = 1
@@ -138,7 +138,12 @@ def estimate_recipe(product):
     # cons.append({ 'type': 'ineq', 'fun': lambda x: 100.1 - (sum(x[0::2]) - sum(x[1::2]))})
 
     # COBYQA is very slow
-    solution = minimize(objective,x,method='COBYLA',bounds=bounds,constraints=cons,options={'maxiter': 10000})
+    #solution = minimize(objective,x,method='COBYLA',bounds=bounds,constraints=cons,options={'maxiter': 10000})
+    solution = minimize(objective,x,method='SLSQP',bounds=bounds,constraints=cons) # Fastest
+    #solution = minimize(objective,x,method='trust-constr',bounds=bounds,constraints=cons)
+    # May need to consider using global minimization as the objective function is probably not convex
+    # Looks like shgo is the only one that supports constraints
+    # solution = shgo(objective, bounds=bounds, constraints=cons) #, n = 1000, minimizer_kwargs={'method': 'COBYLA'})
 
     total_quantity = sum(solution.x[0::2])
 
@@ -161,7 +166,7 @@ def estimate_recipe(product):
     set_percentages(ingredients)
     end = time.perf_counter()
     recipe_estimator['time'] = end - current
-    recipe_estimator['status'] = solution.status
+    recipe_estimator['status'] = 0 if solution.success else 1
     recipe_estimator['status_message'] = solution.message
     #recipe_estimator['iterations'] = solution.nit
 
