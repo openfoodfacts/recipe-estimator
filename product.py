@@ -10,6 +10,14 @@ def print_recipe(ingredients, indent = ''):
         if 'ingredients' in ingredient:
             print_recipe(ingredient['ingredients'], indent + ' ')
 
+def fix_ingredients(ingredients):
+    for ingredient in ingredients:
+        if 'ingredients' in ingredient:
+            sub_ingredients = ingredient['ingredients']
+            if (len(sub_ingredients) > 0):
+                fix_ingredients(sub_ingredients)
+            else:
+                del ingredient['ingredients']
 
 def get_product(id):
     response = requests.get("http://world.openfoodfacts.org/api/v3/product/" + id).json()
@@ -17,6 +25,6 @@ def get_product(id):
         return {}
 
     product = response['product']
-
+    fix_ingredients(product['ingredients'])
     return product
 
