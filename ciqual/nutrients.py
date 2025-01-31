@@ -1,7 +1,7 @@
 import csv
 import json
 import os
-
+import xml.etree.ElementTree as ET
 
 def parse_value(ciqual_nutrient):
     if not ciqual_nutrient or ciqual_nutrient == '-':
@@ -10,18 +10,23 @@ def parse_value(ciqual_nutrient):
 
 # Load Ciqual data
 ciqual_ingredients = {}
-filename = os.path.join(os.path.dirname(__file__), "Ciqual.csv.0")
-with open(filename, newline="", encoding="utf8") as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        values = list(row.values())
-        keys = list(row.keys())
-        for i in range(9,len(values)):
-            value = parse_value(values[i])
-            row[keys[i]] = value
-        ciqual_ingredients[row["alim_code"]] = row
 
-# print(ciqual_ingredients['42501'])
+# Compo file is not valid XML. Need to fix all of the "less than" entries
+with open(os.path.join(os.path.dirname(__file__), "compo_2020_07_07.xml"), encoding="utf8") as compo_file:
+    compo_table = ET.fromstring(compo_file.read().replace(' < ', ' &lt; '))
+
+for compo in compo_table:
+    alim_code = compo.find('alim_code').text.strip()
+    nutrient_key = compo.find('const_code').text.strip()
+    value = parse_value(compo.find('teneur').text.strip())
+    ciqual_ingredient = ciqual_ingredients.setdefault(alim_code, {})
+    ciqual_ingredient = ciqual_ingredients.get(alim_code, {})
+    ciqual_ingredient[nutrient_key] = value
+
+const_codes = {}
+const_table = ET.parse(os.path.join(os.path.dirname(__file__), "const_2020_07_07.xml")).getroot()
+for const in const_table:
+    const_codes[const.find('const_nom_eng').text.strip()] = const.find('const_code').text.strip()
 
 # Load OFF Ciqual Nutrient mapping
 off_to_ciqual = {}
@@ -41,7 +46,7 @@ with open(filename, newline="", encoding="utf8") as csvfile:
                 factor = 1000000.0
             row['factor'] = factor
             off_to_ciqual[row["off_id"]] = row
-            ciqual_to_off[row["ciqual_id"]] = row
+            ciqual_to_off[const_codes[row["ciqual_id"]]] = row
 
 # Load ingredients
 filename = os.path.join(os.path.dirname(__file__), "ingredients.json")

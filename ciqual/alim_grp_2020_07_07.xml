@@ -1,0 +1,1499 @@
+<?xml version="1.0" encoding="windows-1252" ?>
+<TABLE>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0101 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> salades composées et crudités </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> mixed salads </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0102 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> soupes </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> soups </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0103 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> plats composés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dishes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 010301 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> plats de viande sans garniture </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> meat dishes, no garnish </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0103 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> plats composés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dishes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 010302 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> plats de viande et féculents </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> meat dishes, with starchy food </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0103 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> plats composés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dishes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 010303 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> plats de viande et légumes/légumineuses </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> meat dishes, with vegetables/legume </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0103 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> plats composés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dishes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 010304 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> plats de poisson sans garniture </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> fish dishes, no garnish </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0103 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> plats composés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dishes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 010305 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> plats de poisson et féculents </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> fish dishes, with starchy food </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0103 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> plats composés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dishes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 010306 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> plats de légumes/légumineuses </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> vegetable/legume dishes </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0103 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> plats composés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dishes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 010307 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> plats de céréales/pâtes </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> pasta or cereal dishes </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0103 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> plats composés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dishes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 010308 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> plats de fromage </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> cheese dishes </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0103 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> plats composés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dishes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 010309 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> plats végétariens </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> vegetarian dishes </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0104 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> pizzas, tartes et crêpes salées </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> pizzas, crepe and pies </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0105 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> sandwichs </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> sandwiches </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 01 </alim_grp_code>
+      <alim_grp_nom_fr> entrées et plats composés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> starters and dishes </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0106 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> feuilletées et autres entrées </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> savoury pastries and other starters </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0201 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> légumes </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> vegetables </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020101 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> légumes crus </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> vegetables, raw </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0201 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> légumes </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> vegetables </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020102 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> légumes cuits </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> vegetables, cooked </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0201 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> légumes </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> vegetables </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020103 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> légumes séchés ou déshydratés </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> vegetables, dried or dehydrated </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0201 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> légumes </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> vegetables </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020104 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> légumes et leurs produits de la Martinique </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> vegetables from Martinique and their products </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0201 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> légumes </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> vegetables </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020105 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> légumes et leurs produits de la Réunion </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> vegetables from Reunion Island and their products </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0202 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> pommes de terre et autres tubercules </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> potatoes and other tubers </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0203 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> légumineuses </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> legumes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020301 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> légumineuses cuites </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> legumes, cooked </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0203 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> légumineuses </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> legumes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020302 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> légumineuses fraîches </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> legumes, raw </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0203 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> légumineuses </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> legumes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020303 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> légumineuses sèches </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> legumes, dried </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0204 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fruits </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> fruits </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020401 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> fruits crus </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> fresh fruits </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0204 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fruits </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> fruits </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020402 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> compotes et assimilés </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> puréed fruits </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0204 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fruits </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> fruits </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020403 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> fruits appertisés </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> canned fruits </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0204 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fruits </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> fruits </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020404 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> fruits séchés </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> dried fruits </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0204 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fruits </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> fruits </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020405 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> fruits et leurs produits de la Martinique </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> fruits from Martinique and their products </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0204 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fruits </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> fruits </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 020406 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> fruits et leurs produits de la Réunion </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> fruits from Reunion Island and their products </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 02 </alim_grp_code>
+      <alim_grp_nom_fr> fruits, légumes, légumineuses et oléagineux </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fruits, vegetables, legumes and nuts </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0205 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fruits à coque et graines oléagineuses </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> nuts and seeds </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 03 </alim_grp_code>
+      <alim_grp_nom_fr> produits céréaliers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> cereal products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0301 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> pâtes, riz et céréales </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> pasta, rice and grains </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 030101 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> pâtes, riz et céréales cuits </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> pasta, rice and grains, cooked </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 03 </alim_grp_code>
+      <alim_grp_nom_fr> produits céréaliers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> cereal products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0301 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> pâtes, riz et céréales </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> pasta, rice and grains </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 030102 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> pâtes, riz et céréales crus </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> pasta, rice and grains, raw </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 03 </alim_grp_code>
+      <alim_grp_nom_fr> produits céréaliers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> cereal products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0302 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> pains et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> breads and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 030201 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> pains </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> breads </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 03 </alim_grp_code>
+      <alim_grp_nom_fr> produits céréaliers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> cereal products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0302 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> pains et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> breads and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 030202 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> biscottes et pains grillés </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> rusks </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 03 </alim_grp_code>
+      <alim_grp_nom_fr> produits céréaliers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> cereal products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0303 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> biscuits apéritifs </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> savoury biscuits </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0401 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes cuites </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cooked meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0401 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes cuites </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cooked meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040101 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> bœuf et veau </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> beef and veal </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0401 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes cuites </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cooked meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040102 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> porc </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> pork </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0401 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes cuites </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cooked meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040103 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> poulet </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> poultry </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0401 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes cuites </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cooked meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040104 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> dinde </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> turkey </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0401 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes cuites </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cooked meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040105 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> agneau et mouton </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> lamb and mutton </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0401 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes cuites </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cooked meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040106 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> gibier </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> game </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0401 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes cuites </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cooked meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040107 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> autres viandes </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> other meats </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0401 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes cuites </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cooked meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040108 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> abats </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> offals </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0402 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes crues </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> raw meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040201 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> bœuf et veau </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> beef and veal </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0402 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes crues </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> raw meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040202 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> porc </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> pork </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0402 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes crues </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> raw meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040203 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> poulet </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> poultry </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0402 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes crues </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> raw meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040204 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> dinde </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> turkey </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0402 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes crues </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> raw meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040205 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> agneau et mouton </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> lamb and mutton </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0402 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes crues </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> raw meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040206 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> gibier </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> game </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0402 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes crues </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> raw meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040207 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> autres viandes </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> other meats </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0402 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viandes crues </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> raw meat </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040208 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> abats </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> offals </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0403 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> charcuteries et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> delicatessen meat and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0403 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> charcuteries et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> delicatessen meat and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040301 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> jambons cuits </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> cooked ham </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0403 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> charcuteries et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> delicatessen meat and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040302 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> jambons secs et crus </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> raw and cured ham </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0403 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> charcuteries et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> delicatessen meat and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040303 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> saucisson secs </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> dry sausages </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0403 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> charcuteries et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> delicatessen meat and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040304 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> saucisses et assimilés </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> sausages </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0403 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> charcuteries et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> delicatessen meat and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040305 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> pâtés et terrines </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> pâtés and terrines </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0403 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> charcuteries et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> delicatessen meat and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040306 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> rillettes </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> rillettes </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0403 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> charcuteries et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> delicatessen meat and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040307 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> quenelles </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> quenelles </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0403 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> charcuteries et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> delicatessen meat and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040308 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> autres spécialités charcutières </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> other delicatessen </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0403 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> charcuteries et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> delicatessen meat and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 040309 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> substituts de charcuteries pour végétariens </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> delicatessen alternatives for vegetarian </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0404 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> autres produits à base de viande </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> other meat products </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0405 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> poissons cuits </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> fish, cooked </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0406 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> poissons crus </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> fish, raw </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0407 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> mollusques et crustacés cuits </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> seafood, cooked </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0408 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> mollusques et crustacés crus </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> seafood, raw </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0409 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> produits à base de poissons et produits de la mer </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> fish products </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0410 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> œufs </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> eggs </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 041001 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> œufs cuits </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> eggs, cooked </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0410 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> œufs </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> eggs </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 041002 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> œufs crus </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> eggs, raw </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0410 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> œufs </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> eggs </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 041003 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> omelettes et autres ovoproduits </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> omelettes and other egg products </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 04 </alim_grp_code>
+      <alim_grp_nom_fr> viandes, œufs, poissons et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> meat, egg and fish </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0411 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> substitus de produits carnés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> meat substitute </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0501 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> laits </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> milk </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050101 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> laits de vaches liquides (non concentrés) </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> milk from cow, liquid (not concentrated) </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0501 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> laits </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> milk </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050102 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> laits autres que de vache </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> milk, other than from cow </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0501 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> laits </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> milk </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050103 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> laits de vache concentrés ou en poudre </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> milk from cow, concentrated or in powder </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0502 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> produits laitiers frais et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dairy products and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050201 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> yaourts et spécialités laitières type yaourt </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> yoghurts </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0502 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> produits laitiers frais et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dairy products and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050202 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> fromages blancs </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> fromages blanc </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0502 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> produits laitiers frais et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dairy products and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050203 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> desserts lactés </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> dairy desserts </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0502 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> produits laitiers frais et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dairy products and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050204 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> autres desserts </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> other desserts </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0502 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> produits laitiers frais et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> dairy products and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050205 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> desserts végétaux </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> plant-based desserts </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0503 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fromages et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cheese and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0503 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fromages et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cheese and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050301 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> fromages à pâte molle </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> soft cheeses </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0503 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fromages et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cheese and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050302 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> fromages à pâte persillée </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> blue cheeses </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0503 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fromages et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cheese and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050303 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> fromages à pâte pressée </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> semihard cheeses </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0503 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fromages et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cheese and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050304 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> fromage fondus </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> processed cheeses </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0503 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fromages et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cheese and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050305 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> autres fromages et spécialités </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> uncured cheeses and similar </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0503 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> fromages et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cheese and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 050306 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> substituts de fromages pour végétariens </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> cheese alternatives for vegetarian </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 05 </alim_grp_code>
+      <alim_grp_nom_fr> produits laitiers et assimilés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> milk and milk products </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0504 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> crèmes et spécialités à base de crème </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cream and similar </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 06 </alim_grp_code>
+      <alim_grp_nom_fr> eaux et autres boissons </alim_grp_nom_fr>
+      <alim_grp_nom_eng> beverages </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0601 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> eaux </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> water </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 06 </alim_grp_code>
+      <alim_grp_nom_fr> eaux et autres boissons </alim_grp_nom_fr>
+      <alim_grp_nom_eng> beverages </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0602 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> boissons sans alcool </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> non-alcoholic beverages </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 060201 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> jus </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> juices </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 06 </alim_grp_code>
+      <alim_grp_nom_fr> eaux et autres boissons </alim_grp_nom_fr>
+      <alim_grp_nom_eng> beverages </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0602 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> boissons sans alcool </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> non-alcoholic beverages </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 060202 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> nectars </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> nectars </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 06 </alim_grp_code>
+      <alim_grp_nom_fr> eaux et autres boissons </alim_grp_nom_fr>
+      <alim_grp_nom_eng> beverages </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0602 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> boissons sans alcool </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> non-alcoholic beverages </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 060203 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> boissons rafraîchissantes sans alcool </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> soft drinks </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 06 </alim_grp_code>
+      <alim_grp_nom_fr> eaux et autres boissons </alim_grp_nom_fr>
+      <alim_grp_nom_eng> beverages </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0602 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> boissons sans alcool </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> non-alcoholic beverages </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 060204 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> boissons rafraîchissantes lactées </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> dairy beverages </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 06 </alim_grp_code>
+      <alim_grp_nom_fr> eaux et autres boissons </alim_grp_nom_fr>
+      <alim_grp_nom_eng> beverages </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0602 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> boissons sans alcool </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> non-alcoholic beverages </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 060205 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> boissons végétales </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> plant-based drinks </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 06 </alim_grp_code>
+      <alim_grp_nom_fr> eaux et autres boissons </alim_grp_nom_fr>
+      <alim_grp_nom_eng> beverages </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0602 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> boissons sans alcool </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> non-alcoholic beverages </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 060206 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> café, thé, cacao etc. prêts à consommer </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> coffee, tea, cocoa beverages, etc. ready to drink </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 06 </alim_grp_code>
+      <alim_grp_nom_fr> eaux et autres boissons </alim_grp_nom_fr>
+      <alim_grp_nom_eng> beverages </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0602 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> boissons sans alcool </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> non-alcoholic beverages </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 060207 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> boissons à reconstituer </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> beverages, to reconstitute </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 06 </alim_grp_code>
+      <alim_grp_nom_fr> eaux et autres boissons </alim_grp_nom_fr>
+      <alim_grp_nom_eng> beverages </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0603 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> boisson alcoolisées </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> alcoholic beverages </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 060301 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> vins </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> wines </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 06 </alim_grp_code>
+      <alim_grp_nom_fr> eaux et autres boissons </alim_grp_nom_fr>
+      <alim_grp_nom_eng> beverages </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0603 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> boisson alcoolisées </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> alcoholic beverages </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 060302 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> bières et cidres </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> beers and ciders </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 06 </alim_grp_code>
+      <alim_grp_nom_fr> eaux et autres boissons </alim_grp_nom_fr>
+      <alim_grp_nom_eng> beverages </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0603 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> boisson alcoolisées </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> alcoholic beverages </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 060303 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> liqueurs et alcools </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> liqueurs and spirits </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 06 </alim_grp_code>
+      <alim_grp_nom_fr> eaux et autres boissons </alim_grp_nom_fr>
+      <alim_grp_nom_eng> beverages </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0603 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> boisson alcoolisées </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> alcoholic beverages </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 060304 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> cocktails </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> cocktails </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 07 </alim_grp_code>
+      <alim_grp_nom_fr> produits sucrés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> sugar and confectionery </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0701 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> sucres, miels et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> sugars and honey </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 07 </alim_grp_code>
+      <alim_grp_nom_fr> produits sucrés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> sugar and confectionery </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0702 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> chocolats et produits à base de chocolat </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> chocolate and chocolate products </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 07 </alim_grp_code>
+      <alim_grp_nom_fr> produits sucrés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> sugar and confectionery </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0703 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> confiseries non chocolatées </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> non-chocolate confectionery </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 07 </alim_grp_code>
+      <alim_grp_nom_fr> produits sucrés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> sugar and confectionery </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0704 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> confitures et assimilés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> jam </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 07 </alim_grp_code>
+      <alim_grp_nom_fr> produits sucrés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> sugar and confectionery </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0705 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> viennoiseries </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> Viennese pastries </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 07 </alim_grp_code>
+      <alim_grp_nom_fr> produits sucrés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> sugar and confectionery </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0706 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> biscuits sucrés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> sweet biscuits </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 07 </alim_grp_code>
+      <alim_grp_nom_fr> produits sucrés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> sugar and confectionery </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0707 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> céréales de petit-déjeuner </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> breakfast cereals </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 07 </alim_grp_code>
+      <alim_grp_nom_fr> produits sucrés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> sugar and confectionery </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0708 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> barres céréalières </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cereal bars </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 07 </alim_grp_code>
+      <alim_grp_nom_fr> produits sucrés </alim_grp_nom_fr>
+      <alim_grp_nom_eng> sugar and confectionery </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0709 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> gâteaux et pâtisseries </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cakes and pastry </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 08 </alim_grp_code>
+      <alim_grp_nom_fr> glaces et sorbets </alim_grp_nom_fr>
+      <alim_grp_nom_eng> ice cream and sorbet </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0000 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> - </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> - </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 08 </alim_grp_code>
+      <alim_grp_nom_fr> glaces et sorbets </alim_grp_nom_fr>
+      <alim_grp_nom_eng> ice cream and sorbet </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0801 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> glaces </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> ice cream </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 08 </alim_grp_code>
+      <alim_grp_nom_fr> glaces et sorbets </alim_grp_nom_fr>
+      <alim_grp_nom_eng> ice cream and sorbet </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0802 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> sorbets </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> sorbet </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 08 </alim_grp_code>
+      <alim_grp_nom_fr> glaces et sorbets </alim_grp_nom_fr>
+      <alim_grp_nom_eng> ice cream and sorbet </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0803 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> desserts glacés </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> frozen desserts </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 09 </alim_grp_code>
+      <alim_grp_nom_fr> matières grasses </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fats and oils </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0901 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> beurres </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> butters </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 09 </alim_grp_code>
+      <alim_grp_nom_fr> matières grasses </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fats and oils </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0902 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> huiles et graisses végétales </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> vegetable oils </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 09 </alim_grp_code>
+      <alim_grp_nom_fr> matières grasses </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fats and oils </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0903 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> margarines </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> margarines </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 09 </alim_grp_code>
+      <alim_grp_nom_fr> matières grasses </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fats and oils </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0904 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> huiles de poissons </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> fish oils </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 09 </alim_grp_code>
+      <alim_grp_nom_fr> matières grasses </alim_grp_nom_fr>
+      <alim_grp_nom_eng> fats and oils </alim_grp_nom_eng>
+      <alim_ssgrp_code> 0905 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> autres matières grasses </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> other fats </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1001 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> sauces </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> sauces </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1001 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> sauces </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> sauces </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 100101 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> sauces condimentaires </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> condiment sauces </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1001 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> sauces </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> sauces </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 100102 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> sauces chaudes </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> warm sauces </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1001 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> sauces </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> sauces </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 100103 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> sauces sucrées </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> dessert sauces </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1002 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> condiments </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> condiments </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1003 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> aides culinaires </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> cooking aids </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1004 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> sels </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> salts </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1005 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> épices </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> spices </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1006 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> herbes </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> herbs </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 100601 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> herbes fraîches </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> fresh herbs </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1006 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> herbes </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> herbs </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 100602 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> herbes séchées </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> dried herbs </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1007 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> algues </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> seaweed </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1008 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> denrées destinées à une alimentation particulière </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> foods for particular nutritional uses </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1009 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> aides culinaires et ingrédients pour végétariens </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> miscellaneous ingredients for vegetarian </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 10 </alim_grp_code>
+      <alim_grp_nom_fr> aides culinaires et ingrédients divers </alim_grp_nom_fr>
+      <alim_grp_nom_eng> miscellaneous </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1009 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> ingrédients divers </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> miscellaneous ingredients </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 11 </alim_grp_code>
+      <alim_grp_nom_fr> aliments infantiles </alim_grp_nom_fr>
+      <alim_grp_nom_eng> baby food </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1101 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> laits et boissons infantiles </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> baby milk and beverages </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 11 </alim_grp_code>
+      <alim_grp_nom_fr> aliments infantiles </alim_grp_nom_fr>
+      <alim_grp_nom_eng> baby food </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1102 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> petits pots salés et plats infantiles </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> baby dishes </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 11 </alim_grp_code>
+      <alim_grp_nom_fr> aliments infantiles </alim_grp_nom_fr>
+      <alim_grp_nom_eng> baby food </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1103 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> desserts infantiles </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> baby deserts </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+   <ALIM_GRP>
+      <alim_grp_code> 11 </alim_grp_code>
+      <alim_grp_nom_fr> aliments infantiles </alim_grp_nom_fr>
+      <alim_grp_nom_eng> baby food </alim_grp_nom_eng>
+      <alim_ssgrp_code> 1104 </alim_ssgrp_code>
+      <alim_ssgrp_nom_fr> céréales et biscuits infantiles </alim_ssgrp_nom_fr>
+      <alim_ssgrp_nom_eng> baby biscuits and cereals </alim_ssgrp_nom_eng>
+      <alim_ssssgrp_code> 000000 </alim_ssssgrp_code>
+      <alim_ssssgrp_nom_fr> - </alim_ssssgrp_nom_fr>
+      <alim_ssssgrp_nom_eng> - </alim_ssssgrp_nom_eng>
+   </ALIM_GRP>
+</TABLE>
