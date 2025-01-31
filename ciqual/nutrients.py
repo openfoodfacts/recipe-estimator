@@ -9,6 +9,11 @@ def parse_value(ciqual_nutrient):
     return float(ciqual_nutrient.replace(',','.').replace('<','').replace('traces','0'))
 
 # Load Ciqual data
+alim_codes = {}
+alim_table = ET.parse(os.path.join(os.path.dirname(__file__), "alim_2020_07_07.xml")).getroot()
+for alim in alim_table:
+    alim_codes[alim.find('alim_code').text.strip()] = alim.find('alim_nom_eng').text.strip()
+
 ciqual_ingredients = {}
 
 # Compo file is not valid XML. Need to fix all of the "less than" entries
@@ -19,8 +24,13 @@ for compo in compo_table:
     alim_code = compo.find('alim_code').text.strip()
     nutrient_key = compo.find('const_code').text.strip()
     value = parse_value(compo.find('teneur').text.strip())
-    ciqual_ingredient = ciqual_ingredients.setdefault(alim_code, {})
-    ciqual_ingredient = ciqual_ingredients.get(alim_code, {})
+    ciqual_ingredient = ciqual_ingredients.setdefault(alim_code, {
+        'id': alim_code,
+        'ciqual_food_code': alim_code,
+        'alim_nom_eng': alim_codes[alim_code],
+        'text': alim_codes[alim_code],
+    })
+    ciqual_ingredient = ciqual_ingredients.get(alim_code)
     ciqual_ingredient[nutrient_key] = value
 
 const_codes = {}
