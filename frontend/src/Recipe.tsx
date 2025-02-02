@@ -63,7 +63,10 @@ export default function Recipe({product}: RecipeProps) {
     async function fetchData() {
       const results = await (await fetch(`${API_PATH}api/v3/estimate_recipe`, {method: 'POST', body: JSON.stringify(product)})).json();
       setIngredients(results.ingredients);
-      setNutrients(results.recipe_estimator.nutrients);
+      setNutrients(Object.fromEntries(
+        Object.entries(results.recipe_estimator.nutrients).filter(
+           ([key, val])=>(val as any).weighting
+        )));
     }
     fetchData();
   }, []);
@@ -86,7 +89,7 @@ export default function Recipe({product}: RecipeProps) {
     for(const ingredient of parent) {
       if (!ingredient.ingredients) {
         if (ingredient.nutrients?.[nutrient_key])
-          total += ingredient.percent_estimate * (nutrient_key ? ingredient.nutrients?.[nutrient_key].percent_max : 1) / 100;
+          total += ingredient.percent_estimate * (nutrient_key ? ingredient.nutrients?.[nutrient_key].percent_nom : 1) / 100;
       }
       else
         total += getTotalForParent(nutrient_key, ingredient.ingredients);
@@ -185,10 +188,10 @@ export default function Recipe({product}: RecipeProps) {
                     }
                     </TableCell>
                     {Object.keys(nutrients).map((nutrient: string) => (
-                      <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] && ingredient.nutrients?.[nutrient].percent_max &&
+                      <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] && ingredient.nutrients?.[nutrient].percent_nom &&
                         <>
-                          <Typography variant="caption">{format(ingredient.nutrients?.[nutrient].percent_max, QUANTITY)}</Typography>
-                          <Typography variant="body1">{format(ingredient.percent_estimate * ingredient.nutrients?.[nutrient].percent_max / 100, QUANTITY)}</Typography>
+                          <Typography variant="caption">{format(ingredient.nutrients?.[nutrient].percent_nom, QUANTITY)}</Typography>
+                          <Typography variant="body1">{format(ingredient.percent_estimate * ingredient.nutrients?.[nutrient].percent_nom / 100, QUANTITY)}</Typography>
                         </>
                       }
                       </TableCell>

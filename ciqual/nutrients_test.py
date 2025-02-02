@@ -9,17 +9,16 @@ def test_prepare_product_populates_nutrients():
     carbs = ingredient_nutrients.get('carbohydrates')
     assert carbs is not None
     assert carbs['percent_min'] > 2.4
-    assert carbs['percent_max'] < 2.6
+    assert 2.6 < carbs['percent_max'] < 5.2
 
     # Check that units are normalised
     calcium = ingredient_nutrients.get('calcium')
-    assert calcium['percent_min'] > 0.006
-    assert calcium['percent_max'] < 0.010
+    assert 0.001 < calcium['percent_min'] < 0.006
+    assert 0.010 < calcium['percent_max'] < 0.020
 
     # Includes water content
     water = ingredient_nutrients.get('water')
-    assert water['percent_min'] > 90
-
+    assert 80 < water['percent_min'] < 90
 
 def test_prepare_product_looks_up_ciqual_code():
     product = {'ingredients': [{'id':'en:tomato'}]}

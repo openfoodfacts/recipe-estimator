@@ -86,7 +86,7 @@ def estimate_recipe(product):
             else:
                 # Set lost water constraint
                 water = ingredient['nutrients'].get('water', {})
-                maximum_water_content = water.get('percent_max', 0) * 0.01
+                maximum_water_content = water.get('percent_nom', 0) * 0.01
                 cons.append(water_constraint(this_start, maximum_water_content))
 
                 # Initial estimate. 0.5 of previous ingredient
@@ -104,7 +104,7 @@ def estimate_recipe(product):
 
                 for n,nutrient_key in enumerate(nutrient_names):
                     ingredient_nutrient =  ingredient['nutrients'][nutrient_key]
-                    ingredients_nutrients[n].append(ingredient_nutrient['percent_min'] / 100)
+                    ingredients_nutrients[n].append(ingredient_nutrient['percent_nom'] / 100)
 
             # Set order constraint
             if (i > 0):

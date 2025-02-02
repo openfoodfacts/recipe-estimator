@@ -6,9 +6,9 @@ def test_prepare_nutrients():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'carbohydrates': {'percent_min': 2.5,'percent_max': 2.5},
-                'energy': {'percent_min': 80,'percent_max': 80},
-                'water': {'percent_min': 90,'percent_max': 90},
+                'carbohydrates': {'percent_nom': 2.5},
+                'energy': {'percent_nom': 80},
+                'water': {'percent_nom': 90},
             }
         }],
         'nutriments': {
@@ -53,9 +53,9 @@ def test_prepare_nutrients_copes_with_no_product_nutrients():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'carbohydrates': {'percent_min': 2.5,'percent_max': 2.5},
-                'energy': {'percent_min': 80,'percent_max': 80},
-                'water': {'percent_min': 90,'percent_max': 90},
+                'carbohydrates': {'percent_nom': 2.5},
+                'energy': {'percent_nom': 80},
+                'water': {'percent_nom': 90},
             }
         }]}
 

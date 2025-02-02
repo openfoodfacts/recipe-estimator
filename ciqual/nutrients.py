@@ -8,31 +8,6 @@ def parse_value(ciqual_nutrient):
         return 0
     return float(ciqual_nutrient.replace(',','.').replace('<','').replace('traces','0'))
 
-# Load Ciqual data
-alim_codes = {}
-alim_table = ET.parse(os.path.join(os.path.dirname(__file__), "alim_2020_07_07.xml")).getroot()
-for alim in alim_table:
-    alim_codes[alim.find('alim_code').text.strip()] = alim.find('alim_nom_eng').text.strip()
-
-ciqual_ingredients = {}
-
-# Compo file is not valid XML. Need to fix all of the "less than" entries
-with open(os.path.join(os.path.dirname(__file__), "compo_2020_07_07.xml"), encoding="utf8") as compo_file:
-    compo_table = ET.fromstring(compo_file.read().replace(' < ', ' &lt; '))
-
-for compo in compo_table:
-    alim_code = compo.find('alim_code').text.strip()
-    nutrient_key = compo.find('const_code').text.strip()
-    value = parse_value(compo.find('teneur').text.strip())
-    ciqual_ingredient = ciqual_ingredients.setdefault(alim_code, {
-        'id': alim_code,
-        'ciqual_food_code': alim_code,
-        'alim_nom_eng': alim_codes[alim_code],
-        'text': alim_codes[alim_code],
-    })
-    ciqual_ingredient = ciqual_ingredients.get(alim_code)
-    ciqual_ingredient[nutrient_key] = value
-
 const_codes = {}
 const_table = ET.parse(os.path.join(os.path.dirname(__file__), "const_2020_07_07.xml")).getroot()
 for const in const_table:
@@ -58,11 +33,61 @@ with open(filename, newline="", encoding="utf8") as csvfile:
             off_to_ciqual[row["off_id"]] = row
             ciqual_to_off[const_codes[row["ciqual_id"]]] = row
 
+# Load Ciqual data
+alim_codes = {}
+alim_table = ET.parse(os.path.join(os.path.dirname(__file__), "alim_2020_07_07.xml")).getroot()
+for alim in alim_table:
+    alim_codes[alim.find('alim_code').text.strip()] = alim.find('alim_nom_eng').text.strip()
+
+ciqual_ingredients = {}
+
+# Compo file is not valid XML. Need to fix all of the "less than" entries
+with open(os.path.join(os.path.dirname(__file__), "compo_2020_07_07.xml"), encoding="utf8") as compo_file:
+    compo_table = ET.fromstring(compo_file.read().replace(' < ', ' &lt; '))
+
+for compo in compo_table:
+    const_code = compo.find('const_code').text.strip()
+    nutrient = ciqual_to_off.get(const_code)
+    if nutrient is not None:
+        nutrient_key = nutrient['off_id']
+        factor = nutrient['factor']
+        alim_code = compo.find('alim_code').text.strip()
+        teneur = compo.find('teneur').text.strip()
+        min = compo.find('min').text
+        max = compo.find('max').text
+        nom_value = parse_value(teneur)
+
+        # TODO: If min and max not set then should be able to apply tolerance based on code_confiance
+        if min is not None:
+            min_value = parse_value(min.strip())
+        elif '<' in teneur:
+            min_value = 0
+        else:
+            min_value = nom_value
+
+        if max is not None:
+            max_value = parse_value(max.strip())
+        else:
+            max_value = nom_value
+
+        ciqual_ingredient = ciqual_ingredients.setdefault(alim_code, {
+            'id': alim_code,
+            'ciqual_food_code': alim_code,
+            'alim_nom_eng': alim_codes[alim_code],
+            'text': alim_codes[alim_code],
+            'nutrients': {},
+        })
+        ciqual_ingredient = ciqual_ingredients.get(alim_code, {})
+        ciqual_ingredient['nutrients'][nutrient_key] = {
+            'percent_nom': nom_value / factor,
+            'percent_min': min_value / factor,
+            'percent_max': max_value / factor,
+        }
+
 # Load ingredients
 filename = os.path.join(os.path.dirname(__file__), "ingredients.json")
 with open(filename, "r", encoding="utf-8") as ingredients_file:
     ingredients_taxonomy = json.load(ingredients_file)
-
 
 def get_ciqual_code(ingredient_id):
     ingredient = ingredients_taxonomy.get(ingredient_id, None)
@@ -107,14 +132,9 @@ def setup_ingredients(ingredients, nutrients):
                     # using the average product nutrient values for unknown ingredients does not give good results      
                     # ingredient_nutrients[off_id] = {'percent_min': product_nutrient_value, 'percent_max': product_nutrient_value}
                     # set the nutrient contribution from unknown ingredients to 0
-                    ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_max': 0}
+                    ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_nom': 0, 'percent_max': 0}
             else:
-                for ciqual_key in ciqual_ingredient:
-                    nutrient = ciqual_to_off.get(ciqual_key)
-                    if (nutrient is not None):
-                        value = ciqual_ingredient[ciqual_key] / nutrient['factor']
-                        # TODO Get range data from CIQUAL values
-                        ingredient_nutrients[nutrient['off_id']] = {'percent_min': value, 'percent_max': value}
+                ingredient_nutrients = ciqual_ingredient['nutrients']
 
             ingredient['nutrients'] = ingredient_nutrients
             ingredient['ciqual_food_code_used'] = ciqual_code

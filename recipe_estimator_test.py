@@ -6,8 +6,8 @@ def test_estimate_recipe_accounts_for_lost_water():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'carbohydrates': {'percent_min': 2.5,'percent_max': 2.5},
-                'water': {'percent_min': 90,'percent_max': 90},
+                'carbohydrates': {'percent_nom': 2.5},
+                'water': {'percent_nom': 90},
             }
         }],
         'nutriments': {
@@ -43,8 +43,8 @@ def test_estimate_recipe_lost_water_is_constrained():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'carbohydrates': {'percent_min': 2.5,'percent_max': 2.5},
-                'water': {'percent_min': 10,'percent_max': 10},
+                'carbohydrates': {'percent_nom': 2.5},
+                'water': {'percent_nom': 10},
             }
         }],
         'nutriments': {
@@ -80,13 +80,13 @@ def test_estimate_recipe_simple_recipe():
             {
                 'id':'one',
                 'nutrients': {
-                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
+                    'carbohydrates': {'percent_nom': 15},
                 }
             },
             {
                 'id':'two',
                 'nutrients': {
-                    'carbohydrates': {'percent_min': 3,'percent_max': 3},
+                    'carbohydrates': {'percent_nom': 3},
                 }
             }
         ],
@@ -111,13 +111,13 @@ def test_estimate_recipe_simple_recipe_with_one_unmatched_ingredient():
             {
                 'id':'one',
                 'nutrients': {
-                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
+                    'carbohydrates': {'percent_nom': 15},
                 }
             },
             {
                 'id':'two',
                 'nutrients': {
-                    'carbohydrates': {'percent_min': 0,'percent_max': 100},
+                    'carbohydrates': {'percent_nom': 0},
                 }
             }
         ],
@@ -143,13 +143,13 @@ def test_estimate_recipe_simple_recipe_with_no_matched_ingredients():
             {
                 'id':'one',
                 'nutrients': {
-                    'carbohydrates': {'percent_min': 0,'percent_max': 100},
+                    'carbohydrates': {'percent_nom': 0},
                 }
             },
             {
                 'id':'two',
                 'nutrients': {
-                    'carbohydrates': {'percent_min': 0,'percent_max': 100},
+                    'carbohydrates': {'percent_nom': 0},
                 }
             }
         ],
@@ -175,13 +175,13 @@ def test_estimate_recipe_simple_recipe_with_no_nutriments():
             {
                 'id':'one',
                 'nutrients': {
-                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
+                    'carbohydrates': {'percent_nom': 15},
                 }
             },
             {
                 'id':'two',
                 'nutrients': {
-                    'carbohydrates': {'percent_min': 3,'percent_max': 3},
+                    'carbohydrates': {'percent_nom': 3},
                 }
             }
         ]}
@@ -202,10 +202,10 @@ def test_estimate_recipe_subingredients():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'carbohydrates': {'percent_min': 5,'percent_max': 5},
-                'water': {'percent_min': 90,'percent_max': 90},
-                'sugars': {'percent_min': 0,'percent_max': 0},
-                'salt': {'percent_min': 0,'percent_max': 0},
+                'carbohydrates': {'percent_nom': 5},
+                'water': {'percent_nom': 90},
+                'sugars': {'percent_nom': 0},
+                'salt': {'percent_nom': 0},
             }
         },
         {
@@ -213,17 +213,17 @@ def test_estimate_recipe_subingredients():
             'ingredients': [{
                 'id':'en:sugar',
                 'nutrients': {
-                    'sugars': {'percent_min': 100,'percent_max': 100},
-                    'carbohydrates': {'percent_min': 0,'percent_max': 0},
-                    'salt': {'percent_min': 0,'percent_max': 0},
+                    'sugars': {'percent_nom': 100},
+                    'carbohydrates': {'percent_nom': 0},
+                    'salt': {'percent_nom': 0},
                 }
             },
             {
                 'id':'en:salt',
                 'nutrients': {
-                    'salt': {'percent_min': 100,'percent_max': 100},
-                    'carbohydrates': {'percent_min': 0,'percent_max': 0},
-                    'sugars': {'percent_min': 0,'percent_max': 0},
+                    'salt': {'percent_nom': 100},
+                    'carbohydrates': {'percent_nom': 0},
+                    'sugars': {'percent_nom': 0},
                 }
             }
             ]
@@ -271,25 +271,25 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
             {
                 'id':'one',
                 'nutrients': {
-                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
+                    'carbohydrates': {'percent_nom': 15},
                 }
             },
             {
                 'id':'two',
                 'nutrients': {
-                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
+                    'carbohydrates': {'percent_nom': 15},
                 }
             },
             {
                 'id':'three',
                 'nutrients': {
-                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
+                    'carbohydrates': {'percent_nom': 15},
                 }
             },
             {
                 'id':'four',
                 'nutrients': {
-                    'carbohydrates': {'percent_min': 15,'percent_max': 15},
+                    'carbohydrates': {'percent_nom': 15},
                 }
             }
         ],
