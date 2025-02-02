@@ -27,7 +27,7 @@ function flattenIngredients(ingredients: any[], depth = 0): any[] {
   const flatIngredients = [];
   for (const ingredient of ingredients) {
     ingredient.depth = depth;
-    ingredient.percent_estimate = round(ingredient.percent_estimate);
+    ingredient.quantity_estimate = round(ingredient.quantity_estimate);
     flatIngredients.push(ingredient);
     if (ingredient.ingredients) {
       flatIngredients.push(...flattenIngredients(ingredient.ingredients, depth + 1));
@@ -89,7 +89,7 @@ export default function Recipe({product}: RecipeProps) {
     for(const ingredient of parent) {
       if (!ingredient.ingredients) {
         if (ingredient.nutrients?.[nutrient_key])
-          total += ingredient.percent_estimate * (nutrient_key ? ingredient.nutrients?.[nutrient_key].percent_nom : 1) / 100;
+          total += ingredient.quantity_estimate * (nutrient_key ? ingredient.nutrients?.[nutrient_key].percent_nom : 1) / 100;
       }
       else
         total += getTotalForParent(nutrient_key, ingredient.ingredients);
@@ -119,7 +119,7 @@ export default function Recipe({product}: RecipeProps) {
   };
   
   function onInputChange(ingredient:any, value: string, reason: string) {
-    if (reason === 'input') {
+    if (['input','clear'].includes(reason)) {
       addFirstOption(ingredient);
       ingredient.searchTerm = value;
       setIngredients([...ingredients]);
@@ -152,7 +152,7 @@ export default function Recipe({product}: RecipeProps) {
                 <TableRow className='total'>
                   <TableCell><Typography>Ingredient</Typography></TableCell>
                   <TableCell><Typography>CIQUAL Code</Typography></TableCell>
-                  <TableCell><Typography>Proportion</Typography></TableCell>
+                  <TableCell><Typography>g/100g</Typography></TableCell>
                   {Object.keys(nutrients).map((nutrient: string) => (
                     <TableCell key={nutrient}>
                       <Typography>{nutrient}</Typography>
@@ -184,14 +184,14 @@ export default function Recipe({product}: RecipeProps) {
                     }
                     </TableCell>
                     <TableCell>{!ingredient.ingredients &&
-                      <TextField type="number" size='small' value={parseFloat(ingredient.percent_estimate) || ''} onChange={(e) => {ingredient.percent_estimate = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
+                      <TextField type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
                     }
                     </TableCell>
                     {Object.keys(nutrients).map((nutrient: string) => (
                       <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] && ingredient.nutrients?.[nutrient].percent_nom &&
                         <>
                           <Typography variant="caption">{format(ingredient.nutrients?.[nutrient].percent_nom, QUANTITY)}</Typography>
-                          <Typography variant="body1">{format(ingredient.percent_estimate * ingredient.nutrients?.[nutrient].percent_nom / 100, QUANTITY)}</Typography>
+                          <Typography variant="body1">{format(ingredient.quantity_estimate * ingredient.nutrients?.[nutrient].percent_nom / 100, QUANTITY)}</Typography>
                         </>
                       }
                       </TableCell>
@@ -226,7 +226,7 @@ export default function Recipe({product}: RecipeProps) {
                       <Typography variant="caption">Weighted</Typography>
                       <Typography>{format(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
                       total + (!nutrients[nutrient_key].notes 
-                        ? nutrients[nutrient_key].weighting * Math.abs(getTotal(nutrient_key)- nutrients[nutrient_key].product_total) 
+                        ? nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total) ** 2
                         : 0), 0), VARIANCE)}
                       </Typography>
                     </TableCell>
