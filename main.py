@@ -26,7 +26,7 @@ async def redirect():
 @app.get("/ciqual/{name}")
 async def ciqual(name):
     search_terms = name.casefold().split()
-    return list(itertools.islice(filter(lambda i: (all(search_term in i['alim_nom_eng'].casefold() for search_term in search_terms)), ciqual_ingredients.values()),20))
+    return list(itertools.islice(filter(lambda i: (all(search_term in (i['alim_nom_eng'] + i['ciqual_food_code']).casefold() for search_term in search_terms)), ciqual_ingredients.values()),20))
 
 @app.get("/product/{id}")
 async def product(id):
