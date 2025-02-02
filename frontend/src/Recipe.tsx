@@ -7,7 +7,7 @@ interface RecipeProps {
 }
 
 function ingredientDisplayName(ingredient: any): string {
-  return ingredient?.text ? `${ingredient.text} (${ingredient.ciqual_food_code} - ${ingredient.ciqual_proxy_food_code})` : ''
+  return ingredient?.text ? `${ingredient.text} (${ingredient.ciqual_food_code ?? (ingredient.ciqual_proxy_food_code ? 'P-' + ingredient.ciqual_proxy_food_code : '?')})` : ''
 }
 function addFirstOption(ingredient: any) {
   ingredient.options ??= [];
@@ -33,7 +33,7 @@ function flattenIngredients(ingredients: any[], depth = 0): any[] {
       flatIngredients.push(...flattenIngredients(ingredient.ingredients, depth + 1));
     } else {
       addFirstOption(ingredient);
-      if (!ingredient.searchTerm)
+      if (ingredient.searchTerm == null)
         ingredient.searchTerm =  ingredientDisplayName(ingredient);
     }
   }
@@ -116,10 +116,11 @@ export default function Recipe({product}: RecipeProps) {
   };
   
   function onInputChange(ingredient:any, value: string, reason: string) {
-    if (value) {
+    if (reason === 'input') {
       addFirstOption(ingredient);
+      ingredient.searchTerm = value;
       setIngredients([...ingredients]);
-      if (reason === 'input' && value) {
+      if (value) {
         getData(value, ingredient);
       }
     }
