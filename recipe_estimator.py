@@ -164,7 +164,7 @@ def estimate_recipe(product):
             penalty += nutrient_weightings[n] * assign_penalty(nutrient_total, 
                                                                nom_nutrient_total_from_ingredients, 1,
                                                                 min_nutrient_total_from_ingredients,
-                                                                 max_nutrient_total_from_ingredients, 10) / nutrient_total
+                                                                 max_nutrient_total_from_ingredients, 10) / max(nutrient_total, 1)
 
         return penalty
 
