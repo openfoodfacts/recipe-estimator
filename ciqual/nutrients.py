@@ -126,13 +126,9 @@ def setup_ingredients(ingredients, nutrients):
             ciqual_ingredient = ciqual_ingredients.get(ciqual_code, None)
             if (ciqual_ingredient is None):
                 # Invent a dummy set of nutrients with maximum ranges
-                # TODO: Could use max values that occur in actual data
+                # TODO: Could use value ranges that occur in actual data
                 for off_id in off_to_ciqual:
-                    product_nutrient_value = nutrients.get(off_id + '_100g', 0)
-                    # using the average product nutrient values for unknown ingredients does not give good results      
-                    # ingredient_nutrients[off_id] = {'percent_min': product_nutrient_value, 'percent_max': product_nutrient_value}
-                    # set the nutrient contribution from unknown ingredients to 0
-                    ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_nom': 0, 'percent_max': 0}
+                    ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_nom': 0, 'percent_max': 100}
             else:
                 ingredient_nutrients = ciqual_ingredient['nutrients']
 

@@ -132,7 +132,11 @@ def estimate_recipe(product):
 
                 for n,nutrient_key in enumerate(nutrient_names):
                     ingredient_nutrient =  ingredient['nutrients'][nutrient_key]
-                    ingredients_nutrients[n].append(ingredient_nutrient['percent_nom'] / 100)
+                    ingredients_nutrients[n].append({
+                        'nom': ingredient_nutrient['percent_nom'] / 100,
+                        'min': ingredient_nutrient['percent_min'] / 100,
+                        'max': ingredient_nutrient['percent_max'] / 100,
+                    })
 
             # Set order constraint
             if (i > 0):
@@ -146,16 +150,23 @@ def estimate_recipe(product):
     add_ingredients(100, ingredients)
 
     def objective(x):
-        nutrient_difference = 0
+        penalty = 0
 
         for n, nutrient_total in enumerate(product_nutrients):
-            nutrient_total_from_ingredients = 0
+            nom_nutrient_total_from_ingredients = 0
+            min_nutrient_total_from_ingredients = 0
+            max_nutrient_total_from_ingredients = 0
             for i, ingredient_nutrient in enumerate(ingredients_nutrients[n]):
-                nutrient_total_from_ingredients += x[i * 2] * ingredient_nutrient
+                nom_nutrient_total_from_ingredients += x[i * 2] * ingredient_nutrient['nom']
+                min_nutrient_total_from_ingredients += x[i * 2] * ingredient_nutrient['min']
+                max_nutrient_total_from_ingredients += x[i * 2] * ingredient_nutrient['max']
 
-            nutrient_difference += nutrient_weightings[n] * (nutrient_total - nutrient_total_from_ingredients) ** 2
+            penalty += nutrient_weightings[n] * assign_penalty(nutrient_total, 
+                                                               nom_nutrient_total_from_ingredients, 1,
+                                                                min_nutrient_total_from_ingredients,
+                                                                 max_nutrient_total_from_ingredients, 10) / nutrient_total
 
-        return nutrient_difference
+        return penalty
 
     # For COBYLA can't use eq constraint
     A = [0] * leaf_ingredient_count * 2

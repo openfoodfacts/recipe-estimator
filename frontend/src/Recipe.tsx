@@ -196,7 +196,7 @@ export default function Recipe({product}: RecipeProps) {
                       <Typography>{format(parseFloat(ingredient.lost_water), QUANTITY)}</Typography>}
                     </TableCell>
                     {Object.keys(nutrients).map((nutrient: string) => (
-                      <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] && ingredient.nutrients?.[nutrient].percent_nom &&
+                      <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] &&
                         <>
                           <Typography variant="caption">
                             {ingredient.nutrients?.[nutrient].percent_min < ingredient.nutrients?.[nutrient].percent_nom ? format(ingredient.nutrients?.[nutrient].percent_min, QUANTITY) : ''}&lt;
