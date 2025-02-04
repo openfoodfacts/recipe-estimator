@@ -75,8 +75,8 @@ export default function Recipe({product}: RecipeProps) {
     getRecipe(product);
   }, [product, getRecipe]);
 
-  function getTotal(nutrient_key: string) {
-    return getTotalForParent(nutrient_key, ingredients);
+  function getTotal(nutrient_key: string, bound = 'nom') {
+    return getTotalForParent(nutrient_key, ingredients, bound);
   }
 
   function recalculateRecipe() {
@@ -84,15 +84,19 @@ export default function Recipe({product}: RecipeProps) {
     getRecipe(product);
   }
 
-  function getTotalForParent(nutrient_key: string, parent: any[]) {
+  function getTotalForParent(nutrient_key: string, parent: any[], bound: string) {
     let total = 0;
     for(const ingredient of parent) {
       if (!ingredient.ingredients) {
-        if (ingredient.nutrients?.[nutrient_key])
-          total += ingredient.quantity_estimate * (nutrient_key ? ingredient.nutrients?.[nutrient_key].percent_nom : 1) / 100;
+        if (nutrient_key === '_total')
+          total += 1.0 * ingredient.quantity_estimate;
+        else if (nutrient_key === '_evaporation')
+          total += ingredient.lost_water;
+        else if (ingredient.nutrients?.[nutrient_key])
+          total += ingredient.quantity_estimate * ingredient.nutrients?.[nutrient_key]['percent_' + bound] / 100;
       }
       else
-        total += getTotalForParent(nutrient_key, ingredient.ingredients);
+        total += getTotalForParent(nutrient_key, ingredient.ingredients, bound);
     }
     return total;
   }
@@ -153,6 +157,7 @@ export default function Recipe({product}: RecipeProps) {
                   <TableCell><Typography>Ingredient</Typography></TableCell>
                   <TableCell><Typography>CIQUAL Code</Typography></TableCell>
                   <TableCell><Typography>g/100g</Typography></TableCell>
+                  <TableCell><Typography>Evaporation</Typography></TableCell>
                   {Object.keys(nutrients).map((nutrient: string) => (
                     <TableCell key={nutrient}>
                       <Typography>{nutrient}</Typography>
@@ -187,10 +192,17 @@ export default function Recipe({product}: RecipeProps) {
                       <TextField type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
                     }
                     </TableCell>
+                    <TableCell>{!ingredient.ingredients &&
+                      <Typography>{format(parseFloat(ingredient.lost_water), QUANTITY)}</Typography>}
+                    </TableCell>
                     {Object.keys(nutrients).map((nutrient: string) => (
                       <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] && ingredient.nutrients?.[nutrient].percent_nom &&
                         <>
-                          <Typography variant="caption">{format(ingredient.nutrients?.[nutrient].percent_nom, QUANTITY)}</Typography>
+                          <Typography variant="caption">
+                            {ingredient.nutrients?.[nutrient].percent_min < ingredient.nutrients?.[nutrient].percent_nom ? format(ingredient.nutrients?.[nutrient].percent_min, QUANTITY) : ''}&lt;
+                            {format(ingredient.nutrients?.[nutrient].percent_nom, QUANTITY)}
+                            &lt;{ingredient.nutrients?.[nutrient].percent_max > ingredient.nutrients?.[nutrient].percent_nom ? format(ingredient.nutrients?.[nutrient].percent_max, QUANTITY) : ''}
+                          </Typography>
                           <Typography variant="body1">{format(ingredient.quantity_estimate * ingredient.nutrients?.[nutrient].percent_nom / 100, QUANTITY)}</Typography>
                         </>
                       }
@@ -200,15 +212,18 @@ export default function Recipe({product}: RecipeProps) {
                 ))}
                   <TableRow className='total'>
                     <TableCell colSpan={2}><Typography>Ingredients totals</Typography></TableCell>
-                    <TableCell><Typography>{format(getTotal(''), PERCENT)}</Typography></TableCell>
+                    <TableCell><Typography>{format(getTotal('_total'), QUANTITY)}</Typography></TableCell>
+                    <TableCell><Typography>{format(getTotal('_evaporation'), QUANTITY)}</Typography></TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
-                        <Typography variant="body1">{format(getTotal(nutrient_key), QUANTITY)}</Typography>
+                          <Typography variant="caption">{format(getTotal(nutrient_key, 'min'), QUANTITY)}</Typography>
+                          <Typography variant="body1">{format(getTotal(nutrient_key), QUANTITY)}</Typography>
+                          <Typography variant="caption">{format(getTotal(nutrient_key, 'max'), QUANTITY)}</Typography>
                       </TableCell>
                     ))}
                   </TableRow>
                   <TableRow>
-                    <TableCell colSpan={3}><Typography>Quoted product nutrients</Typography></TableCell>
+                    <TableCell colSpan={4}><Typography>Quoted product nutrients</Typography></TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
                         <Typography variant="body1">{format(nutrients[nutrient_key].product_total, QUANTITY)}</Typography>
@@ -222,7 +237,7 @@ export default function Recipe({product}: RecipeProps) {
                     <TableCell>
                       <Button variant='contained' onClick={recalculateRecipe}>recalculate</Button>
                     </TableCell>
-                    <TableCell>
+                    <TableCell colSpan={2}>
                       <Typography variant="caption">Weighted</Typography>
                       <Typography>{format(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
                       total + (!nutrients[nutrient_key].notes 
