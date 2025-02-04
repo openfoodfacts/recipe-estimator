@@ -3,6 +3,34 @@ from scipy.optimize import minimize, LinearConstraint, shgo
 
 from prepare_nutrients import prepare_nutrients
 
+# Penalty function returns zero if the target matches the nominal value and returns
+# a positive value based on the graidient if there is divergence. If the divergence is more than
+# the min / max then the steep gradient is used
+#
+# penalty
+#    ^            *                                           *
+#    |             * <------- steep_gradient --------------> *                            
+#    |              *                                       *                             
+#    |               ***                                   *                              
+#    |                  ***                               *                               
+#    |                     ***                           *                                
+#    |                        ***     shallow_gradient  *                                 
+#    |                           *** <-------------> ***                                  
+#    |                              ***           ***                                     
+#    |                                 ***     ***                                       
+#    |------------------------------------*****------------------------------------------> value
+#                    ^                      ^           ^
+#                min_value               nom_value   max_value
+#
+def assign_penalty(value, nom_value, shallow_gradient, min_value, max_value, steep_gradient):
+    if (value < min_value):
+        return (min_value - value) * steep_gradient + (nom_value - min_value) * shallow_gradient
+
+    if (value > max_value):
+        return (value - max_value) * steep_gradient + (max_value - nom_value) * shallow_gradient
+
+    return abs(nom_value - value) * shallow_gradient
+
 # estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
 # The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
 def estimate_recipe(product):

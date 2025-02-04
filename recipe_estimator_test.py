@@ -1,5 +1,19 @@
 import json
-from recipe_estimator import estimate_recipe
+from recipe_estimator import estimate_recipe, assign_penalty
+
+def test_assign_penalty_value_equals_nominal():
+    assert assign_penalty(10, 10, 1, 1, 100, 10) == 0
+
+def test_assign_penalty_value_shallow_gradient_used_within_tolerance():
+    assert assign_penalty(40, 50, 2, 20, 70, 10) == 20
+    assert assign_penalty(60, 50, 2, 20, 70, 10) == 20
+
+def test_assign_penalty_value_steep_gradient_used_outside_tolerance():
+    # Should be 30 at a gradient of 2 + 10 at a gradient of 10 = 160
+    assert assign_penalty(10, 50, 2, 20, 70, 10) == 160
+    # Should be 20 at a gradient of 2 + 20 at a gradient of 10 = 240
+    assert assign_penalty(90, 50, 2, 20, 70, 10) == 240
+
 
 def test_estimate_recipe_accounts_for_lost_water():
     product = {
