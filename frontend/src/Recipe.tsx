@@ -65,7 +65,7 @@ export default function Recipe({product}: RecipeProps) {
       setIngredients(results.ingredients);
       setNutrients(Object.fromEntries(
         Object.entries(results.recipe_estimator.nutrients).filter(
-           ([key, val])=>(val as any).weighting
+           ([key, val])=>(val as any).product_total
         )));
     }
     fetchData();
@@ -182,14 +182,14 @@ export default function Recipe({product}: RecipeProps) {
                         isOptionEqualToValue={(option:any, value:any) => option.id === value.id}
                         style={{ width: 300 }}
                         renderInput={(params) => (
-                          <TextField {...params} size='small'/>
+                          <TextField {...params} variant='standard' size='small'/>
                         )}
                         filterOptions={(options) => options}
                       />
                     }
                     </TableCell>
                     <TableCell>{!ingredient.ingredients &&
-                      <TextField type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
+                      <TextField variant="standard" type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
                     }
                     </TableCell>
                     <TableCell>{!ingredient.ingredients &&
@@ -199,9 +199,9 @@ export default function Recipe({product}: RecipeProps) {
                       <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] &&
                         <>
                           <Typography variant="caption">
-                            {ingredient.nutrients?.[nutrient].percent_min < ingredient.nutrients?.[nutrient].percent_nom ? format(ingredient.nutrients?.[nutrient].percent_min, QUANTITY) : ''}&lt;
-                            {format(ingredient.nutrients?.[nutrient].percent_nom, QUANTITY)}
-                            &lt;{ingredient.nutrients?.[nutrient].percent_max > ingredient.nutrients?.[nutrient].percent_nom ? format(ingredient.nutrients?.[nutrient].percent_max, QUANTITY) : ''}
+                            {ingredient.nutrients?.[nutrient].percent_min < ingredient.nutrients?.[nutrient].percent_nom ? format(ingredient.nutrients?.[nutrient].percent_min, QUANTITY) + '<' : ''}
+                            {format(ingredient.nutrients?.[nutrient].percent_nom, QUANTITY)}[{ingredient.nutrients?.[nutrient].confidence}]
+                            {ingredient.nutrients?.[nutrient].percent_max > ingredient.nutrients?.[nutrient].percent_nom ? '<' + format(ingredient.nutrients?.[nutrient].percent_max, QUANTITY) : ''}
                           </Typography>
                           <Typography variant="body1">{format(ingredient.quantity_estimate * ingredient.nutrients?.[nutrient].percent_nom / 100, QUANTITY)}</Typography>
                         </>
@@ -247,13 +247,12 @@ export default function Recipe({product}: RecipeProps) {
                     </TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
-                        {!nutrients[nutrient_key].notes 
-                          ? <>
-                            <Typography variant="caption">{format(getTotal(nutrient_key) - nutrients[nutrient_key].product_total, VARIANCE)}</Typography>
-                            <Typography>{format(nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total), VARIANCE)}</Typography>
-                            </>
-                          : <Typography variant="caption">{nutrients[nutrient_key].notes}</Typography>
-                        }
+                          <Typography variant="caption">{format(getTotal(nutrient_key) - nutrients[nutrient_key].product_total, VARIANCE)}</Typography>
+                          <br/>
+                          {!nutrients[nutrient_key].notes && nutrients[nutrient_key].weighting > 0
+                            ? <Typography>{format(nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total), VARIANCE)}</Typography>
+                            : <Typography variant="caption">{nutrients[nutrient_key].notes ?? 'Not used'}</Typography>
+                          }
                       </TableCell>
                     ))}
                   </TableRow>
