@@ -7,7 +7,7 @@ interface RecipeProps {
 }
 
 function ingredientDisplayName(ingredient: any): string {
-  return ingredient?.text ? `${ingredient.text} (${ingredient.ciqual_food_code ?? (ingredient.ciqual_proxy_food_code ? 'P-' + ingredient.ciqual_proxy_food_code : '?')})` : ''
+  return ingredient?.alim_nom_eng ? `${ingredient.alim_nom_eng} (${ingredient.ciqual_food_code ?? (ingredient.ciqual_proxy_food_code ? 'P-' + ingredient.ciqual_proxy_food_code : '?')})` : ''
 }
 function addFirstOption(ingredient: any) {
   ingredient.options ??= [];
@@ -15,7 +15,7 @@ function addFirstOption(ingredient: any) {
     ingredient.options.push({
       ciqual_food_code: ingredient.ciqual_food_code,
       ciqual_proxy_food_code: ingredient.ciqual_proxy_food_code,
-      text: ingredient.text,
+      alim_nom_eng: ingredient.alim_nom_eng,
       id: ingredient.id,
       searchTerm: ingredientDisplayName(ingredient),
       nutrients: ingredient.nutrients,
@@ -140,7 +140,7 @@ export default function Recipe({product}: RecipeProps) {
       ingredient.id = value.id;
       ingredient.ciqual_food_code = value.ciqual_food_code;
       ingredient.ciqual_proxy_food_code = value.ciqual_proxy_food_code;
-      ingredient.text = value.text;
+      ingredient.alim_nom_eng = value.alim_nom_eng;
       ingredient.nutrients = value.nutrients;
       ingredient.searchTerm = ingredientDisplayName(value);
       setIngredients([...ingredients]);
