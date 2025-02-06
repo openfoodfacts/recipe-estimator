@@ -1,3 +1,5 @@
+from ciqual.nutrients import off_to_ciqual
+
 
 # count the number of leaf ingredients in the product
 # for each nutrient, store in nutrients the number of leaf ingredients that have a nutrient value
@@ -18,7 +20,7 @@ def count_ingredients(ingredients, nutrients):
                     proportion = ingredient_nutrients[off_id]['percent_nom']
                     existing_nutrient = nutrients.get(off_id)
                     if (existing_nutrient is None):
-                         nutrients[off_id] = {'ingredient_count': 1, 'unweighted_total': proportion}
+                         nutrients[off_id] = {'ingredient_count': 1, 'unweighted_total': proportion, 'weighting': 0}
                     else:
                         existing_nutrient['ingredient_count'] = existing_nutrient['ingredient_count'] + 1
                         existing_nutrient['unweighted_total'] = existing_nutrient['unweighted_total'] + proportion
@@ -40,7 +42,7 @@ def assign_weightings(product):
             continue
 
         computed_nutrient['product_total'] = product_nutrient
-
+        
         # Energy is derived from other nutrients, so don't use it
         if nutrient_key == 'energy':
             computed_nutrient['notes'] = 'Energy not used for calculation'
@@ -59,25 +61,9 @@ def assign_weightings(product):
             computed_nutrient['notes'] = 'Not available for all ingredients'
             continue
 
-        # Favor Sodium over salt if both are present
-        #if not 'error' in nutrients.get('Sodium (mg/100g)',{}) and not 'error' in nutrients.get('Salt (g/100g)', {}):
-        #    nutrients['Salt (g/100g)']['error'] = 'Prefer sodium where both present'
-
-        # Weighting based on size of ingredient, i.e. percentage based
-        # Comment out this code to use weighting specified in nutrient_map.csv
-        try:
-            if product_nutrient > 0:
-                computed_nutrient['weighting'] = 1 / product_nutrient
-            else:
-                computed_nutrient['weighting'] = min(0.01, count / computed_nutrient['unweighted_total']) # Weighting below 0.01 causes bad performance, although it isn't that simple as just multiplying all weights doesn't help
-        except Exception as e:
-            computed_nutrient['notes'] = e
-
-        if nutrient_key == 'xsalt':
-            computed_nutrient['weighting'] = 100
-            continue
-
-        computed_nutrient['weighting'] = 1
+        weighting = off_to_ciqual[nutrient_key]['weighting']
+        if weighting != '':
+            computed_nutrient['weighting'] = float(weighting)
 
 
 def prepare_nutrients(product):
