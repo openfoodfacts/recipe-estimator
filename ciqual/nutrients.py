@@ -45,6 +45,12 @@ ciqual_ingredients = {}
 with open(os.path.join(os.path.dirname(__file__), "compo_2020_07_07.xml"), encoding="utf8") as compo_file:
     compo_table = ET.fromstring(compo_file.read().replace(' < ', ' &lt; '))
 
+# Code below creates the ciqual_stats.csv file
+# Note need to uncomment other lines below too
+# ciqual_csv_file = open(os.path.join(os.path.dirname(__file__), 'ciqual_stats.csv'), "w", newline="")
+# ciqual_csv = csv.writer(ciqual_csv_file)
+# ciqual_csv.writerow(['alim_code', 'alim_nom_eng', 'nutrient', 'min', 'nom', 'max', 'confidence', 'minus', 'plus'])
+
 for compo in compo_table:
     const_code = compo.find('const_code').text.strip()
     nutrient = ciqual_to_off.get(const_code)
@@ -57,24 +63,45 @@ for compo in compo_table:
         max = compo.find('max').text
         nom_value = parse_value(teneur)
 
-        # TODO: If min and max not set then should be able to apply tolerance based on code_confiance
+        has_min = True
         if min is not None:
             min_value = parse_value(min.strip())
         elif '<' in teneur:
             min_value = 0
         else:
             min_value = nom_value
+            has_min = False
 
+        has_max = True
         if max is not None:
             max_value = parse_value(max.strip())
         else:
             max_value = nom_value
+            has_max = False
+
+        alim_nom_eng = alim_codes[alim_code]
+        confidence = compo.find('code_confiance').text
+        # Looking at the data the code confidence doesn't seem to affect the min / max range
+        #
+        # Confidence | Average Minus | Average Plus
+        #     A      |      42%      |     704%
+        #     B      |      25%      |      36%
+        #     C      |      31%      |      45%
+        #     D      |      36%      |      62%
+        #
+        # Hence we can't really use it to set a percentage range
+        #
+        # Code below creates the ciqual_stats.csv file
+        # ciqual_csv.writerow([alim_code, alim_nom_eng, nutrient_key, min_value, nom_value, max_value,
+        #                      confidence.strip() if confidence is not None else '',
+        #                      round(100 * (nom_value - min_value) / nom_value, 2) if has_min and nom_value > 0 else '',
+        #                      round(100 * (max_value - nom_value) / nom_value, 2) if has_max and nom_value > 0 else ''])
 
         ciqual_ingredient = ciqual_ingredients.setdefault(alim_code, {
             'id': alim_code,
             'ciqual_food_code': alim_code,
-            'alim_nom_eng': alim_codes[alim_code],
-            'text': alim_codes[alim_code],
+            'alim_nom_eng': alim_nom_eng,
+            'text': alim_nom_eng,
             'nutrients': {},
         })
         ciqual_ingredient = ciqual_ingredients.get(alim_code, {})
@@ -82,7 +109,11 @@ for compo in compo_table:
             'percent_nom': nom_value / factor,
             'percent_min': min_value / factor,
             'percent_max': max_value / factor,
+            'confidence' : confidence.strip() if confidence is not None else 'D'
         }
+
+# Code below creates the ciqual_stats.csv file
+# ciqual_csv_file.close()
 
 # Load ingredients
 filename = os.path.join(os.path.dirname(__file__), "ingredients.json")
