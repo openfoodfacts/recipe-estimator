@@ -1,0 +1,2 @@
+refresh_ingredients_taxonomy:
+	node scripts/refresh_ingredients_taxonomy.mjs

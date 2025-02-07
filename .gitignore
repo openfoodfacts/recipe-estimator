@@ -130,3 +130,6 @@ dmypy.json
 
 # Built static pages
 static
+
+# Build scripts
+/node_modules
