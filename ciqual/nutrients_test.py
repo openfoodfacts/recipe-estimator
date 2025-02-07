@@ -38,5 +38,6 @@ def test_prepare_product_creates_a_max_range_entry_if_ingredient_not_found():
     assert carbs['percent_max'] <= 100
 
 def test_get_ciqual_code_should_use_proxy_if_no_main_code():
-    ciqual_code = get_ciqual_code('en:tomato-sauce')
-    assert ciqual_code == '11107'
+    ciqual_code, ciqual_proxy_code = get_ciqual_code('en:tomato-sauce')
+    assert ciqual_code is None
+    assert ciqual_proxy_code == '11107'

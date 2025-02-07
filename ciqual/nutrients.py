@@ -121,24 +121,31 @@ with open(filename, "r", encoding="utf-8") as ingredients_file:
     ingredients_taxonomy = json.load(ingredients_file)
 
 def get_ciqual_code(ingredient_id):
+    ciqual_code = None
+    ciqual_proxy_code = None
+    
     ingredient = ingredients_taxonomy.get(ingredient_id, None)
     if ingredient is None:
-        print(ingredient_id + ' not found')        
-        return None
+        print(ingredient_id + ' not found')       
+        return None, None
 
-    ciqual_code = ingredient.get('ciqual_food_code', ingredient.get('ciqual_proxy_food_code', None))
-    if ciqual_code:
-        return ciqual_code['en']
+    ciqual_code_object = ingredient.get('ciqual_food_code', None)
+    if ciqual_code_object:
+        ciqual_code  = ciqual_code_object['en']
+    ciqual_code_object = ingredient.get('ciqual_proxy_food_code', None)
+    if ciqual_code_object:
+        ciqual_proxy_code = ciqual_code_object['en']
 
-    parents = ingredient.get('parents', None)
-    if parents:
-        for parent_id in parents:
-            ciqual_code = get_ciqual_code(parent_id)
-            if ciqual_code:
-                print('Obtained ciqual_code from ' + parent_id)
-                return ciqual_code
+    if not ciqual_code and not ciqual_proxy_code:
+        parents = ingredient.get('parents', None)
+        if parents:
+            for parent_id in parents:
+                ciqual_code, ciqual_proxy_code = get_ciqual_code(parent_id)
+                if ciqual_code or ciqual_proxy_code:
+                    print('Obtained ciqual_code from ' + parent_id)
+                    break
 
-    return None
+    return ciqual_code, ciqual_proxy_code
 
 
 def setup_ingredients(ingredients, nutrients):
@@ -148,9 +155,12 @@ def setup_ingredients(ingredients, nutrients):
             setup_ingredients(ingredient['ingredients'], nutrients)
 
         else:
-            ciqual_code = ingredient.get('ciqual_food_code', ingredient.get('ciqual_proxy_food_code', None))
-            if (ciqual_code is None):
-                ciqual_code = get_ciqual_code(ingredient['id'])
+            # Always get the ciqual code from the taxonomy
+            ciqual_code, ciqual_proxy_code = get_ciqual_code(ingredient['id'])
+            ingredient['ciqual_food_code'] = ciqual_code
+            ingredient['ciqual_proxy_food_code'] = ciqual_proxy_code
+            
+            ciqual_code = ciqual_code or ciqual_proxy_code
 
             # Convert CIQUAL nutrient codes back to OFF
             ingredient_nutrients = {}
