@@ -44,7 +44,7 @@ function round(num: any){
   return num == null || isNaN(num) ? 'unknown' : parseFloat(num).toPrecision(4);
 }
 
-const PERCENT = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2,style:"percent"});
+const PERCENT = new Intl.NumberFormat(undefined, {maximumFractionDigits:1,minimumFractionDigits:0,style:"percent"});
 const VARIANCE = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2,signDisplay:"always"});
 const QUANTITY = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2});
 
@@ -92,6 +92,8 @@ export default function Recipe({product}: RecipeProps) {
           total += 1.0 * ingredient.quantity_estimate;
         else if (nutrient_key === '_evaporation')
           total += ingredient.lost_water;
+        else if (nutrient_key === '_percent')
+          total += 0.01 * ingredient.percent_estimate;
         else if (ingredient.nutrients?.[nutrient_key])
           total += ingredient.quantity_estimate * ingredient.nutrients?.[nutrient_key]['percent_' + bound] / 100;
       }
@@ -151,13 +153,14 @@ export default function Recipe({product}: RecipeProps) {
     <div>
       {nutrients && ingredients &&
         <div>
-            <Table size='small'>
+            <Table size='small' stickyHeader sx={{'& .MuiTableCell-sizeSmall': {padding: '1px 4px'}}}>
               <TableHead>
                 <TableRow className='total'>
                   <TableCell><Typography>Ingredient</Typography></TableCell>
                   <TableCell><Typography>CIQUAL Code</Typography></TableCell>
                   <TableCell><Typography>g/100g</Typography></TableCell>
-                  <TableCell><Typography>Evaporation</Typography></TableCell>
+                  <TableCell><Typography align='center'>Evaporation</Typography></TableCell>
+                  <TableCell><Typography align='center'>Percent</Typography></TableCell>
                   {Object.keys(nutrients).map((nutrient: string) => (
                     <TableCell key={nutrient}>
                       <Typography>{nutrient}</Typography>
@@ -192,8 +195,11 @@ export default function Recipe({product}: RecipeProps) {
                       <TextField variant="standard" type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
                     }
                     </TableCell>
-                    <TableCell>{!ingredient.ingredients &&
+                    <TableCell align='center'>{!ingredient.ingredients &&
                       <Typography>{format(parseFloat(ingredient.lost_water), QUANTITY)}</Typography>}
+                    </TableCell>
+                    <TableCell align='center'>{!ingredient.ingredients &&
+                      <Typography>{format(0.01 * parseFloat(ingredient.percent_estimate), PERCENT)}</Typography>}
                     </TableCell>
                     {Object.keys(nutrients).map((nutrient: string) => (
                       <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] &&
@@ -213,7 +219,8 @@ export default function Recipe({product}: RecipeProps) {
                   <TableRow className='total'>
                     <TableCell colSpan={2}><Typography>Ingredients totals</Typography></TableCell>
                     <TableCell><Typography>{format(getTotal('_total'), QUANTITY)}</Typography></TableCell>
-                    <TableCell><Typography>{format(getTotal('_evaporation'), QUANTITY)}</Typography></TableCell>
+                    <TableCell><Typography align='center'>{format(getTotal('_evaporation'), QUANTITY)}</Typography></TableCell>
+                    <TableCell><Typography align='center'>{format(getTotal('_percent'), PERCENT)}</Typography></TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
                           <Typography variant="caption">{format(getTotal(nutrient_key, 'min'), QUANTITY)}</Typography>
@@ -223,7 +230,7 @@ export default function Recipe({product}: RecipeProps) {
                     ))}
                   </TableRow>
                   <TableRow>
-                    <TableCell colSpan={4}><Typography>Quoted product nutrients</Typography></TableCell>
+                    <TableCell colSpan={5}><Typography>Quoted product nutrients</Typography></TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
                         <Typography variant="body1">{format(nutrients[nutrient_key].product_total, QUANTITY)}</Typography>
@@ -234,10 +241,10 @@ export default function Recipe({product}: RecipeProps) {
                     <TableCell>
                       <Typography>Variance</Typography>
                     </TableCell>
-                    <TableCell>
+                    <TableCell padding='normal'>
                       <Button variant='contained' onClick={recalculateRecipe}>recalculate</Button>
                     </TableCell>
-                    <TableCell colSpan={2}>
+                    <TableCell colSpan={3}>
                       <Typography variant="caption">Weighted</Typography>
                       <Typography>{format(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
                       total + (!nutrients[nutrient_key].notes 
