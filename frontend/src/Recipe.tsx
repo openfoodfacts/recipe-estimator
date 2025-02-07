@@ -140,8 +140,9 @@ export default function Recipe({product}: RecipeProps) {
       // print ingredient to console
       console.log(value);
       ingredient.id = value.id;
+      ingredient.ciqual_food_code_used = value.ciqual_food_code;
       ingredient.ciqual_food_code = value.ciqual_food_code;
-      ingredient.ciqual_proxy_food_code = value.ciqual_proxy_food_code;
+      ingredient.ciqual_proxy_food_code = null;
       ingredient.alim_nom_eng = value.alim_nom_eng;
       ingredient.nutrients = value.nutrients;
       ingredient.searchTerm = ingredientDisplayName(value);

@@ -332,3 +332,94 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
     assert 25 < product['ingredients'][1]['percent_estimate'] < 29 # 26.7
     assert 11 < product['ingredients'][2]['percent_estimate'] < 15 # 13.3
     assert 5  < product['ingredients'][3]['percent_estimate'] < 9  # 6.7
+    
+    
+def test_estimate_recipe_subingredient_limits():
+    product = {
+        'ingredients': [
+            {
+                'id':'en:dummy-ingredients',
+                'ingredients': [
+                    {
+                        'id':'en:one',
+                        'nutrients': {
+                            'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                        }
+                    },
+                    {
+                        'id':'en:two',
+                        'nutrients': {
+                            'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                        }
+                    }
+                ]
+            },
+            {
+                'id':'en:salt',
+                'nutrients': {
+                    'salt': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
+                }
+            },
+        ],
+        'nutriments': {
+            'salt_100g': 100
+        }}
+
+    # For the above there is no way to reach the salt limit as the only ingredient with salt is in second place
+    # so can be at most 50%
+    estimate_recipe(product)
+
+    metrics = product.get('recipe_estimator')
+    assert metrics is not None
+
+    salt = product['ingredients'][1]
+    # Percent estimate is as high a possible
+    assert round(salt.get('percent_estimate')) == 50
+
+
+def test_estimate_recipe_minimize_maximum_distance_between_ingredients_with_subingredients():
+    product = {
+        'ingredients': [
+            {
+                'id':'one',
+                'ingredients': [
+                    {
+                        'id':'two',
+                        'nutrients': {
+                            'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                        }
+                    },
+                    {
+                        'id':'three',
+                        'nutrients': {
+                            'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                        }
+                    },
+                ]
+            },
+            {
+                'id':'four',
+                'nutrients': {
+                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                }
+            }
+        ],
+        'nutriments': {
+            'fiber_100g': 45,
+        }}
+
+    # For 2 ingredients in the absence of anything better we want
+    # the first ingredient to be (0.5 * 100) / (1 - 0.5 ^ 2) = 66.7%
+    # Each subsequent one half that, so ingredient 4 should be 33.3%
+    # For the sub-ingredients of ingredient one the first should be
+    # (0.5 * 66.7) / (1 - 0.5 ^ 2) = 44.4%
+    # So the second would be 22.2%
+    estimate_recipe(product)
+
+    metrics = product.get('recipe_estimator')
+    assert metrics is not None
+
+    # Estimates shouldn't vary too far from original values as no ingredient is any better than the others
+    assert 40 < product['ingredients'][0]['ingredients'][0]['percent_estimate'] < 50 # 44.4
+    assert 20 < product['ingredients'][0]['ingredients'][1]['percent_estimate'] < 25 # 22.2
+    assert 30 < product['ingredients'][1]['percent_estimate'] < 40 # 33.3

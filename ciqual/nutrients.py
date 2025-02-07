@@ -155,28 +155,29 @@ def setup_ingredients(ingredients, nutrients):
             setup_ingredients(ingredient['ingredients'], nutrients)
 
         else:
-            # Always get the ciqual code from the taxonomy
-            ciqual_code, ciqual_proxy_code = get_ciqual_code(ingredient['id'])
-            ingredient['ciqual_food_code'] = ciqual_code
-            ingredient['ciqual_proxy_food_code'] = ciqual_proxy_code
-            
-            ciqual_code = ciqual_code or ciqual_proxy_code
+            # Always get the ciqual code from the taxonomy unless the nutrients are already setup
+            if 'nutrients' not in ingredient:
+                ciqual_code, ciqual_proxy_code = get_ciqual_code(ingredient['id'])
+                ingredient['ciqual_food_code'] = ciqual_code
+                ingredient['ciqual_proxy_food_code'] = ciqual_proxy_code
+                
+                ciqual_code = ciqual_code or ciqual_proxy_code
 
-            # Convert CIQUAL nutrient codes back to OFF
-            ingredient_nutrients = {}
-            ciqual_ingredient = ciqual_ingredients.get(ciqual_code, None)
-            if (ciqual_ingredient is None):
-                # Invent a dummy set of nutrients with maximum ranges
-                # TODO: Could use value ranges that occur in actual data
-                ingredient['alim_nom_eng'] = 'Unknown'
-                for off_id in off_to_ciqual:
-                    ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_nom': 0, 'percent_max': 100}
-            else:
-                ingredient['alim_nom_eng'] = ciqual_ingredient['alim_nom_eng']
-                ingredient_nutrients = ciqual_ingredient['nutrients']
+                # Convert CIQUAL nutrient codes back to OFF
+                ingredient_nutrients = {}
+                ciqual_ingredient = ciqual_ingredients.get(ciqual_code, None)
+                if (ciqual_ingredient is None):
+                    # Invent a dummy set of nutrients with maximum ranges
+                    # TODO: Could use value ranges that occur in actual data
+                    ingredient['alim_nom_eng'] = 'Unknown'
+                    for off_id in off_to_ciqual:
+                        ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_nom': 0, 'percent_max': 100}
+                else:
+                    ingredient['alim_nom_eng'] = ciqual_ingredient['alim_nom_eng']
+                    ingredient_nutrients = ciqual_ingredient['nutrients']
 
-            ingredient['nutrients'] = ingredient_nutrients
-            ingredient['ciqual_food_code_used'] = ciqual_code
+                ingredient['nutrients'] = ingredient_nutrients
+                ingredient['ciqual_food_code_used'] = ciqual_code
 
 
 def prepare_product(product):

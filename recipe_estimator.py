@@ -111,14 +111,13 @@ def estimate_recipe(product):
 
     def add_ingredients(total, ingredients):
         added = 0
-        start = len(x)
         # Initial estimate of ingredients is a geometric progression where each is half the previous one
         # Sum of a  geometric progression is Sn = a(1 - r^n) / (1 - r)
         # In our case Sn = 100 and r = 0.5 so our first ingredient (a) will be
         # (100 * 0.5) / (1 - 0.5 ^ n)
         a = (total * 0.5) / (1 - 0.5 ** len(ingredients))
         for i,ingredient in enumerate(ingredients):
-            this_start = start + i * 2
+            this_start = len(x)
 
             if ('ingredients' in ingredient and len(ingredient['ingredients']) > 0):
                 ingredients_added = add_ingredients(a, ingredient['ingredients'])
@@ -130,9 +129,8 @@ def estimate_recipe(product):
 
                 # Initial estimate. 0.5 of previous ingredient
                 x.append(a)
-                a /= 2
                 maximum_weight = None if maximum_water_content == 1 else 100 / (1 - maximum_water_content)
-                bounds.append((100 / len(ingredients) if this_start == 0 else 0, maximum_weight))
+                bounds.append((0, maximum_weight))
  
                 # Water loss
                 x.append(0)
@@ -154,6 +152,7 @@ def estimate_recipe(product):
                 # Sum of children must be less than previous ingredient (or sum of its children)
                 cons.append(ingredient_order_constraint(previous_start, this_start, ingredients_added))
 
+            a /= 2
             added += ingredients_added
             previous_start = this_start
         return added
