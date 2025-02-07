@@ -61,11 +61,11 @@ for compo in compo_table:
         teneur = compo.find('teneur').text.strip()
         min = compo.find('min').text
         max = compo.find('max').text
-        nom_value = parse_value(teneur)
+        nom_value = parse_value(teneur) / factor
 
         has_min = True
         if min is not None:
-            min_value = parse_value(min.strip())
+            min_value = parse_value(min.strip()) / factor
         elif '<' in teneur:
             min_value = 0
         else:
@@ -74,7 +74,7 @@ for compo in compo_table:
 
         has_max = True
         if max is not None:
-            max_value = parse_value(max.strip())
+            max_value = parse_value(max.strip()) / factor
         else:
             max_value = nom_value
             has_max = False
@@ -106,9 +106,9 @@ for compo in compo_table:
         })
         ciqual_ingredient = ciqual_ingredients.get(alim_code, {})
         ciqual_ingredient['nutrients'][nutrient_key] = {
-            'percent_nom': nom_value / factor,
-            'percent_min': min_value / factor,
-            'percent_max': max_value / factor,
+            'percent_nom': nom_value,
+            'percent_min': min_value,
+            'percent_max': max_value,
             'confidence' : confidence.strip() if confidence is not None else 'D'
         }
 
