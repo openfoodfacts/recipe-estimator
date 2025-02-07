@@ -5,14 +5,18 @@ def test_assign_penalty_value_equals_nominal():
     assert assign_penalty(10, 10, 1, 1, 100, 10) == 0
 
 def test_assign_penalty_value_shallow_gradient_used_within_tolerance():
-    assert assign_penalty(40, 50, 2, 20, 70, 10) == 20
-    assert assign_penalty(60, 50, 2, 20, 70, 10) == 20
+    # Value is half way between nominal and min so penalty = 0.5 * 2
+    assert assign_penalty(35, 50, 2, 20, 70, 10) == 1
+    
+    # Value is half way between nominal and max so penalty = 0.5 * 2
+    assert assign_penalty(60, 50, 2, 20, 70, 10) == 1
 
 def test_assign_penalty_value_steep_gradient_used_outside_tolerance():
-    # Should be 30 at a gradient of 2 + 10 at a gradient of 10 = 160
-    assert assign_penalty(10, 50, 2, 20, 70, 10) == 160
-    # Should be 20 at a gradient of 2 + 20 at a gradient of 10 = 240
-    assert assign_penalty(90, 50, 2, 20, 70, 10) == 240
+    # Gradient factor will average of 50, 20 and 80 = 50
+    # Penalty of 2 at the min 500 / 50 * 10 below min = 102
+    assert assign_penalty(10, 50, 2, 20, 80, 500) == 102
+    # Penalty of 2 at the max plus 500 / 50 * 20 after max = 202
+    assert assign_penalty(100, 50, 2, 20, 80, 500) == 202
 
 
 def test_estimate_recipe_accounts_for_lost_water():
@@ -20,18 +24,15 @@ def test_estimate_recipe_accounts_for_lost_water():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'carbohydrates': {'percent_nom': 2.5, 'percent_min': 0, 'percent_max': 100},
+                'fiber': {'percent_nom': 2.5, 'percent_min': 0, 'percent_max': 100},
                 'water': {'percent_nom': 90},
             }
         }],
         'nutriments': {
-            'carbohydrates_100g': 5,
+            'fiber_100g': 5,
         }}
 
     estimate_recipe(product)
-
-    # Print the resulting product structure
-    print(product)
 
     metrics = product.get('recipe_estimator')
     assert metrics is not None
@@ -57,12 +58,12 @@ def test_estimate_recipe_lost_water_is_constrained():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'carbohydrates': {'percent_nom': 2.5, 'percent_min': 0, 'percent_max': 100},
+                'fiber': {'percent_nom': 2.5, 'percent_min': 0, 'percent_max': 100},
                 'water': {'percent_nom': 10},
             }
         }],
         'nutriments': {
-            'carbohydrates_100g': 5,
+            'fiber_100g': 5,
         }}
 
 
@@ -94,18 +95,18 @@ def test_estimate_recipe_simple_recipe():
             {
                 'id':'one',
                 'nutrients': {
-                    'carbohydrates': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
                 }
             },
             {
                 'id':'two',
                 'nutrients': {
-                    'carbohydrates': {'percent_nom': 3, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 3, 'percent_min': 0, 'percent_max': 100},
                 }
             }
         ],
         'nutriments': {
-            'carbohydrates_100g': 10,
+            'fiber_100g': 10,
         }}
 
     estimate_recipe(product)
@@ -125,18 +126,18 @@ def test_estimate_recipe_simple_recipe_with_one_unmatched_ingredient():
             {
                 'id':'one',
                 'nutrients': {
-                    'carbohydrates': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
                 }
             },
             {
                 'id':'two',
                 'nutrients': {
-                    'carbohydrates': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
                 }
             }
         ],
         'nutriments': {
-            'carbohydrates_100g': 10,
+            'fiber_100g': 10,
         }}
 
     estimate_recipe(product)
@@ -157,18 +158,18 @@ def test_estimate_recipe_simple_recipe_with_no_matched_ingredients():
             {
                 'id':'one',
                 'nutrients': {
-                    'carbohydrates': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
                 }
             },
             {
                 'id':'two',
                 'nutrients': {
-                    'carbohydrates': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
                 }
             }
         ],
         'nutriments': {
-            'carbohydrates_100g': 10,
+            'fiber_100g': 10,
         }}
 
     estimate_recipe(product)
@@ -189,13 +190,13 @@ def test_estimate_recipe_simple_recipe_with_no_nutriments():
             {
                 'id':'one',
                 'nutrients': {
-                    'carbohydrates': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
                 }
             },
             {
                 'id':'two',
                 'nutrients': {
-                    'carbohydrates': {'percent_nom': 3, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 3, 'percent_min': 0, 'percent_max': 100},
                 }
             }
         ]}
@@ -216,7 +217,7 @@ def test_estimate_recipe_subingredients():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'carbohydrates': {'percent_nom': 5, 'percent_min': 0, 'percent_max': 100},
+                'fiber': {'percent_nom': 5, 'percent_min': 0, 'percent_max': 100},
                 'water': {'percent_nom': 90, 'percent_min': 0, 'percent_max': 100},
                 'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
                 'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
@@ -228,7 +229,7 @@ def test_estimate_recipe_subingredients():
                 'id':'en:sugar',
                 'nutrients': {
                     'sugars': {'percent_nom': 100, 'percent_min': 0, 'percent_max': 100},
-                    'carbohydrates': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
                     'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
                 }
             },
@@ -236,14 +237,14 @@ def test_estimate_recipe_subingredients():
                 'id':'en:salt',
                 'nutrients': {
                     'salt': {'percent_nom': 100, 'percent_min': 0, 'percent_max': 100},
-                    'carbohydrates': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
                     'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
                 }
             }
             ]
         }],
         'nutriments': {
-            'carbohydrates_100g': 5,
+            'fiber_100g': 5,
             'sugars_100g': 10,
             'salt_100g': 5
         }}
@@ -285,30 +286,30 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
             {
                 'id':'one',
                 'nutrients': {
-                    'carbohydrates': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
                 }
             },
             {
                 'id':'two',
                 'nutrients': {
-                    'carbohydrates': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
                 }
             },
             {
                 'id':'three',
                 'nutrients': {
-                    'carbohydrates': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
                 }
             },
             {
                 'id':'four',
                 'nutrients': {
-                    'carbohydrates': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
                 }
             }
         ],
         'nutriments': {
-            'carbohydrates_100g': 60,
+            'fiber_100g': 60,
         }}
 
     # For 4 ingredients in the absence of anything better we want

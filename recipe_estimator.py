@@ -4,32 +4,43 @@ from scipy.optimize import minimize, LinearConstraint, shgo
 from prepare_nutrients import prepare_nutrients
 
 # Penalty function returns zero if the target matches the nominal value and returns
-# a positive value based on the graidient if there is divergence. If the divergence is more than
-# the min / max then the steep gradient is used
+# a positive value based on tolerance_penalty where there is divergence. If the divergence is more than
+# the min / max then the steep gradient is used.
+# We want the steep_gradient to be proportional to the order of magnitude of the nutrient size
+# So the penalty for a nutrient with a nominal value of 1g/100g should increase by the steep_gradient
+# for every 1g outside min / max, whereas a nutrient with a nominal value of 1ug/100g should 
+# have a penalty of steep_gradient times the number of ug outside of the min / max range
 #
 # penalty
-#    ^            *                                           *
-#    |             * <------- steep_gradient --------------> *                            
-#    |              *                                       *                             
-#    |               ***                                   *                              
-#    |                  ***                               *                               
-#    |                     ***                           *                                
-#    |                        ***     shallow_gradient  *                                 
-#    |                           *** <-------------> ***                                  
-#    |                              ***           ***                                     
-#    |                                 ***     ***                                       
-#    |------------------------------------*****------------------------------------------> value
+#    ^        *                                               *
+#    |         * <----------- steep_gradient --------------> *                            
+#    |          *                                           *                             
+#    |           *                                         *                              
+#    |            *                                       *                               
+#    |             *                                     *                                
+#    |              *                                   *                                 
+#    |               ******                          ***  <- tolerance_penalty          
+#    |                     ******                 ***                                     
+#    |                           ******        ***                                       
+#    |---------------------------------********------------------------------------------> value
 #                    ^                      ^           ^
 #                min_value               nom_value   max_value
 #
-def assign_penalty(value, nom_value, shallow_gradient, min_value, max_value, steep_gradient):
+def assign_penalty(value, nom_value, tolerance_penalty, min_value, max_value, steep_gradient):
+    # Use an average of the nominal value, min & max to determine the gradient factor.
+    # Use a minimum of 0.0001 as that seems to be the lowest nutrient value we see in Ciqual
+    gradient_factor = max((nom_value + min_value + max_value) / 3, 0.0001)
+    
     if (value < min_value):
-        return (min_value - value) * steep_gradient + (nom_value - min_value) * shallow_gradient
+        return tolerance_penalty + (min_value - value) * steep_gradient / gradient_factor
 
     if (value > max_value):
-        return (value - max_value) * steep_gradient + (max_value - nom_value) * shallow_gradient
+        return tolerance_penalty + (value - max_value) * steep_gradient / gradient_factor
 
-    return abs(nom_value - value) * shallow_gradient
+    if (value > nom_value):
+        return tolerance_penalty * (value - nom_value) / (max_value - nom_value)
+    
+    return tolerance_penalty * (nom_value - value) / (nom_value - min_value)
 
 # estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
 # The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
@@ -161,18 +172,19 @@ def estimate_recipe(product):
                 min_nutrient_total_from_ingredients += x[i * 2] * ingredient_nutrient['min']
                 max_nutrient_total_from_ingredients += x[i * 2] * ingredient_nutrient['max']
 
+            # Factors need to quite large as the algorithms only make tiny changes to the variables to determine gradients
+            # TODO: Need to experiment with factors here
             penalty += nutrient_weightings[n] * assign_penalty(nutrient_total, 
-                                                               nom_nutrient_total_from_ingredients, 1,
+                                                               nom_nutrient_total_from_ingredients, 100,
                                                                 min_nutrient_total_from_ingredients,
-                                                                 max_nutrient_total_from_ingredients, 10) / max(nutrient_total, 1)
-
+                                                                 max_nutrient_total_from_ingredients, 1000)
         return penalty
 
     # For COBYLA can't use eq constraint
     A = [0] * leaf_ingredient_count * 2
     for i in range(0, leaf_ingredient_count * 2):
         A[i] = -1 if i % 2 else 1
-    cons.append(LinearConstraint(A, lb = 99.9, ub = 100.1))
+    cons.append(LinearConstraint(A, lb = 99.99, ub = 100.01))
     # cons.append({ 'type': 'ineq', 'fun': lambda x: sum(x[0::2]) - sum(x[1::2]) - 99.9})
     # cons.append({ 'type': 'ineq', 'fun': lambda x: 100.1 - (sum(x[0::2]) - sum(x[1::2]))})
 
