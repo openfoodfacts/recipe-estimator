@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 import requests
 
 
@@ -20,6 +22,12 @@ def fix_ingredients(ingredients):
                 del ingredient['ingredients']
 
 def get_product(id):
+    # First see if the product is in a test set
+    matches = list(Path('../recipe-estimator-metrics/test-sets/input').rglob(id + '.json'))
+    if len(matches) > 0:
+        with open(matches[0]) as f:
+            return json.load(f)
+    
     response = requests.get("http://world.openfoodfacts.org/api/v3/product/" + id).json()
     if not 'product' in response:
         return {}
