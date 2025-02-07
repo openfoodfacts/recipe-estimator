@@ -1,12 +1,12 @@
 off_id,countprep,ciqual_id,ciqual_unit,weighting,comments
 water,,"Water (g/100g)",g,,Added manually
-energy,2086602,"Energy, Regulation EU No 1169/2011 (kJ/100g)",kj,0.1,
+energy,2086602,"Energy, Regulation EU No 1169/2011 (kJ/100g)",kj,,Energy is derived
 proteins,2075645,Protein (g/100g),g,1,
-carbohydrates,2073749,Carbohydrate (g/100g),g,0,
-fat,2073742,Fat (g/100g),g,0,
+carbohydrates,2073749,Carbohydrate (g/100g),g,,Carbs can be net or gross
+fat,2073742,Fat (g/100g),g,1,
 sugars,2057784,Sugars (g/100g),g,1,
 saturated-fat,2031183,FA saturated (g/100g),g,1,
-sodium,1865460,Sodium (mg/100g),mg,0.1,
+sodium,1865460,Sodium (mg/100g),mg,,Salt is used instead
 fiber,867716,Fibres (g/100g),g,1,
 calcium,275041,Calcium (mg/100g),mg,1,
 cholesterol,271288,Cholesterol (mg/100g),mg,,

@@ -45,7 +45,7 @@ def test_prepare_nutrients():
 
     # Enery is not weighted
     energy = nutrients.get('energy')
-    assert energy.get('weighting') is None
+    assert energy.get('weighting') == 0
 
 
 def test_prepare_nutrients_copes_with_no_product_nutrients():
@@ -74,6 +74,6 @@ def test_prepare_nutrients_copes_with_no_product_nutrients():
 
     # Nutrient information flagged
     assert nutrient.get('notes') is not None
-    assert nutrient.get('weighting') is None
+    assert nutrient.get('weighting') == 0
 
 

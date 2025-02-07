@@ -43,16 +43,6 @@ def assign_weightings(product):
 
         computed_nutrient['product_total'] = product_nutrient
         
-        # Energy is derived from other nutrients, so don't use it
-        if nutrient_key == 'energy':
-            computed_nutrient['notes'] = 'Energy not used for calculation'
-            continue
-
-        # Sodium is computed from salt, so don't use it, to avoid double counting
-        if nutrient_key == 'sodium':
-            computed_nutrient['notes'] = 'Sodium not used for calculation'
-            continue
-
         if product_nutrient == 0 and computed_nutrient['unweighted_total'] == 0:
             computed_nutrient['notes'] = 'All zero values'
             continue
@@ -61,8 +51,11 @@ def assign_weightings(product):
             computed_nutrient['notes'] = 'Not available for all ingredients'
             continue
 
-        weighting = off_to_ciqual[nutrient_key]['weighting']
-        if weighting != '':
+        nutrient = off_to_ciqual[nutrient_key]
+        weighting = nutrient['weighting']
+        if weighting == '':
+            computed_nutrient['notes'] = nutrient['comments']
+        else:
             computed_nutrient['weighting'] = float(weighting)
 
 
