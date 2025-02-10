@@ -1,24 +1,24 @@
-off_id,countprep,ciqual_id,ciqual_unit,weighting,comments
-water,,"Water (g/100g)",g,,Added manually
-energy,2086602,"Energy, Regulation EU No 1169/2011 (kJ/100g)",kj,,Energy is derived
-proteins,2075645,Protein (g/100g),g,1,
-carbohydrates,2073749,Carbohydrate (g/100g),g,,Carbs can be net or gross
-fat,2073742,Fat (g/100g),g,1,
-sugars,2057784,Sugars (g/100g),g,1,
-saturated-fat,2031183,FA saturated (g/100g),g,1,
-sodium,1865460,Sodium (mg/100g),mg,,Salt is used instead
-fiber,867716,Fibres (g/100g),g,1,
-calcium,275041,Calcium (mg/100g),mg,1,
+off_id,countprep,ciqual_id,ciqual_unit,weighting,penalty_factor,comments
+water,,"Water (g/100g)",g,,,Added manually
+energy,2086602,"Energy, Regulation EU No 1169/2011 (kJ/100g)",kj,,,Energy is derived
+proteins,2075645,Protein (g/100g),g,1,1
+carbohydrates,2073749,Carbohydrate (g/100g),g,,,Carbs can be net or gross
+fat,2073742,Fat (g/100g),g,1,1
+sugars,2057784,Sugars (g/100g),g,1,1
+saturated-fat,2031183,FA saturated (g/100g),g,1,1
+sodium,1865460,Sodium (mg/100g),mg,,,Salt is used instead
+fiber,867716,Fibres (g/100g),g,1,1
+calcium,275041,Calcium (mg/100g),mg,1,100
 cholesterol,271288,Cholesterol (mg/100g),mg,,
-iron,267996,Iron (mg/100g),mg,1,
-salt,1865462,Salt (g/100g),g,1,
+iron,267996,Iron (mg/100g),mg,1,100
+salt,1865462,Salt (g/100g),g,1,10
 vitamin-c,221743,Vitamin C (mg/100g),mg,,
 potassium,94142,Potassium (mg/100g),mg,,
-monounsaturated-fat,49138,FA mono (g/100g),g,1,
-polyunsaturated-fat,49095,FA poly (g/100g),g,1,
+monounsaturated-fat,49138,FA mono (g/100g),g,1,1
+polyunsaturated-fat,49095,FA poly (g/100g),g,1,1
 alcohol,27268,Alcohol (g/100g),g,,
 vitamin-b1,24952,Vitamin B1 or Thiamin (mg/100g),mg,,
-vitamin-pp,24523,Vitamin B3 or Niacin (mg/100g),mg,,A component of B3?
+vitamin-pp,24523,Vitamin B3 or Niacin (mg/100g),mg,,,A component of B3?
 vitamin-b2,24088,Vitamin B2 or Riboflavin (mg/100g),mg,,
 vitamin-b6,16923,Vitamin B6 (mg/100g),mg,,
 magnesium,15608,Magnesium (mg/100g),mg,,
@@ -33,9 +33,9 @@ copper,4475,Copper (mg/100g),mg,,
 vitamin-e,4289,Vitamin E (mg/100g),mg,,
 manganese,4281,Manganese (mg/100g),mg,,
 polyols,3904,Polyols (g/100g),g,,
-vitamin-a,214147,,,,Need a formula to combine retinol and beta-carotene
-trans-fat,266865,,,,Unclear whic CIQUAL FA should be used or if it is a sum of a number
-cocoa,6989,,,,?
+vitamin-a,214147,,,,,Need a formula to combine retinol and beta-carotene
+trans-fat,266865,,,,,Unclear whic CIQUAL FA should be used or if it is a sum of a number
+cocoa,6989,,,,,?
 carbon-footprint-from-known-ingredients_100g,111858,,,,
 energy_unit,2086630,,,,
 energy_value,2086545,,,,

@@ -94,6 +94,7 @@ def estimate_recipe(product):
     product_nutrients = []
     ingredients_nutrients = []
     nutrient_weightings = []
+    nutrient_penalty_factors = []
     for nutrient_key in nutrients:
         nutrient = nutrients[nutrient_key]
 
@@ -107,6 +108,7 @@ def estimate_recipe(product):
         product_nutrients.append(nutrient['product_total'])
         nutrient_weightings.append(weighting)
         ingredients_nutrients.append([])
+        nutrient_penalty_factors.append(nutrient['penalty_factor'])
 
 
     def add_ingredients(total, ingredients):
@@ -176,7 +178,7 @@ def estimate_recipe(product):
             penalty += nutrient_weightings[n] * assign_penalty(nutrient_total, 
                                                                nom_nutrient_total_from_ingredients, 100,
                                                                 min_nutrient_total_from_ingredients,
-                                                                 max_nutrient_total_from_ingredients, 1000)
+                                                                 max_nutrient_total_from_ingredients, 1000 * nutrient_penalty_factors[n])
         return penalty
 
     # For COBYLA can't use eq constraint
@@ -184,8 +186,8 @@ def estimate_recipe(product):
     for i in range(0, leaf_ingredient_count * 2):
         A[i] = -1 if i % 2 else 1
     cons.append(LinearConstraint(A, lb = 99.99, ub = 100.01))
-    # cons.append({ 'type': 'ineq', 'fun': lambda x: sum(x[0::2]) - sum(x[1::2]) - 99.9})
-    # cons.append({ 'type': 'ineq', 'fun': lambda x: 100.1 - (sum(x[0::2]) - sum(x[1::2]))})
+    # cons.append({ 'type': 'ineq', 'fun': lambda x: sum(x[0::2]) - sum(x[1::2]) - 99.99})
+    # cons.append({ 'type': 'ineq', 'fun': lambda x: 100.01 - (sum(x[0::2]) - sum(x[1::2]))})
 
     # COBYQA is very slow
     #solution = minimize(objective,x,method='COBYLA',bounds=bounds,constraints=cons,options={'maxiter': 10000})

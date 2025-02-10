@@ -58,6 +58,9 @@ def assign_weightings(product):
         else:
             computed_nutrient['weighting'] = float(weighting)
 
+        penalty_factor = nutrient['penalty_factor']
+        computed_nutrient['penalty_factor'] = 0 if penalty_factor == '' else float(penalty_factor)
+
 
 def prepare_nutrients(product):
     nutrients = {}
