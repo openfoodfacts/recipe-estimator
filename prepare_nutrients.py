@@ -66,9 +66,9 @@ def assign_weightings(product):
     # 2. The countries_tags includes "en:united-states" (carbs could be gross rather than net)
     carbohydrates = computed_nutrients.get('carbohydrates')
     if (carbohydrates and carbohydrates['weighting'] > 0):
-        if 'en:united-states' in product['countries_tags']:
+        if 'countries_tags' not in product or 'en:united-states' in product['countries_tags']:
             carbohydrates['weighting'] = 0
-            carbohydrates['notes'] = 'US product may be gross carbs'
+            carbohydrates['notes'] = 'Possible US product quoting gross carbs'
         else:
             fiber = computed_nutrients.get('fiber')
             sugars = computed_nutrients.get('sugars')

@@ -12,11 +12,10 @@ def test_assign_penalty_value_shallow_gradient_used_within_tolerance():
     assert assign_penalty(60, 50, 2, 20, 70, 10) == 1
 
 def test_assign_penalty_value_steep_gradient_used_outside_tolerance():
-    # Gradient factor will average of 50, 20 and 80 = 50
-    # Penalty of 2 at the min 500 / 50 * 10 below min = 102
-    assert assign_penalty(10, 50, 2, 20, 80, 500) == 102
-    # Penalty of 2 at the max plus 500 / 50 * 20 after max = 202
-    assert assign_penalty(100, 50, 2, 20, 80, 500) == 202
+    # Penalty of 2 at the min plus 500 * (0.20 - 0.10) below min = 5002
+    assert assign_penalty(10, 50, 2, 20, 80, 500) == 5002
+    # Penalty of 2 at the max plus 500 * (100 - 80) after max = 10002
+    assert assign_penalty(100, 50, 2, 20, 80, 500) == 10002
 
 
 def test_estimate_recipe_accounts_for_lost_water():

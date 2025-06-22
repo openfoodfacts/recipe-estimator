@@ -27,8 +27,6 @@ from prepare_nutrients import prepare_nutrients
 #                min_value               nom_value   max_value
 #
 def assign_penalty(value, nom_value, tolerance_penalty, min_value, max_value, steep_gradient):
-    # Use an average of the nominal value, min & max to determine the gradient factor.
-    # Use a minimum of 0.000001 as that seems to be the lowest nutrient value we see in Ciqual (ug)
     if (value < min_value):
         return tolerance_penalty + (min_value - value) * steep_gradient
 
