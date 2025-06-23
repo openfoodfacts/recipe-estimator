@@ -56,17 +56,19 @@ function format(num: number, formatter: Intl.NumberFormat){
 export default function Recipe({product}: RecipeProps) {
   const [ingredients, setIngredients] = useState<any>();
   const [nutrients, setNutrients] = useState<any>();
+  const [algorithm, setAlgorithm] = useState<boolean>();
 
-  const getRecipe = useCallback((product: any) => {
+  const getRecipe = useCallback((product: any, scipy = false) => {
     if (!product || !product.ingredients)
       return;
     async function fetchData() {
-      const results = await (await fetch(`${API_PATH}api/v3/estimate_recipe`, {method: 'POST', body: JSON.stringify(product)})).json();
+      const results = await (await fetch(`${API_PATH}api/v3/estimate_recipe${scipy ? '_scipy' : ''}`, {method: 'POST', body: JSON.stringify(product)})).json();
       setIngredients(results.ingredients);
       setNutrients(Object.fromEntries(
         Object.entries(results.recipe_estimator.nutrients).filter(
            ([key, val])=>(val as any).product_total > 0
         )));
+      setAlgorithm(scipy)
     }
     fetchData();
   }, []);
@@ -79,9 +81,9 @@ export default function Recipe({product}: RecipeProps) {
     return getTotalForParent(nutrient_key, ingredients, bound);
   }
 
-  function recalculateRecipe() {
+  function recalculateRecipe(useScipy: boolean) {
     product.ingredients = ingredients;
-    getRecipe(product);
+    getRecipe(product, useScipy);
   }
 
   function getTotalForParent(nutrient_key: string, parent: any[], bound: string) {
@@ -243,7 +245,9 @@ export default function Recipe({product}: RecipeProps) {
                       <Typography>Variance</Typography>
                     </TableCell>
                     <TableCell padding='normal'>
-                      <Button variant='contained' onClick={recalculateRecipe}>recalculate</Button>
+                      <Button variant={algorithm ? 'outlined' : 'contained'} onClick={()=>recalculateRecipe(false)}>GLOP</Button>
+                      &nbsp;
+                      <Button variant={algorithm ? 'contained' : 'outlined'} onClick={()=>recalculateRecipe(true)}>SciPy</Button>
                     </TableCell>
                     <TableCell colSpan={3}>
                       <Typography variant="caption">Weighted</Typography>
