@@ -61,22 +61,20 @@ def assign_weightings(product):
         penalty_factor = nutrient['penalty_factor']
         computed_nutrient['penalty_factor'] = 0 if penalty_factor == '' else float(penalty_factor)
         
-    # Need to figure out whether to do this for all algorithms
-        
-    # # Exclude carbohydrates if one of these is true
-    # # 1. We have a value for both sugars and fibre
-    # # 2. The countries_tags includes "en:united-states" (carbs could be gross rather than net)
-    # carbohydrates = computed_nutrients.get('carbohydrates')
-    # if (carbohydrates and carbohydrates['weighting'] > 0):
-    #     if 'countries_tags' not in product or 'en:united-states' in product['countries_tags']:
-    #         carbohydrates['weighting'] = 0
-    #         carbohydrates['notes'] = 'Possible US product quoting gross carbs'
-    #     else:
-    #         fiber = computed_nutrients.get('fiber')
-    #         sugars = computed_nutrients.get('sugars')
-    #         if fiber and sugars and fiber['weighting'] > 0 and sugars['weighting'] > 0:
-    #             carbohydrates['weighting'] = 0
-    #             carbohydrates['notes'] = 'Have sugar and fiber so ignore carbs'
+    # Exclude carbohydrates if one of these is true
+    # 1. We have a value for both sugars and fibre
+    # 2. The countries_tags includes "en:united-states" (carbs could be gross rather than net)
+    carbohydrates = computed_nutrients.get('carbohydrates')
+    if (carbohydrates and carbohydrates['weighting'] > 0):
+        if 'countries_tags' not in product or 'en:united-states' in product['countries_tags']:
+            carbohydrates['weighting'] = 0
+            carbohydrates['notes'] = 'Possible US product quoting gross carbs'
+        else:
+            fiber = computed_nutrients.get('fiber')
+            sugars = computed_nutrients.get('sugars')
+            if fiber and sugars and fiber['weighting'] > 0 and sugars['weighting'] > 0:
+                carbohydrates['weighting'] = 0
+                carbohydrates['notes'] = 'Have sugar and fiber so ignore carbs'
 
 
 def prepare_nutrients(product):
