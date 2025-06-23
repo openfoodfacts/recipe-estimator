@@ -1,223 +1,314 @@
 import time  
-from scipy.optimize import minimize, LinearConstraint, shgo
+from ortools.linear_solver import pywraplp
 
 from prepare_nutrients import prepare_nutrients
 
-# Penalty function returns zero if the target matches the nominal value and returns
-# a positive value based on tolerance_penalty where there is divergence. If the divergence is more than
-# the min / max then the steep gradient is used.
-# We want the steep_gradient to be proportional to the order of magnitude of the nutrient size
-# So the penalty for a nutrient with a nominal value of 1g/100g should increase by the steep_gradient
-# for every 1g outside min / max, whereas a nutrient with a nominal value of 1ug/100g should 
-# have a penalty of steep_gradient times the number of ug outside of the min / max range
-#
-# penalty
-#    ^        *                                               *
-#    |         * <----------- steep_gradient --------------> *                            
-#    |          *                                           *                             
-#    |           *                                         *                              
-#    |            *                                       *                               
-#    |             *                                     *                                
-#    |              *                                   *                                 
-#    |               ******                          ***  <- tolerance_penalty          
-#    |                     ******                 ***                                     
-#    |                           ******        ***                                       
-#    |---------------------------------********------------------------------------------> value
-#                    ^                      ^           ^
-#                min_value               nom_value   max_value
-#
-def assign_penalty(value, nom_value, tolerance_penalty, min_value, max_value, steep_gradient):
-    if (value < min_value):
-        return tolerance_penalty + (min_value - value) * steep_gradient
+precision = 0.01
 
-    if (value > max_value):
-        return tolerance_penalty + (value - max_value) * steep_gradient
 
-    if (value > nom_value):
-        return tolerance_penalty * (value - nom_value) / (max_value - nom_value)
+def add_ingredients_to_solver(ingredients, solver, total_ingredients):
+    ingredient_numvars = []
+
+    for i,ingredient in enumerate(ingredients):
+
+        ingredient_numvar = {'ingredient': ingredient, 'numvar': solver.NumVar(0.0, solver.infinity(), '')}
+        ingredient_numvars.append(ingredient_numvar)
+        # TODO: Known percentage or stated range
+
+        if ingredient.get('ingredients'):
+            # Child ingredients
+            child_numvars = add_ingredients_to_solver(ingredient['ingredients'], solver, total_ingredients)
+
+            ingredient_numvar['child_numvars'] = child_numvars
+
+        else:
+            # Constrain water loss. If ingredient is 20% water then
+            # raw ingredient - lost water must be greater than 80
+            # ingredient - water_loss >= ingredient * (100 - water_ratio) / 100
+            # ingredient - water_loss >= ingredient - ingredient * water ratio / 100
+            # ingredient * water ratio / 100 - water_loss >= 0
+            
+            ingredient_numvar['lost_water'] = solver.NumVar(0, solver.infinity(), '')
+            water = ingredient['nutrients'].get('water', {})
+            maximum_water_content = water.get('percent_max', 0)
+            print("maximum_water_content", ingredient['id'], maximum_water_content)
+
+            water_loss_ratio_constraint = solver.Constraint(0, solver.infinity(),  '')
+            water_loss_ratio_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.01 * maximum_water_content)
+            water_loss_ratio_constraint.SetCoefficient(ingredient_numvar['lost_water'], -1.0)
+
+            total_ingredients.SetCoefficient(ingredient_numvar['numvar'], 1)
+            total_ingredients.SetCoefficient(ingredient_numvar['lost_water'], -1.0)
+            print("total_ingredients:", total_ingredients.name(), ingredient_numvar['ingredient']['id'])
+
+    return ingredient_numvars
+
+# Add constraints to ensure that the quantity of each ingredient is greater than or equal to the quantity of the next ingredient
+# and that the sum of children ingredients is equal to the parent ingredient
+def add_relative_constraints_on_ingredients(solver, parent_ingredient_numvar, ingredient_numvars):
+
+    # Constraint: parent_ingredient = sum(children_ingredients)
+    if (parent_ingredient_numvar is not None):
+        parent_ingredient_constraint = solver.Constraint(0, 0)
+        parent_ingredient_constraint.SetCoefficient(parent_ingredient_numvar['numvar'], 1)
+        print("parent_ingredient_constraint - parent :", parent_ingredient_constraint.name(), parent_ingredient_numvar['ingredient']['id'])
+        for i,ingredient_numvar in enumerate(ingredient_numvars):
+            parent_ingredient_constraint.SetCoefficient(ingredient_numvar['numvar'], -1)
+            print("parent_ingredient_constraint - child :", parent_ingredient_constraint.name(), ingredient_numvar['ingredient']['id'])
+
+    for i,ingredient_numvar in enumerate(ingredient_numvars):
+
+        # Relative constraints on consecutive ingredients        
+        if i < (len(ingredient_numvars) - 1):
+            # constraint: ingredient (i) - ingredient (i+1) >= 0
+            relative_constraint = solver.Constraint(0, solver.infinity())
+            relative_constraint.SetCoefficient(ingredient_numvar['numvar'], 1.0)
+            relative_constraint.SetCoefficient(ingredient_numvars[i+1]['numvar'], -1.0)
+            print("relative_constraint:", relative_constraint.name(), ingredient_numvar['ingredient']['id'], '>=', ingredient_numvars[i+1]['ingredient']['id'])
+        
+        # Recursively apply parent ingredient constraint and relative constraints to child ingredients
+        if 'child_numvars' in ingredient_numvar:
+            add_relative_constraints_on_ingredients(solver, ingredient_numvar, ingredient_numvar['child_numvars'])
+
+def add_to_relative_constraint(solver, relative_constraint, ingredient_numvar, coefficient):
+    if 'child_numvars' in ingredient_numvar:
+        child_numvars = ingredient_numvar['child_numvars']
+        for i,child_numvar in enumerate(child_numvars):
+            add_to_relative_constraint(solver, relative_constraint, child_numvar, coefficient)
+            if i < (len(child_numvars) - 1):
+                child_constraint = solver.Constraint(0, solver.infinity())
+                add_to_relative_constraint(solver, child_constraint, child_numvar, 1.0)
+                add_to_relative_constraint(solver, child_constraint, child_numvars[i+1], -1.0)
+    else:
+        print("relative_constraint:", relative_constraint.name(), ingredient_numvar['ingredient']['id'], coefficient)
+        relative_constraint.SetCoefficient(ingredient_numvar['numvar'], coefficient)
+
+# add maximum quantity constraints on some ingredients like en:salt (5g) and en:flavouring (1g)
+def add_maximum_quantity_constraints(solver, ingredient_numvars):
+    for ingredient_numvar in ingredient_numvars:
+        ingredient = ingredient_numvar['ingredient']
+        if ('child_numvars' in ingredient_numvar):
+            add_maximum_quantity_constraints(solver, ingredient_numvar['child_numvars'])
+        else:
+            if ingredient['id'] == 'en:salt' or ingredient['id'] == 'en:sea-salt':
+                salt_constraint = solver.Constraint(0, 5)
+                salt_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+            if ingredient['id'] == 'en:flavouring' or ingredient['id'] == 'en:natural-flavouring':
+                flavouring_constraint = solver.Constraint(0, 2)
+                flavouring_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+            # if the ingredient is an additive (id starts with "en:e" + digits) then we set a maximum quantity of 1g
+            if ingredient['id'].startswith('en:e'):
+                additive_constraint = solver.Constraint(0, 2)
+                additive_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+
+# add max limits on ingredients en:salt and en:sugar based on the sugars and salt nutrition facts of the product
+def add_maximum_limits_on_salt_and_sugar(solver, ingredient_numvars, salt_constraint, sugars_constraint, fat_constraint):
+    for ingredient_numvar in ingredient_numvars:
+        ingredient = ingredient_numvar['ingredient']
+        if ('child_numvars' in ingredient_numvar):
+            add_maximum_limits_on_salt_and_sugar(solver, ingredient_numvar['child_numvars'], salt_constraint, sugars_constraint, fat_constraint)
+        else:
+            # salt: ingredient id is en:salt or ends with -salt
+            if ingredient['id'] == 'en:salt' or ingredient['id'].endswith('-salt'):
+                salt_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+            # sugar: ingredient id is en:sugar or ends with -sugar
+            if ingredient['id'] == 'en:sugar' or ingredient['id'].endswith('-sugar'):
+                sugars_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+            # oils: ingredient id ending with -oil, en:cocoa-butter
+            if ingredient['id'].endswith('-oil') or ingredient['id'] == 'en:cocoa-butter':
+                fat_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+            # fats: ingredient id ending with -fat
+            if ingredient['id'].endswith('-fat'):
+                fat_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.8)
+            # butter: min 80% fat
+            if ingredient['id'] == 'en:butter':
+                fat_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.8)
+            # butterfat: 90% fat
+            if ingredient['id'] == 'en:butterfat':
+                fat_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.9)
+
+
+# For each ingredient, get the quantity estimate from the solver (for leaf ingredients)
+# or sum the quantity estimates of the child ingredients (for non-leaf ingredients)
+def get_quantity_estimate(ingredient_numvars):
+    total_quantity = 0
+    quantity_estimate = 0
+    for ingredient_numvar in ingredient_numvars:
+        if ('child_numvars' in ingredient_numvar):
+            quantity_estimate = get_quantity_estimate(ingredient_numvar['child_numvars'])
+        else:
+            quantity_estimate = ingredient_numvar['numvar'].solution_value()
+            ingredient_numvar['ingredient']['lost_water'] = ingredient_numvar['lost_water'].solution_value()
+        
+        ingredient_numvar['ingredient']['quantity_estimate'] = quantity_estimate
+        total_quantity += quantity_estimate
+
+    return total_quantity
+
+
+def set_percent_estimate(ingredients, total_quantity):
+    for ingredient in ingredients:
+        if ingredient.get('ingredients'):
+            set_percent_estimate(ingredient['ingredients'], total_quantity)
+
+        ingredient['percent_estimate'] = 100 * ingredient['quantity_estimate'] / total_quantity
+
+
+def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint, negative_constraint, weighting):
+    for ingredient_numvar in ingredient_numvars:
+        ingredient = ingredient_numvar['ingredient']
+        if 'child_numvars' in ingredient_numvar:
+            #print(ingredient['indent'] + ' - ' + ingredient['text'] + ':')
+            add_nutrient_distance(ingredient_numvar['child_numvars'], nutrient_key, positive_constraint, negative_constraint, weighting)
+        else:
+            # TODO: Figure out whether to do anything special with < ...
+            ingredient_nutrient =  ingredient['nutrients'][nutrient_key]
+            #print(ingredient['indent'] + ' - ' + ingredient['text'] + ' (' + ingredient['ciqual_code'] + ') : ' + str(ingredient_nutrient))
+            print("nutrient_distance:", ingredient['id'], nutrient_key, ingredient_nutrient['percent_min'], ingredient_nutrient['percent_max'])
+            negative_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_min'] / 100)
+            positive_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_max'] / 100)
+
+
+# Add an objective to minimize the difference between the quantity of each ingredient and the next ingredient (and 0 for the last ingredient)
+def add_objective_to_minimize_maximum_distance_between_ingredients(solver, objective, weighting, ingredient_numvars):
     
-    return tolerance_penalty * (nom_value - value) / (nom_value - min_value)
+    max_ingredients_distance = solver.NumVar(0, solver.infinity(), "max_ingredients_distance")
+
+    for i,ingredient_numvar in enumerate(ingredient_numvars):
+        
+        # constraint: ingredient(i) - ingredient(i+1) <= max_ingredients_distance
+        # can be expressed as: ingredient(i) - ingredient(i+1) - max_ingredients_distance <= 0
+        constraint = solver.Constraint(-solver.infinity(), 0)
+        constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+        if i < (len(ingredient_numvars) - 1):
+            constraint.SetCoefficient(ingredient_numvars[i+1]['numvar'], -1)
+            # for the last ingredient, we look at its distance to 0
+            # so the constraint is only ingredient(i) < max_ingredients_distance
+            # and we don't need add it to the constraint
+        constraint.SetCoefficient(max_ingredients_distance, -1)
+
+        # Apply recursively to child ingredients
+        if 'child_numvars' in ingredient_numvar:
+            add_objective_to_minimize_maximum_distance_between_ingredients(solver, objective, weighting, ingredient_numvar['child_numvars'])
+
+    objective.SetCoefficient(max_ingredients_distance, weighting)
 
 # estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
 # The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
 def estimate_recipe(product):
     current = time.perf_counter()
-    leaf_ingredient_count = prepare_nutrients(product)
+    prepare_nutrients(product)
     ingredients = product['ingredients']
     recipe_estimator = product['recipe_estimator']
     nutrients = recipe_estimator['nutrients']
     
-    # For the model we need an array of variables. This will be the quantity of each leaf ingredient to make 100g of product
-    # in order followed by the amount of mass (typically water) lost during preparation (e.g. evaporation during cooking)
-    # For example, a simple tomato sauce of tomatoes and onions might have a matrix of [120, 60, 50, 10]
-    # This is saying we start with 120g of tomatoes and 50g of onions and during cooking we lose 60g water from the 
-    # tomatoes and 10g from the onions.
-    # The constraints we apply are as follows:
-    #  - Total of ingredients minus lost mass must add up to 100. Expressed as a matrix [1, -1, 1, -1] = 100
-    #  - Lost mass cannot be greater that the water content of each item. So:
-    #       Tomatoes with 80% water: [0.8, -1, 0, 0] >= 0
-    #       Onions with 20% water:   [0, 0, 0.2, -1] >= 0
-    # The later ingredient must be less than the one before. [1, 0, -1, 0] >= 0. For n ingredients there will be n-1 of these constraints
-    # TODO: explain how it works for sub-ingredients
-    # For the objective function, for each nutrient we sum the product of the mass of each ingredient and its nutrient proportion 
-    # and subtract this from the quoted nutrient value of the product. We square this and weight it and then minimise the
-    # sum of the weighted squares of the nutrient differences.
-
+    # Instantiate a Glop solver
+    solver = pywraplp.Solver.CreateSolver('GLOP')
+    if not solver:
+        return
+    
     # Total of leaf level ingredients must add up to at least 100
-    x = []
-    cons = []
-    bounds = []
+    total_ingredients = solver.Constraint(100 - precision, 100 + precision, '')
+    ingredient_numvars = add_ingredients_to_solver(ingredients, solver, total_ingredients)
 
-    def water_constraint(i, maximum_water_content):
-        # return { 'type': 'ineq', 'fun': lambda x: x[i] * maximum_water_content - x[i + 1]}
-        A = [0] * leaf_ingredient_count * 2
-        A[i] = maximum_water_content
-        A[i + 1] = -1
-        return LinearConstraint(A, lb = 0)
+    # Make sure nth ingredient > n+1 th ingredient
+    # add_relative_constraints_on_ingredients(solver, ingredient_numvars)
 
-    def ingredient_order_constraint(previous_start, this_start, this_count):
-        # return { 'type': 'ineq', 'fun': lambda x: sum(x[previous_start : this_start : 2]) - sum(x[this_start : this_start + this_count * 2 : 2])}
-        A = [0] * leaf_ingredient_count * 2
-        for i in range(0, leaf_ingredient_count * 2, 2):
-            if i >= previous_start and i < this_start:
-                A[i] = 1
-            if i >= this_start and i < this_start + this_count * 2:
-                A[i] = -1
-        return LinearConstraint(A, lb = 0)
+    add_relative_constraints_on_ingredients(solver, None, ingredient_numvars)
 
-    # Prepare nutrients information in arrays for fast objective function
-    nutrient_names = []
-    product_nutrients = []
-    ingredients_nutrients = []
-    nutrient_weightings = []
-    nutrient_penalty_factors = []
+    add_maximum_quantity_constraints(solver, ingredient_numvars)
+
+    salt = product['nutriments'].get('salt_100g', 0)
+    salt_constraint = solver.Constraint(0, salt)
+
+    sugar = product['nutriments'].get('sugars_100g', 0)
+    sugar_constraint = solver.Constraint(0, sugar)
+    
+    fat = product['nutriments'].get('fat_100g', 0)
+    fat_constraint = solver.Constraint(0, fat)
+
+    add_maximum_limits_on_salt_and_sugar(solver, ingredient_numvars, salt_constraint, sugar_constraint, fat_constraint)
+
+    objective = solver.Objective()
     for nutrient_key in nutrients:
         nutrient = nutrients[nutrient_key]
 
         weighting = nutrient.get('weighting')
-
         # Skip nutrients that don't have a weighting
         if weighting is None or weighting == 0:
-            #print("Skipping nutrient without weight:", nutrient_key)
+            print("Skipping nutrient without weight:", nutrient_key)
             continue
-        nutrient_names.append(nutrient_key)
-        product_nutrients.append(nutrient['product_total'])
-        nutrient_weightings.append(weighting)
-        ingredients_nutrients.append([])
-        nutrient_penalty_factors.append(nutrient['penalty_factor'])
 
+        # We want to minimise the absolute difference between the sum of the ingredient nutrients and the total nutrients
+        # Ni: Nutrient content of ingredient i
+        # Ntot: Total nutrient content of product
+        # i.e. minimize(abs(sum(Ni) - Ntot))
+        # However we can't do absolute as it isn't linear
+        # We get around this by introducing a nutrient distance variable that has to be positive
+        # This is achieved by setting the following constraints:
+        #    Ndist >= (Sum(Ni) - Ntot) 
+        #    Ndist >= -(Sum(Ni) - Ntot) 
+        # or
+        #    Negative constraint:  -infinity < ( sum(Ni) - Ndist ) <= Ntot 
+        #    Positive constraint:  +infinity > ( sum(Ni) + Ndist ) >= Ntot
+        #
+        # If the nutrition information about the ingredient is a range of value then use the higher value
+        # on the positive constraint and the lower value on the negative constraint as this will make it "easier"
+        # to meet these constraints
+        #
+        # Conversely, if the product nutrition value (Ntot) has a range then use the higher value on the negative
+        # constraint and a lower value on the positive constraint
 
-    def add_ingredients(total, ingredients):
-        added = 0
-        # Initial estimate of ingredients is a geometric progression where each is half the previous one
-        # Sum of a  geometric progression is Sn = a(1 - r^n) / (1 - r)
-        # In our case Sn = 100 and r = 0.5 so our first ingredient (a) will be
-        # (100 * 0.5) / (1 - 0.5 ^ n)
-        a = (total * 0.5) / (1 - 0.5 ** len(ingredients))
-        for i,ingredient in enumerate(ingredients):
-            this_start = len(x)
+        nutrient_total = nutrient['product_total']
 
-            if ('ingredients' in ingredient and len(ingredient['ingredients']) > 0):
-                ingredients_added = add_ingredients(a, ingredient['ingredients'])
-            else:
-                # Set lost water constraint
-                water = ingredient['nutrients'].get('water', {})
-                maximum_water_content = water.get('percent_nom', 0) * 0.01
-                cons.append(water_constraint(this_start, maximum_water_content))
+        nutrient_distance = solver.NumVar(0, solver.infinity(), nutrient_key)
 
-                # Initial estimate. 0.5 of previous ingredient
-                x.append(a)
-                maximum_weight = None if maximum_water_content == 1 else 100 / (1 - maximum_water_content)
-                bounds.append((0, maximum_weight))
- 
-                # Water loss
-                x.append(0)
-                bounds.append((0, None if maximum_water_content == 1 else maximum_water_content * maximum_weight))
+        # not sure this is right as if one ingredient is way over and another is way under
+        # then will give a good result
+        negative_constraint = solver.Constraint(-solver.infinity(), nutrient_total)
+        negative_constraint.SetCoefficient(nutrient_distance, -1)
+        positive_constraint = solver.Constraint(nutrient_total, solver.infinity())
+        positive_constraint.SetCoefficient(nutrient_distance, 1)
+        add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint, negative_constraint, weighting)
 
-                ingredient['index'] = this_start
-                ingredients_added = 1
+        print("nutrient_key:", nutrient_key, "nutrient_total:", nutrient_total, "weighting:", weighting)
+        objective.SetCoefficient(nutrient_distance, weighting)
 
-                for n,nutrient_key in enumerate(nutrient_names):
-                    ingredient_nutrient =  ingredient['nutrients'][nutrient_key]
-                    ingredients_nutrients[n].append({
-                        'nom': ingredient_nutrient['percent_nom'] / 100,
-                        'min': ingredient_nutrient['percent_min'] / 100,
-                        'max': ingredient_nutrient['percent_max'] / 100,
-                    })
+    add_objective_to_minimize_maximum_distance_between_ingredients(solver, objective, 0.005, ingredient_numvars)
 
-            # Set order constraint
-            if (i > 0):
-                # Sum of children must be less than previous ingredient (or sum of its children)
-                cons.append(ingredient_order_constraint(previous_start, this_start, ingredients_added))
+    objective.SetMinimization()
 
-            a /= 2
-            added += ingredients_added
-            previous_start = this_start
-        return added
+    # Have had to keep increasing this until we get a solution for a good set of products
+    # Not sure what the correct approach is here
+    solver.SetSolverSpecificParametersAsString("solution_feasibility_tolerance:1e5")
 
-    add_ingredients(100, ingredients)
+    # Following may be an alternative (haven't tried yet)
+    #solver_parameters = pywraplp.MPSolverParameters()
+    #solver_parameters.SetDoubleParam(pywraplp.MPSolverParameters.PRIMAL_TOLERANCE, 0.001)
+    #status = solver.Solve(solver_parameters)
+    
+    #solver.EnableOutput()
 
-    def objective(x):
-        penalty = 0
+    status = solver.Solve()
 
-        for n, nutrient_total in enumerate(product_nutrients):
-            nom_nutrient_total_from_ingredients = 0
-            min_nutrient_total_from_ingredients = 0
-            max_nutrient_total_from_ingredients = 0
-            for i, ingredient_nutrient in enumerate(ingredients_nutrients[n]):
-                nom_nutrient_total_from_ingredients += x[i * 2] * ingredient_nutrient['nom']
-                min_nutrient_total_from_ingredients += x[i * 2] * ingredient_nutrient['min']
-                max_nutrient_total_from_ingredients += x[i * 2] * ingredient_nutrient['max']
+    # Check that the problem has an optimal solution.
+    if status == solver.OPTIMAL:
+        print('An optimal solution was found in', solver.iterations(), 'iterations')
+    else:
+        if status == solver.FEASIBLE:
+            print('A potentially suboptimal solution was found in', solver.iterations(), 'iterations')
+        else:
+            print('The solver could not solve the problem.')
+            return status
 
-            # Factors need to quite large as the algorithms only make tiny changes to the variables to determine gradients
-            # TODO: Need to experiment with factors here
-            penalty += nutrient_weightings[n] * assign_penalty(nutrient_total, 
-                                                               nom_nutrient_total_from_ingredients, 100,
-                                                                min_nutrient_total_from_ingredients,
-                                                                 max_nutrient_total_from_ingredients, 1000 * nutrient_penalty_factors[n])
-        return penalty
+    total_quantity = get_quantity_estimate(ingredient_numvars)
+    set_percent_estimate(ingredients, total_quantity)
 
-    # For COBYLA can't use eq constraint
-    A = [0] * leaf_ingredient_count * 2
-    for i in range(0, leaf_ingredient_count * 2):
-        A[i] = -1 if i % 2 else 1
-    cons.append(LinearConstraint(A, lb = 99.99, ub = 100.01))
-    # cons.append({ 'type': 'ineq', 'fun': lambda x: sum(x[0::2]) - sum(x[1::2]) - 99.99})
-    # cons.append({ 'type': 'ineq', 'fun': lambda x: 100.01 - (sum(x[0::2]) - sum(x[1::2]))})
-
-    # COBYQA is very slow
-    #solution = minimize(objective,x,method='COBYLA',bounds=bounds,constraints=cons,options={'maxiter': 10000})
-    solution = minimize(objective,x,method='SLSQP',bounds=bounds,constraints=cons) # Fastest
-    #solution = minimize(objective,x,method='trust-constr',bounds=bounds,constraints=cons)
-    # May need to consider using global minimization as the objective function is probably not convex
-    # Looks like shgo is the only one that supports constraints
-    # solution = shgo(objective, bounds=bounds, constraints=cons) #, n = 1000, minimizer_kwargs={'method': 'COBYLA'})
-
-    total_quantity = sum(solution.x[0::2])
-
-    def set_percentages(ingredients):
-        total_percent = 0
-        for ingredient in ingredients:
-            if ('ingredients' in ingredient and len(ingredient['ingredients']) > 0):
-                percent_estimate = set_percentages(ingredient['ingredients'])
-            else:
-                index = ingredient['index']
-                ingredient['quantity_estimate'] = solution.x[index]
-                ingredient['lost_water'] = solution.x[index + 1]
-                percent_estimate = round(100 * solution.x[index] / total_quantity, 2)
-
-            ingredient['percent_estimate'] = percent_estimate
-            total_percent += percent_estimate
-
-        return total_percent
-
-    set_percentages(ingredients)
     end = time.perf_counter()
     recipe_estimator['time'] = end - current
-    recipe_estimator['status'] = 0 if solution.success else 1
-    recipe_estimator['status_message'] = solution.message
-    #recipe_estimator['iterations'] = solution.nit
+    recipe_estimator['status'] = status
+    recipe_estimator['iterations'] = solver.iterations()
 
     print('Time spent in solver: ', recipe_estimator['time'], 'seconds')
 
-    return solution
+    return status
