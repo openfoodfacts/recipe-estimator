@@ -65,7 +65,7 @@ export default function Recipe({product}: RecipeProps) {
       setIngredients(results.ingredients);
       setNutrients(Object.fromEntries(
         Object.entries(results.recipe_estimator.nutrients).filter(
-           ([key, val])=>(val as any).product_total
+           ([key, val])=>(val as any).product_total > 0
         )));
     }
     fetchData();
