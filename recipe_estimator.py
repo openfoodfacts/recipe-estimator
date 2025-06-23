@@ -108,13 +108,18 @@ def add_maximum_limits_on_salt_and_sugar(solver, ingredient_numvars, salt_constr
         if ('child_numvars' in ingredient_numvar):
             add_maximum_limits_on_salt_and_sugar(solver, ingredient_numvar['child_numvars'], salt_constraint, sugars_constraint, fat_constraint)
         else:
-            if ingredient['id'] == 'en:salt' or ingredient['id'] == 'en:sea-salt':
+            # salt: ingredient id is en:salt or ends with -salt
+            if ingredient['id'] == 'en:salt' or ingredient['id'].endswith('-salt'):
                 salt_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
-            if ingredient['id'] == 'en:sugar' or ingredient['id'] == 'en:cane-sugar':
+            # sugar: ingredient id is en:sugar or ends with -sugar
+            if ingredient['id'] == 'en:sugar' or ingredient['id'].endswith('-sugar'):
                 sugars_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
             # oils: ingredient id ending with -oil, en:cocoa-butter
             if ingredient['id'].endswith('-oil') or ingredient['id'] == 'en:cocoa-butter':
                 fat_constraint.SetCoefficient(ingredient_numvar['numvar'], 1)
+            # fats: ingredient id ending with -fat
+            if ingredient['id'].endswith('-fat'):
+                fat_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.8)
             # butter: min 80% fat
             if ingredient['id'] == 'en:butter':
                 fat_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.8)
