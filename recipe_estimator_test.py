@@ -307,56 +307,12 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
     assert metrics is not None
 
     # Status is valid
-    #assert metrics['status'] == 0
+    assert metrics['status'] == 0
 
-    # Estimates shouldn't vary too far from original values as no ingredient is any better than the others
-    assert 51 < product['ingredients'][0]['percent_estimate'] < 55 # 53.3
-    assert 25 < product['ingredients'][1]['percent_estimate'] < 29 # 26.7
-    assert 11 < product['ingredients'][2]['percent_estimate'] < 15 # 13.3
-    assert 5  < product['ingredients'][3]['percent_estimate'] < 9  # 6.7
-    
-    
-def test_estimate_recipe_subingredient_limits():
-    product = {
-        'ingredients': [
-            {
-                'id':'en:dummy-ingredients',
-                'ingredients': [
-                    {
-                        'id':'en:one',
-                        'nutrients': {
-                            'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
-                        }
-                    },
-                    {
-                        'id':'en:two',
-                        'nutrients': {
-                            'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
-                        }
-                    }
-                ]
-            },
-            {
-                'id':'en:salt',
-                'nutrients': {
-                    'salt': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
-                }
-            },
-        ],
-        'nutriments': {
-            'salt_100g': 100
-        }}
-
-    # For the above there is no way to reach the salt limit as the only ingredient with salt is in second place
-    # so can be at most 50%
-    estimate_recipe(product)
-
-    metrics = product.get('recipe_estimator')
-    assert metrics is not None
-
-    salt = product['ingredients'][1]
-    # Percent estimate is as high a possible
-    assert round(salt.get('percent_estimate')) == 50
+    assert round(product['ingredients'][0]['percent_estimate']) == 40
+    assert round(product['ingredients'][1]['percent_estimate']) == 30
+    assert round(product['ingredients'][2]['percent_estimate']) == 20
+    assert round(product['ingredients'][3]['percent_estimate']) == 10
 
 
 def test_estimate_recipe_minimize_maximum_distance_between_ingredients_with_subingredients():

@@ -218,13 +218,14 @@ def estimate_recipe(product):
 
     add_maximum_quantity_constraints(solver, ingredient_numvars)
 
-    salt = product['nutriments'].get('salt_100g', 0)
+    nutriments = product.get('nutriments', {})
+    salt = nutriments.get('salt_100g', 0)
     salt_constraint = solver.Constraint(0, salt)
 
-    sugar = product['nutriments'].get('sugars_100g', 0)
+    sugar = nutriments.get('sugars_100g', 0)
     sugar_constraint = solver.Constraint(0, sugar)
     
-    fat = product['nutriments'].get('fat_100g', 0)
+    fat = nutriments.get('fat_100g', 0)
     fat_constraint = solver.Constraint(0, fat)
 
     add_maximum_limits_on_salt_and_sugar(solver, ingredient_numvars, salt_constraint, sugar_constraint, fat_constraint)
