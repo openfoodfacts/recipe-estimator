@@ -8,6 +8,9 @@ install:
 watch:
 	uvicorn recipe_estimator.main:app --port 5521 --reload
 
+watch_frontend:
+	cd ./frontend; npm start
+
 build:
 	docker compose build
 
