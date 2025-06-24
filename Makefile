@@ -6,4 +6,4 @@ dev:
 	pip install -r requirements.txt
 
 up:
-	uvicorn main:app --reload
+	uvicorn recipe_estimator.main:app --reload

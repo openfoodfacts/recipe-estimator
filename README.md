@@ -42,7 +42,7 @@ pip install -r requirements.txt
 To run the API server:
 
 ```
-uvicorn main:app --reload
+uvicorn recipe_estimator.main:app --reload
 ```
 
 The static pages can be accessed like this:
