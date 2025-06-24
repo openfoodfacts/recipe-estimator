@@ -12,4 +12,4 @@ RUN pip3 install -r requirements.txt
 COPY recipe_estimator ./recipe_estimator
 COPY --from=frontend-build app/build ./static
 
-CMD [ "uvicorn", "recipe_estimator.main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD [ "uvicorn", "recipe_estimator.main:app", "--host", "0.0.0.0", "--port", "5521"]

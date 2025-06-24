@@ -1,0 +1,4 @@
+services:
+  recipe_estimator:
+    build: .
+    image: recipe-estimator:dev

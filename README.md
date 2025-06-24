@@ -81,7 +81,7 @@ docker build --tag recipe_estimator .
 ```
 And to run:
 ```
-docker run --name recipe_estimator -dp 5520:80 recipe_estimator
+docker run --name recipe_estimator -dp 5520:5521 recipe_estimator
 ```
 
 # Processing Steps
