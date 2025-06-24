@@ -9,17 +9,16 @@ def test_prepare_product_populates_nutrients():
     carbs = ingredient_nutrients.get('carbohydrates')
     assert carbs is not None
     assert carbs['percent_min'] > 2.4
-    assert carbs['percent_max'] < 2.6
+    assert 2.6 < carbs['percent_max'] < 5.2
 
     # Check that units are normalised
     calcium = ingredient_nutrients.get('calcium')
-    assert calcium['percent_min'] > 0.006
-    assert calcium['percent_max'] < 0.010
+    assert 0.001 < calcium['percent_min'] < 0.006
+    assert 0.010 < calcium['percent_max'] < 0.020
 
     # Includes water content
     water = ingredient_nutrients.get('water')
-    assert water['percent_min'] > 90
-
+    assert 80 < water['percent_min'] < 90
 
 def test_prepare_product_looks_up_ciqual_code():
     product = {'ingredients': [{'id':'en:tomato'}]}
@@ -39,5 +38,6 @@ def test_prepare_product_creates_a_max_range_entry_if_ingredient_not_found():
     assert carbs['percent_max'] <= 100
 
 def test_get_ciqual_code_should_use_proxy_if_no_main_code():
-    ciqual_code = get_ciqual_code('en:tomato-sauce')
-    assert ciqual_code == '11107'
+    ciqual_code, ciqual_proxy_code = get_ciqual_code('en:tomato-sauce')
+    assert ciqual_code is None
+    assert ciqual_proxy_code == '11107'

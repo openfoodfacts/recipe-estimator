@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from ciqual.nutrients import ciqual_ingredients, prepare_product
 from product import get_product
 from recipe_estimator import estimate_recipe
+from recipe_estimator_scipy import estimate_recipe as estimate_recipe_scipy
 
 app = FastAPI()
 
@@ -26,7 +27,7 @@ async def redirect():
 @app.get("/ciqual/{name}")
 async def ciqual(name):
     search_terms = name.casefold().split()
-    return list(itertools.islice(filter(lambda i: (all(search_term in i['alim_nom_eng'].casefold() for search_term in search_terms)), ciqual_ingredients.values()),20))
+    return list(itertools.islice(filter(lambda i: (all(search_term in (i['alim_nom_eng'] + i['ciqual_food_code']).casefold() for search_term in search_terms)), ciqual_ingredients.values()),20))
 
 @app.get("/product/{id}")
 async def product(id):
@@ -38,4 +39,11 @@ async def recipe(request: Request):
     product = await request.json()
     prepare_product(product)
     estimate_recipe(product)
+    return product
+
+@app.post("/api/v3/estimate_recipe_scipy")
+async def recipe(request: Request):
+    product = await request.json()
+    prepare_product(product)
+    estimate_recipe_scipy(product)
     return product

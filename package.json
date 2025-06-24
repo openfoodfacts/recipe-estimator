@@ -1,0 +1,12 @@
+{
+  "name": "receipe-estimator",
+  "version": "0.0.1",
+  "description": "Estimate ingredient percentages based on nutritional values",
+  "scripts": {},
+  "keywords": [],
+  "author": "Open Food Facts contributors",
+  "license": "AGPL-3.0-only",
+  "devDependencies": {
+    "json-stable-stringify": "^1.2.1"
+  }
+}

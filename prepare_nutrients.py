@@ -1,3 +1,5 @@
+from ciqual.nutrients import off_to_ciqual
+
 
 # count the number of leaf ingredients in the product
 # for each nutrient, store in nutrients the number of leaf ingredients that have a nutrient value
@@ -5,11 +7,9 @@
 def count_ingredients(ingredients, nutrients):
     count = 0
     for ingredient in ingredients:
-        if ('ingredients' in ingredient):
+        if ('ingredients' in ingredient and len(ingredient['ingredients']) > 0):
             # Child ingredients
             child_count = count_ingredients(ingredient['ingredients'], nutrients)
-            if child_count == 0:
-                return 0
             count = count + child_count
 
         else:
@@ -17,10 +17,10 @@ def count_ingredients(ingredients, nutrients):
             ingredient_nutrients = ingredient.get('nutrients')
             if (ingredient_nutrients is not None):
                 for off_id in ingredient_nutrients:
-                    proportion = ingredient_nutrients[off_id]['percent_max'] # Use the maximum in a range for weighting
+                    proportion = ingredient_nutrients[off_id]['percent_nom']
                     existing_nutrient = nutrients.get(off_id)
                     if (existing_nutrient is None):
-                         nutrients[off_id] = {'ingredient_count': 1, 'unweighted_total': proportion}
+                         nutrients[off_id] = {'ingredient_count': 1, 'unweighted_total': proportion, 'weighting': 0}
                     else:
                         existing_nutrient['ingredient_count'] = existing_nutrient['ingredient_count'] + 1
                         existing_nutrient['unweighted_total'] = existing_nutrient['unweighted_total'] + proportion
@@ -42,17 +42,7 @@ def assign_weightings(product):
             continue
 
         computed_nutrient['product_total'] = product_nutrient
-
-        # Energy is derived from other nutrients, so don't use it
-        if nutrient_key == 'energy':
-            computed_nutrient['notes'] = 'Energy not used for calculation'
-            continue
-
-        # Sodium is computed from salt, so don't use it, to avoid double counting
-        if nutrient_key == 'sodium':
-            computed_nutrient['notes'] = 'Sodium not used for calculation'
-            continue
-
+        
         if product_nutrient == 0 and computed_nutrient['unweighted_total'] == 0:
             computed_nutrient['notes'] = 'All zero values'
             continue
@@ -61,25 +51,30 @@ def assign_weightings(product):
             computed_nutrient['notes'] = 'Not available for all ingredients'
             continue
 
-        # Favor Sodium over salt if both are present
-        #if not 'error' in nutrients.get('Sodium (mg/100g)',{}) and not 'error' in nutrients.get('Salt (g/100g)', {}):
-        #    nutrients['Salt (g/100g)']['error'] = 'Prefer sodium where both present'
+        nutrient = off_to_ciqual[nutrient_key]
+        weighting = nutrient['weighting']
+        if weighting == '':
+            computed_nutrient['notes'] = nutrient['comments']
+        else:
+            computed_nutrient['weighting'] = float(weighting)
 
-        # Weighting based on size of ingredient, i.e. percentage based
-        # Comment out this code to use weighting specified in nutrient_map.csv
-        try:
-            if product_nutrient > 0:
-                computed_nutrient['weighting'] = 1 / product_nutrient
-            else:
-                computed_nutrient['weighting'] = min(0.01, count / computed_nutrient['unweighted_total']) # Weighting below 0.01 causes bad performance, although it isn't that simple as just multiplying all weights doesn't help
-        except Exception as e:
-            computed_nutrient['notes'] = e
-
-        if nutrient_key == 'xsalt':
-            computed_nutrient['weighting'] = 100
-            continue
-
-        computed_nutrient['weighting'] = 1
+        penalty_factor = nutrient['penalty_factor']
+        computed_nutrient['penalty_factor'] = 0 if penalty_factor == '' else float(penalty_factor)
+        
+    # Exclude carbohydrates if one of these is true
+    # 1. We have a value for both sugars and fibre
+    # 2. The countries_tags includes "en:united-states" (carbs could be gross rather than net)
+    carbohydrates = computed_nutrients.get('carbohydrates')
+    if (carbohydrates and carbohydrates['weighting'] > 0):
+        if 'countries_tags' not in product or 'en:united-states' in product['countries_tags']:
+            carbohydrates['weighting'] = 0
+            carbohydrates['notes'] = 'Possible US product quoting gross carbs'
+        else:
+            fiber = computed_nutrients.get('fiber')
+            sugars = computed_nutrients.get('sugars')
+            if fiber and sugars and fiber['weighting'] > 0 and sugars['weighting'] > 0:
+                carbohydrates['weighting'] = 0
+                carbohydrates['notes'] = 'Have sugar and fiber so ignore carbs'
 
 
 def prepare_nutrients(product):
@@ -87,4 +82,4 @@ def prepare_nutrients(product):
     count = count_ingredients(product['ingredients'], nutrients)
     product['recipe_estimator'] = {'nutrients':nutrients, 'ingredient_count': count}
     assign_weightings(product)
-    return
+    return count

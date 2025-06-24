@@ -30,7 +30,7 @@ def add_ingredients_to_solver(ingredients, solver, total_ingredients):
             
             ingredient_numvar['lost_water'] = solver.NumVar(0, solver.infinity(), '')
             water = ingredient['nutrients'].get('water', {})
-            maximum_water_content = water.get('percent_max', 0)
+            maximum_water_content = water.get('percent_nom', 0)
             print("maximum_water_content", ingredient['id'], maximum_water_content)
 
             water_loss_ratio_constraint = solver.Constraint(0, solver.infinity(),  '')
@@ -164,9 +164,9 @@ def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint,
             # TODO: Figure out whether to do anything special with < ...
             ingredient_nutrient =  ingredient['nutrients'][nutrient_key]
             #print(ingredient['indent'] + ' - ' + ingredient['text'] + ' (' + ingredient['ciqual_code'] + ') : ' + str(ingredient_nutrient))
-            print("nutrient_distance:", ingredient['id'], nutrient_key, ingredient_nutrient['percent_min'], ingredient_nutrient['percent_max'])
-            negative_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_min'] / 100)
-            positive_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_max'] / 100)
+            print("nutrient_distance:", ingredient['id'], nutrient_key, ingredient_nutrient['percent_nom'])
+            negative_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_nom'] / 100)
+            positive_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_nom'] / 100)
 
 
 # Add an objective to minimize the difference between the quantity of each ingredient and the next ingredient (and 0 for the last ingredient)
@@ -218,13 +218,14 @@ def estimate_recipe(product):
 
     add_maximum_quantity_constraints(solver, ingredient_numvars)
 
-    salt = product['nutriments'].get('salt_100g', 0)
+    nutriments = product.get('nutriments', {})
+    salt = nutriments.get('salt_100g', 0)
     salt_constraint = solver.Constraint(0, salt)
 
-    sugar = product['nutriments'].get('sugars_100g', 0)
+    sugar = nutriments.get('sugars_100g', 0)
     sugar_constraint = solver.Constraint(0, sugar)
     
-    fat = product['nutriments'].get('fat_100g', 0)
+    fat = nutriments.get('fat_100g', 0)
     fat_constraint = solver.Constraint(0, fat)
 
     add_maximum_limits_on_salt_and_sugar(solver, ingredient_numvars, salt_constraint, sugar_constraint, fat_constraint)

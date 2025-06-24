@@ -7,7 +7,7 @@ interface RecipeProps {
 }
 
 function ingredientDisplayName(ingredient: any): string {
-  return ingredient?.text ? `${ingredient.text} (${ingredient.ciqual_food_code} - ${ingredient.ciqual_proxy_food_code})` : ''
+  return ingredient?.alim_nom_eng ? `${ingredient.alim_nom_eng} (${ingredient.ciqual_food_code ?? (ingredient.ciqual_proxy_food_code ? 'P-' + ingredient.ciqual_proxy_food_code : '?')})` : ''
 }
 function addFirstOption(ingredient: any) {
   ingredient.options ??= [];
@@ -15,7 +15,7 @@ function addFirstOption(ingredient: any) {
     ingredient.options.push({
       ciqual_food_code: ingredient.ciqual_food_code,
       ciqual_proxy_food_code: ingredient.ciqual_proxy_food_code,
-      text: ingredient.text,
+      alim_nom_eng: ingredient.alim_nom_eng,
       id: ingredient.id,
       searchTerm: ingredientDisplayName(ingredient),
       nutrients: ingredient.nutrients,
@@ -27,13 +27,13 @@ function flattenIngredients(ingredients: any[], depth = 0): any[] {
   const flatIngredients = [];
   for (const ingredient of ingredients) {
     ingredient.depth = depth;
-    ingredient.percent_estimate = round(ingredient.percent_estimate);
+    ingredient.quantity_estimate = round(ingredient.quantity_estimate);
     flatIngredients.push(ingredient);
     if (ingredient.ingredients) {
       flatIngredients.push(...flattenIngredients(ingredient.ingredients, depth + 1));
     } else {
       addFirstOption(ingredient);
-      if (!ingredient.searchTerm)
+      if (ingredient.searchTerm == null)
         ingredient.searchTerm =  ingredientDisplayName(ingredient);
     }
   }
@@ -44,7 +44,7 @@ function round(num: any){
   return num == null || isNaN(num) ? 'unknown' : parseFloat(num).toPrecision(4);
 }
 
-const PERCENT = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2,style:"percent"});
+const PERCENT = new Intl.NumberFormat(undefined, {maximumFractionDigits:1,minimumFractionDigits:0,style:"percent"});
 const VARIANCE = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2,signDisplay:"always"});
 const QUANTITY = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2});
 
@@ -56,14 +56,19 @@ function format(num: number, formatter: Intl.NumberFormat){
 export default function Recipe({product}: RecipeProps) {
   const [ingredients, setIngredients] = useState<any>();
   const [nutrients, setNutrients] = useState<any>();
+  const [algorithm, setAlgorithm] = useState<boolean>();
 
-  const getRecipe = useCallback((product: any) => {
+  const getRecipe = useCallback((product: any, scipy = false) => {
     if (!product || !product.ingredients)
       return;
     async function fetchData() {
-      const results = await (await fetch(`${API_PATH}api/v3/estimate_recipe`, {method: 'POST', body: JSON.stringify(product)})).json();
+      const results = await (await fetch(`${API_PATH}api/v3/estimate_recipe${scipy ? '_scipy' : ''}`, {method: 'POST', body: JSON.stringify(product)})).json();
       setIngredients(results.ingredients);
-      setNutrients(results.recipe_estimator.nutrients);
+      setNutrients(Object.fromEntries(
+        Object.entries(results.recipe_estimator.nutrients).filter(
+           ([key, val])=>(val as any).product_total > 0
+        )));
+      setAlgorithm(scipy)
     }
     fetchData();
   }, []);
@@ -72,24 +77,30 @@ export default function Recipe({product}: RecipeProps) {
     getRecipe(product);
   }, [product, getRecipe]);
 
-  function getTotal(nutrient_key: string) {
-    return getTotalForParent(nutrient_key, ingredients);
+  function getTotal(nutrient_key: string, bound = 'nom') {
+    return getTotalForParent(nutrient_key, ingredients, bound);
   }
 
-  function recalculateRecipe() {
+  function recalculateRecipe(useScipy: boolean) {
     product.ingredients = ingredients;
-    getRecipe(product);
+    getRecipe(product, useScipy);
   }
 
-  function getTotalForParent(nutrient_key: string, parent: any[]) {
+  function getTotalForParent(nutrient_key: string, parent: any[], bound: string) {
     let total = 0;
     for(const ingredient of parent) {
       if (!ingredient.ingredients) {
-        if (ingredient.nutrients?.[nutrient_key])
-          total += ingredient.percent_estimate * (nutrient_key ? ingredient.nutrients?.[nutrient_key].percent_max : 1) / 100;
+        if (nutrient_key === '_total')
+          total += 1.0 * ingredient.quantity_estimate;
+        else if (nutrient_key === '_evaporation')
+          total += ingredient.lost_water;
+        else if (nutrient_key === '_percent')
+          total += 0.01 * ingredient.percent_estimate;
+        else if (ingredient.nutrients?.[nutrient_key])
+          total += ingredient.quantity_estimate * ingredient.nutrients?.[nutrient_key]['percent_' + bound] / 100;
       }
       else
-        total += getTotalForParent(nutrient_key, ingredient.ingredients);
+        total += getTotalForParent(nutrient_key, ingredient.ingredients, bound);
     }
     return total;
   }
@@ -116,10 +127,11 @@ export default function Recipe({product}: RecipeProps) {
   };
   
   function onInputChange(ingredient:any, value: string, reason: string) {
-    if (value) {
+    if (['input','clear'].includes(reason)) {
       addFirstOption(ingredient);
+      ingredient.searchTerm = value;
       setIngredients([...ingredients]);
-      if (reason === 'input' && value) {
+      if (value) {
         getData(value, ingredient);
       }
     }
@@ -130,9 +142,10 @@ export default function Recipe({product}: RecipeProps) {
       // print ingredient to console
       console.log(value);
       ingredient.id = value.id;
+      ingredient.ciqual_food_code_used = value.ciqual_food_code;
       ingredient.ciqual_food_code = value.ciqual_food_code;
-      ingredient.ciqual_proxy_food_code = value.ciqual_proxy_food_code;
-      ingredient.text = value.text;
+      ingredient.ciqual_proxy_food_code = null;
+      ingredient.alim_nom_eng = value.alim_nom_eng;
       ingredient.nutrients = value.nutrients;
       ingredient.searchTerm = ingredientDisplayName(value);
       setIngredients([...ingredients]);
@@ -143,12 +156,14 @@ export default function Recipe({product}: RecipeProps) {
     <div>
       {nutrients && ingredients &&
         <div>
-            <Table size='small'>
+            <Table size='small' stickyHeader sx={{'& .MuiTableCell-sizeSmall': {padding: '1px 4px'}}}>
               <TableHead>
                 <TableRow className='total'>
                   <TableCell><Typography>Ingredient</Typography></TableCell>
                   <TableCell><Typography>CIQUAL Code</Typography></TableCell>
-                  <TableCell><Typography>Proportion</Typography></TableCell>
+                  <TableCell><Typography>g/100g</Typography></TableCell>
+                  <TableCell><Typography align='center'>Evaporation</Typography></TableCell>
+                  <TableCell><Typography align='center'>Percent</Typography></TableCell>
                   {Object.keys(nutrients).map((nutrient: string) => (
                     <TableCell key={nutrient}>
                       <Typography>{nutrient}</Typography>
@@ -173,21 +188,31 @@ export default function Recipe({product}: RecipeProps) {
                         isOptionEqualToValue={(option:any, value:any) => option.id === value.id}
                         style={{ width: 300 }}
                         renderInput={(params) => (
-                          <TextField {...params} size='small'/>
+                          <TextField {...params} variant='standard' size='small'/>
                         )}
                         filterOptions={(options) => options}
                       />
                     }
                     </TableCell>
                     <TableCell>{!ingredient.ingredients &&
-                      <TextField type="number" size='small' value={parseFloat(ingredient.percent_estimate) || ''} onChange={(e) => {ingredient.percent_estimate = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
+                      <TextField variant="standard" type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
                     }
                     </TableCell>
+                    <TableCell align='center'>{!ingredient.ingredients &&
+                      <Typography>{format(parseFloat(ingredient.lost_water), QUANTITY)}</Typography>}
+                    </TableCell>
+                    <TableCell align='center'>{!ingredient.ingredients &&
+                      <Typography>{format(0.01 * parseFloat(ingredient.percent_estimate), PERCENT)}</Typography>}
+                    </TableCell>
                     {Object.keys(nutrients).map((nutrient: string) => (
-                      <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] && ingredient.nutrients?.[nutrient].percent_max &&
+                      <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] &&
                         <>
-                          <Typography variant="caption">{format(ingredient.nutrients?.[nutrient].percent_max, QUANTITY)}</Typography>
-                          <Typography variant="body1">{format(ingredient.percent_estimate * ingredient.nutrients?.[nutrient].percent_max / 100, QUANTITY)}</Typography>
+                          <Typography variant="caption">
+                            {ingredient.nutrients?.[nutrient].percent_min < ingredient.nutrients?.[nutrient].percent_nom ? format(ingredient.nutrients?.[nutrient].percent_min, QUANTITY) + '<' : ''}
+                            {format(ingredient.nutrients?.[nutrient].percent_nom, QUANTITY)}[{ingredient.nutrients?.[nutrient].confidence}]
+                            {ingredient.nutrients?.[nutrient].percent_max > ingredient.nutrients?.[nutrient].percent_nom ? '<' + format(ingredient.nutrients?.[nutrient].percent_max, QUANTITY) : ''}
+                          </Typography>
+                          <Typography variant="body1">{format(ingredient.quantity_estimate * ingredient.nutrients?.[nutrient].percent_nom / 100, QUANTITY)}</Typography>
                         </>
                       }
                       </TableCell>
@@ -196,15 +221,19 @@ export default function Recipe({product}: RecipeProps) {
                 ))}
                   <TableRow className='total'>
                     <TableCell colSpan={2}><Typography>Ingredients totals</Typography></TableCell>
-                    <TableCell><Typography>{format(getTotal(''), PERCENT)}</Typography></TableCell>
+                    <TableCell><Typography>{format(getTotal('_total'), QUANTITY)}</Typography></TableCell>
+                    <TableCell><Typography align='center'>{format(getTotal('_evaporation'), QUANTITY)}</Typography></TableCell>
+                    <TableCell><Typography align='center'>{format(getTotal('_percent'), PERCENT)}</Typography></TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
-                        <Typography variant="body1">{format(getTotal(nutrient_key), QUANTITY)}</Typography>
+                          <Typography variant="caption">{format(getTotal(nutrient_key, 'min'), QUANTITY)}</Typography>
+                          <Typography variant="body1">{format(getTotal(nutrient_key), QUANTITY)}</Typography>
+                          <Typography variant="caption">{format(getTotal(nutrient_key, 'max'), QUANTITY)}</Typography>
                       </TableCell>
                     ))}
                   </TableRow>
                   <TableRow>
-                    <TableCell colSpan={3}><Typography>Quoted product nutrients</Typography></TableCell>
+                    <TableCell colSpan={5}><Typography>Quoted product nutrients</Typography></TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
                         <Typography variant="body1">{format(nutrients[nutrient_key].product_total, QUANTITY)}</Typography>
@@ -215,26 +244,27 @@ export default function Recipe({product}: RecipeProps) {
                     <TableCell>
                       <Typography>Variance</Typography>
                     </TableCell>
-                    <TableCell>
-                      <Button variant='contained' onClick={recalculateRecipe}>recalculate</Button>
+                    <TableCell padding='normal'>
+                      <Button variant={algorithm ? 'outlined' : 'contained'} onClick={()=>recalculateRecipe(false)}>GLOP</Button>
+                      &nbsp;
+                      <Button variant={algorithm ? 'contained' : 'outlined'} onClick={()=>recalculateRecipe(true)}>SciPy</Button>
                     </TableCell>
-                    <TableCell>
+                    <TableCell colSpan={3}>
                       <Typography variant="caption">Weighted</Typography>
                       <Typography>{format(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
                       total + (!nutrients[nutrient_key].notes 
-                        ? nutrients[nutrient_key].weighting * Math.abs(getTotal(nutrient_key)- nutrients[nutrient_key].product_total) 
+                        ? nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total) ** 2
                         : 0), 0), VARIANCE)}
                       </Typography>
                     </TableCell>
                     {Object.keys(nutrients).map((nutrient_key: string) => (
                       <TableCell key={nutrient_key}>
-                        {!nutrients[nutrient_key].notes 
-                          ? <>
-                            <Typography variant="caption">{format(getTotal(nutrient_key) - nutrients[nutrient_key].product_total, VARIANCE)}</Typography>
-                            <Typography>{format(nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total), VARIANCE)}</Typography>
-                            </>
-                          : <Typography variant="caption">{nutrients[nutrient_key].notes}</Typography>
-                        }
+                          <Typography variant="caption">{format(getTotal(nutrient_key) - nutrients[nutrient_key].product_total, VARIANCE)}</Typography>
+                          <br/>
+                          {!nutrients[nutrient_key].notes && nutrients[nutrient_key].weighting > 0
+                            ? <Typography>{format(nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total), VARIANCE)}</Typography>
+                            : <Typography variant="caption">{nutrients[nutrient_key].notes ?? 'Not used'}</Typography>
+                          }
                       </TableCell>
                     ))}
                   </TableRow>
