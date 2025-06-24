@@ -1,7 +1,7 @@
 refresh_ingredients_taxonomy:
 	python scripts/refresh_ingredients_taxonomy.py
 
-dev:
+install:
 	cd ./frontend; npm install; npm run build
 	pip install -r requirements.txt
 
@@ -14,5 +14,5 @@ build:
 up: build
 	docker compose up --wait
 
-test:
+tests:
 	pytest
