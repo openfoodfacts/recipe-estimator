@@ -1,5 +1,5 @@
 refresh_ingredients_taxonomy:
-	node scripts/refresh_ingredients_taxonomy.mjs
+	python scripts/refresh_ingredients_taxonomy.py
 
 dev:
 	cd ./frontend; npm install; npm run build
