@@ -14,4 +14,5 @@ build:
 up: build
 	docker compose up --wait
 
-
+test:
+	pytest
