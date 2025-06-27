@@ -54,6 +54,8 @@ e.g.
 
 http://localhost:8000/static/#0677294998025
 
+(or if you use the docker compose, it might be http://localhost:5520/static/#0677294998025)
+
 To run the frontend with dynamic reloading (in a new terminal):
 ```
 cd ./frontend
