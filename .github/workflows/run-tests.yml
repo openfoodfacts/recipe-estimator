@@ -1,8 +1,10 @@
 name: Docker Image CI
 
 on:
-  push:
   pull_request:
+  push:
+    branches:
+    - main
 
 jobs:
   run_tests:
@@ -29,7 +31,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run docker compose dev
-        run: docker compose up -d
+        run: |
+          docker create network off_shared_network
+          docker compose up -d
 
       - name: Check services are running
         run: |

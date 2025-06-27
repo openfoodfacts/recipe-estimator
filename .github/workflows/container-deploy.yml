@@ -38,13 +38,13 @@ jobs:
         if: matrix.env == 'recipe-estimator-org'
         run: |
           # This is the OSM proxy server, that does have an ipv4 address
-          echo "SSH_PROXY_HOST=45.147.209.254" >> $GITHUB_ENV
+          echo "SSH_PROXY_HOST=ovh2.openfoodfacts.org" >> $GITHUB_ENV
           echo "SSH_USERNAME=off" >> $GITHUB_ENV
           echo "SSH_PROXY_USERNAME=off" >> $GITHUB_ENV
-          echo "SSH_HOST=10.3.0.200" >> $GITHUB_ENV
+          echo "SSH_HOST=10.1.0.201" >> $GITHUB_ENV
 
           # configurations
-          echo "COMMON_NET_NAME=common_net" >> $GITHUB_ENV
+          echo "COMMON_NET_NAME=po_webnet" >> $GITHUB_ENV
       - name: Wait for container build workflow
         uses: tomchv/wait-my-workflow@v1.1.0
         id: wait-build
