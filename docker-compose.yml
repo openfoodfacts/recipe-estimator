@@ -2,9 +2,14 @@ services:
   recipe_estimator:
     image: ghcr.io/openfoodfacts/recipe-estimator:${TAG}
     restart: ${RESTART_POLICY:-always}
+    environment:
+    - OPENFOODFACTS_URL=${OPENFOODFACTS_URL}
     # Use a different number so does not clash with locally running instance
     ports:
       - "${EXPOSE_PORT:-5520}:5521"
+    volumes:
+      # shared folder to ease data loading
+      - ./data:/data
     networks:
       - common_net
 

@@ -1,4 +1,14 @@
 services:
   recipe_estimator:
-    build: .
+    build:
+      context: .
+      args:
+        USER_UID: ${USER_UID:-1000}
+        USER_GID: ${USER_GID:-1000}
+        PYTHON_VERSION: ${PYTHON_VERSION:-3.10}
     image: recipe-estimator:dev
+    volumes:
+      - ./recipe_estimator:/app/recipe_estimator
+
+    # TODO we might want to have
+    # a dynamic build of react assets with a shared volume

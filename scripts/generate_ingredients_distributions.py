@@ -1,6 +1,7 @@
 import gzip
 import json
 
+
 # go through the ingredients recursively and sum the percent_estimate field of each ingredient
 # input: ingredients - recursive ingredients structure
 # output: ingredients_percent_estimates - dict of summed percent_estimate fields for each ingredient id
@@ -57,7 +58,7 @@ def compute_stats(ingredients_values):
         }
     return stats
 
-file_path = './openfoodfacts-products.jsonl.gz'
+file_path = '../data/openfoodfacts-products.jsonl.gz'
 ingredients_values = {}
 products_ingredients = read_openfoodfacts_products(file_path, ingredients_values, 10000)
 print(f"Loaded {len(products_ingredients)} products")

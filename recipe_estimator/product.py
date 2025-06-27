@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 import requests
 
+from . import settings
+
 
 def print_recipe(ingredients, indent = ''):
     for ingredient in ingredients:
@@ -27,8 +29,8 @@ def get_product(id):
     if len(matches) > 0:
         with open(matches[0]) as f:
             return json.load(f)
-    
-    response = requests.get("http://world.openfoodfacts.org/api/v3/product/" + id).json()
+
+    response = requests.get(settings.OPENFOODFACTS_URL + "/api/v3/product/" + id).json()
     if not 'product' in response:
         return {}
 
