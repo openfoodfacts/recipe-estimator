@@ -42,7 +42,7 @@ pip install -r requirements.txt
 To run the API server:
 
 ```
-uvicorn main:app --reload
+uvicorn recipe_estimator.main:app --reload
 ```
 
 The static pages can be accessed like this:
@@ -53,6 +53,8 @@ http://localhost:8000/static/#product_code
 e.g.
 
 http://localhost:8000/static/#0677294998025
+
+(or if you use the docker compose, it might be http://localhost:5520/static/#0677294998025)
 
 To run the frontend with dynamic reloading (in a new terminal):
 ```
@@ -77,11 +79,11 @@ There are currently no frontend unit tests.
 
 From the project root folder:
 ```
-docker build --tag recipe-estimator .  
+docker build --tag recipe_estimator .  
 ```
 And to run:
 ```
-docker run --name recipe_estimator -dp 5520:80 recipe-estimator
+docker run --name recipe_estimator -dp 5520:5521 recipe_estimator
 ```
 
 # Processing Steps
@@ -90,13 +92,13 @@ docker run --name recipe_estimator -dp 5520:80 recipe-estimator
 
 For each ingredient we need to obtain the expected nutrient breakdown. This currently comes from the CIQUAL database, but other databases could be used, e.g. based on a regional preference.
 
-If the ingredient on the product doesn't currently have a CIQUAL code then attempt to look this up is made using ingredients.json. To refresh the ingredients taxonomy you can use the followng script. I have currently formatted the JSON before committing:
+If the ingredient on the product doesn't currently have a CIQUAL code then attempt to look this up is made using ingredients.json. To refresh the ingredients taxonomy you can run:
 
 ```
-curl https://static.openfoodfacts.org/data/taxonomies/ingredients.json --output ciqual/ingredients.json
+make refresh_ingredients_taxonomy
 ```
 
-Having found the ingredient in CIQUAL a nutrient map is added to each ingredient. Only the "main" nutrient is used (one without an underscore suffix).
+Having found the ingredient in CIQUAL a nutrient map is added to each ingredient. Only the "main" nutrient is used (the one with a `_100g` suffix).
 
 ## Determine nutrients for computation
 
