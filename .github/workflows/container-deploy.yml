@@ -34,6 +34,7 @@ jobs:
 
           # configurations
           echo "COMMON_NET_NAME=po_webnet" >> $GITHUB_ENV
+          echo "OPENFOODFACTS_URL=https://world.openfoodfacts.net" >> $GITHUB_ENV
       - name: Set various variable for production deployment
         if: matrix.env == 'recipe-estimator-org'
         run: |
@@ -45,6 +46,7 @@ jobs:
 
           # configurations
           echo "COMMON_NET_NAME=po_webnet" >> $GITHUB_ENV
+          echo "OPENFOODFACTS_URL=https://world.openfoodfacts.org" >> $GITHUB_ENV
       - name: Wait for container build workflow
         uses: tomchv/wait-my-workflow@v1.1.0
         id: wait-build
@@ -113,6 +115,8 @@ jobs:
             echo "RESTART_POLICY=always" >> .env
             echo "COMPOSE_FILE=docker-compose.yml" >> .env
             echo "TAG=sha-${{ github.sha }}" >> .env
+            echo "COMMON_NET_NAME=${{COMMON_NET_NAME}}" >> .env
+            echo "OPENFOODFACTS_URL=${{OPENFOODFACTS_URL}}" >> .env
 
       - name: Start services
         uses: appleboy/ssh-action@master

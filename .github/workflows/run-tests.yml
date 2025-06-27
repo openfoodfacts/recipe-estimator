@@ -35,7 +35,7 @@ jobs:
 
       - name: Run docker compose dev
         run: |
-          docker create network off_shared_network
+          docker network create off_shared_network
           docker compose up -d
 
       - name: Check services are running
