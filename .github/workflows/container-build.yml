@@ -26,17 +26,6 @@ jobs:
           version: v0.10.0
           buildkitd-flags: --debug
 
-      - name: Use Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-
-      - name: Install Dependencies
-        run: make install
-
-      - name: Run Tests
-        run: make tests
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository

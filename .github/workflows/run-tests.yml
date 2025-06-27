@@ -1,0 +1,65 @@
+name: Docker Image CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Use Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Dependencies
+        run: make install
+
+      - name: Run Tests
+        run: make tests
+
+  docker_dev:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run docker compose dev
+        run: docker compose up -d
+
+      - name: Check services are running
+        run: |
+          # wait a bit
+          exit_code=0
+          for service in `docker compose config  --service | tr '\n' ' '`; do
+            if [ -z `docker compose ps -q $service` ] || [ -z `docker ps -q --no-trunc | grep $(docker compose ${{ env.compose_args }} ps -q $service)` ]; then
+              echo "$service: DOWN"
+              exit_code=1
+            else
+              echo "$service: UP"
+            fi
+          done;
+          exit $exit_code;
+
+      - name: Check server is up
+        run: |
+          tempted=0
+          while true; do
+            if ( curl http://127.0.0.1:5520/docs ); then
+              echo "Service responding"
+              exit 0
+            fi
+            tempted=$((tempted+1))
+            if [ $tempted -gt 10 ]; then
+              echo "Service not responding"
+              exit 1
+            fi
+            sleep 1
+          done
+
+      - name: Stop docker
+        run: docker compose down -v
