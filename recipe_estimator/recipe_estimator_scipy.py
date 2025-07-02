@@ -77,7 +77,7 @@ def estimate_recipe(product):
     leaf_ingredients = []
     ingredient_order_multipliers = []
     water_loss_multipliers = []
-    bounds = []
+    maximum_percentages = []
 
     def water_constraint(ingredient_index, maximum_water_content):
         # return { 'type': 'ineq', 'fun': lambda x: x[i] * maximum_water_content - x[i + 1]}
@@ -152,20 +152,11 @@ def estimate_recipe(product):
                     if maximum_water_content == 1
                     else 100 / (1 - maximum_water_content)
                 )
-                bounds.append((0, maximum_weight))
+                maximum_percentages.append(maximum_weight)
 
                 # Water loss. Initial estimate is zero
                 leaf_ingredients.append(0)
-                bounds.append(
-                    (
-                        0,
-                        (
-                            None
-                            if maximum_water_content == 1
-                            else maximum_water_content * maximum_weight
-                        ),
-                    )
-                )
+                maximum_percentages.append(None if maximum_water_content == 1 else maximum_water_content * maximum_weight)
 
                 ingredient["index"] = leaf_ingredient_index
                 sub_ingredient_count = 1
@@ -231,14 +222,46 @@ def estimate_recipe(product):
                 max_nutrient_total_from_ingredients,
                 1000 * nutrient_penalty_factors[n],
             )
+
+        # Now add a penalty for the constraints and the bounds
+        for multipliers in ingredient_order_multipliers:
+            ingredient_order_test = sum([ingredient_quantity * multipliers[n] for n, ingredient_quantity in enumerate(ingredient_percentages)])
+            # If the test is negative (ingredients bigger than previous) then add a big penalty
+            if ingredient_order_test < 0:
+                penalty += (-ingredient_order_test) * 10000
+
+        for multipliers in water_loss_multipliers:
+            water_loss_test = sum([ingredient_quantity * multipliers[n] for n, ingredient_quantity in enumerate(ingredient_percentages)])
+            # If the test is negative (water loss is more than the expected maximum water content of the ingredient) then add a moderate penalty
+            if water_loss_test < 0:
+                penalty += (-water_loss_test) * 1000
+
+        total_mass = 0
+        for n, factor in enumerate(total_mass_multipliers):
+            total_mass += ingredient_percentages[n] * factor
+        # Add a high penalty as the total mass diverges from 100g
+        penalty += abs(100 - total_mass) * 10000
+        
+        # Although we could also model bounds using penalties the optimizers seem to work better if they have bounds
+        
+        # for n, maximum_percentage in enumerate(maximum_percentages):
+        #     if ingredient_percentages[n] < 0:
+        #         # Add a big penalty for negative ingredients
+        #         penalty += (-ingredient_percentages[n]) * 100000
+        #     if maximum_percentage and ingredient_percentages[n] > maximum_percentage:
+        #         # Add a moderate penalty if an ingredient is bigger than what we think it's maximum should be
+        #         penalty += (ingredient_percentages[n] - maximum_percentage) * 1000
+
         return penalty
 
-    constraints = [
-        LinearConstraint(A, lb=0)
-        for A in ingredient_order_multipliers + water_loss_multipliers
-    ]
-    # For COBYLA can't use eq constraint
-    constraints.append(LinearConstraint(total_mass_multipliers, lb=99.99, ub=100.01))
+    # constraints = [
+    #     LinearConstraint(A, lb=0)
+    #     for A in ingredient_order_multipliers + water_loss_multipliers
+    # ]
+    # # For COBYLA can't use eq constraint
+    # constraints.append(LinearConstraint(total_mass_multipliers, lb=99.99, ub=100.01))
+
+    bounds = [[0, maximum_percentage] for maximum_percentage in maximum_percentages]
 
     # COBYQA is very slow
     # solution = minimize(objective,x,method='COBYLA',bounds=bounds,constraints=cons,options={'maxiter': 10000})
@@ -247,7 +270,7 @@ def estimate_recipe(product):
         leaf_ingredients,
         method="SLSQP",
         bounds=bounds,
-        constraints=constraints,
+        # constraints=constraints,
     )  # Fastest
     # solution = minimize(objective,x,method='trust-constr',bounds=bounds,constraints=cons)
     # May need to consider using global minimization as the objective function is probably not convex
@@ -277,12 +300,6 @@ def estimate_recipe(product):
     recipe_estimator["time"] = round(end - current, 2)
     recipe_estimator["status"] = 0
     recipe_estimator["status_message"] = solution.message
-    if solution.status != 0:
-        print(
-            f"Product: {product['code']}, status: {solution.message}, iterations: {solution.nit}"
-        )
-    # recipe_estimator['iterations'] = solution.nit
-
-    print("Time spent in solver: ", recipe_estimator["time"], "seconds")
+    print(f"Product: {product['code']}, time: {recipe_estimator["time"]} s, status: {solution.message}, iterations: {solution.nit}")
 
     return solution
