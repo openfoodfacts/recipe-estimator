@@ -142,7 +142,7 @@ def get_ciqual_code(ingredient_id):
             for parent_id in parents:
                 ciqual_code, ciqual_proxy_code = get_ciqual_code(parent_id)
                 if ciqual_code or ciqual_proxy_code:
-                    print('Obtained ciqual_code from ' + parent_id)
+                    print('Obtained ciqual_code from parent ' + parent_id)
                     break
 
     return ciqual_code, ciqual_proxy_code

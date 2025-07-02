@@ -36,7 +36,11 @@ def assign_penalty(value, nom_value, tolerance_penalty, min_value, max_value, st
     if (value > nom_value):
         return tolerance_penalty * (value - nom_value) / (max_value - nom_value)
     
-    return tolerance_penalty * (nom_value - value) / (nom_value - min_value)
+    if (value < nom_value):
+        return tolerance_penalty * (nom_value - value) / (nom_value - min_value)
+    
+    # Value = nom_value
+    return 0
 
 # estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
 # The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
@@ -214,8 +218,10 @@ def estimate_recipe(product):
     set_percentages(ingredients)
     end = time.perf_counter()
     recipe_estimator['time'] = end - current
-    recipe_estimator['status'] = 0 if solution.success else 1
+    recipe_estimator['status'] = 0
     recipe_estimator['status_message'] = solution.message
+    if solution.status != 0:
+        print(f"Product: {product['code']}, status: {solution.message}, iterations: {solution.nit}")
     #recipe_estimator['iterations'] = solution.nit
 
     print('Time spent in solver: ', recipe_estimator['time'], 'seconds')
