@@ -62,37 +62,39 @@ def estimate_recipe(product):
     #       Tomatoes with 80% water: [0.8, -1, 0, 0] >= 0
     #       Onions with 20% water:   [0, 0, 0.2, -1] >= 0
     # The later ingredient must be less than the one before. [1, 0, -1, 0] >= 0. For n ingredients there will be n-1 of these constraints
-    # TODO: explain how it works for sub-ingredients
+    # If we are dealing with an ingredient where the next ingredient has sub-ingredients then the earlier ingredient must be greater than
+    # or equal to the the sum of the sub-ingredients of the later ingredient. Similarly if the earlier ingredient has sub-ingredients
+    # then the sum of its sub-ingredients must be greater than or equal to the next ingredient. 
     # For the objective function, for each nutrient we sum the product of the mass of each ingredient and its nutrient proportion 
-    # and subtract this from the quoted nutrient value of the product. We square this and weight it and then minimise the
-    # sum of the weighted squares of the nutrient differences.
+    # and assign a penalty based on its divergence from the nutrient value of the product. We weight this depending on a factor for the nutrient.
 
-    # Total of leaf level ingredients must add up to at least 100
-    x = []
-    cons = []
+    # Leaf ingredients are those that do not have sub-ingredients. Each leaf ingredient is immediately followed by the mass lost (typically water)
+    # for that ingredient during processing (e.g. cooking)
+    leaf_ingredients = []
+    constraints = []
     bounds = []
 
-    def water_constraint(i, maximum_water_content):
+    def water_constraint(ingredient_index, maximum_water_content):
         # return { 'type': 'ineq', 'fun': lambda x: x[i] * maximum_water_content - x[i + 1]}
         A = [0] * leaf_ingredient_count * 2
-        A[i] = maximum_water_content
-        A[i + 1] = -1
+        A[ingredient_index] = maximum_water_content
+        A[ingredient_index + 1] = -1
         return LinearConstraint(A, lb = 0)
 
-    def ingredient_order_constraint(previous_start, this_start, this_count):
+    def ingredient_order_constraint(start_of_previous_parent, leaf_ingredient_index, sub_ingredient_count):
         # return { 'type': 'ineq', 'fun': lambda x: sum(x[previous_start : this_start : 2]) - sum(x[this_start : this_start + this_count * 2 : 2])}
         A = [0] * leaf_ingredient_count * 2
         for i in range(0, leaf_ingredient_count * 2, 2):
-            if i >= previous_start and i < this_start:
+            if i >= start_of_previous_parent and i < leaf_ingredient_index:
                 A[i] = 1
-            if i >= this_start and i < this_start + this_count * 2:
+            if i >= leaf_ingredient_index and i < leaf_ingredient_index + sub_ingredient_count * 2:
                 A[i] = -1
         return LinearConstraint(A, lb = 0)
 
     # Prepare nutrients information in arrays for fast objective function
     nutrient_names = []
     product_nutrients = []
-    ingredients_nutrients = []
+    nutrient_ingredients = []
     nutrient_weightings = []
     nutrient_penalty_factors = []
     for nutrient_key in nutrients:
@@ -107,43 +109,43 @@ def estimate_recipe(product):
         nutrient_names.append(nutrient_key)
         product_nutrients.append(nutrient['product_total'])
         nutrient_weightings.append(weighting)
-        ingredients_nutrients.append([])
+        nutrient_ingredients.append([])
         nutrient_penalty_factors.append(nutrient['penalty_factor'])
 
 
-    def add_ingredients(total, ingredients):
-        added = 0
+    def add_ingredients(total_percent, ingredients):
+        leaf_ingredients_added = 0
         # Initial estimate of ingredients is a geometric progression where each is half the previous one
         # Sum of a  geometric progression is Sn = a(1 - r^n) / (1 - r)
         # In our case Sn = 100 and r = 0.5 so our first ingredient (a) will be
         # (100 * 0.5) / (1 - 0.5 ^ n)
-        a = (total * 0.5) / (1 - 0.5 ** len(ingredients))
+        initial_estimate = (total_percent * 0.5) / (1 - 0.5 ** len(ingredients))
         for i,ingredient in enumerate(ingredients):
-            this_start = len(x)
+            leaf_ingredient_index = len(leaf_ingredients)
 
             if ('ingredients' in ingredient and len(ingredient['ingredients']) > 0):
-                ingredients_added = add_ingredients(a, ingredient['ingredients'])
+                sub_ingredient_count = add_ingredients(initial_estimate, ingredient['ingredients'])
             else:
                 # Set lost water constraint
                 water = ingredient['nutrients'].get('water', {})
                 maximum_water_content = water.get('percent_nom', 0) * 0.01
-                cons.append(water_constraint(this_start, maximum_water_content))
+                constraints.append(water_constraint(leaf_ingredient_index, maximum_water_content))
 
                 # Initial estimate. 0.5 of previous ingredient
-                x.append(a)
+                leaf_ingredients.append(initial_estimate)
                 maximum_weight = None if maximum_water_content == 1 else 100 / (1 - maximum_water_content)
                 bounds.append((0, maximum_weight))
  
-                # Water loss
-                x.append(0)
+                # Water loss. Initial estimate is zero
+                leaf_ingredients.append(0)
                 bounds.append((0, None if maximum_water_content == 1 else maximum_water_content * maximum_weight))
 
-                ingredient['index'] = this_start
-                ingredients_added = 1
+                ingredient['index'] = leaf_ingredient_index
+                sub_ingredient_count = 1
 
                 for n,nutrient_key in enumerate(nutrient_names):
-                    ingredient_nutrient =  ingredient['nutrients'][nutrient_key]
-                    ingredients_nutrients[n].append({
+                    ingredient_nutrient = ingredient['nutrients'][nutrient_key]
+                    nutrient_ingredients[n].append({
                         'nom': ingredient_nutrient['percent_nom'] / 100,
                         'min': ingredient_nutrient['percent_min'] / 100,
                         'max': ingredient_nutrient['percent_max'] / 100,
@@ -152,12 +154,12 @@ def estimate_recipe(product):
             # Set order constraint
             if (i > 0):
                 # Sum of children must be less than previous ingredient (or sum of its children)
-                cons.append(ingredient_order_constraint(previous_start, this_start, ingredients_added))
+                constraints.append(ingredient_order_constraint(start_of_previous_parent, leaf_ingredient_index, sub_ingredient_count))
 
-            a /= 2
-            added += ingredients_added
-            previous_start = this_start
-        return added
+            initial_estimate /= 2
+            leaf_ingredients_added += sub_ingredient_count
+            start_of_previous_parent = leaf_ingredient_index
+        return leaf_ingredients_added
 
     add_ingredients(100, ingredients)
 
@@ -168,10 +170,10 @@ def estimate_recipe(product):
             nom_nutrient_total_from_ingredients = 0
             min_nutrient_total_from_ingredients = 0
             max_nutrient_total_from_ingredients = 0
-            for i, ingredient_nutrient in enumerate(ingredients_nutrients[n]):
-                nom_nutrient_total_from_ingredients += x[i * 2] * ingredient_nutrient['nom']
-                min_nutrient_total_from_ingredients += x[i * 2] * ingredient_nutrient['min']
-                max_nutrient_total_from_ingredients += x[i * 2] * ingredient_nutrient['max']
+            for i, nutrient_ingredient in enumerate(nutrient_ingredients[n]):
+                nom_nutrient_total_from_ingredients += x[i * 2] * nutrient_ingredient['nom']
+                min_nutrient_total_from_ingredients += x[i * 2] * nutrient_ingredient['min']
+                max_nutrient_total_from_ingredients += x[i * 2] * nutrient_ingredient['max']
 
             # Factors need to quite large as the algorithms only make tiny changes to the variables to determine gradients
             # TODO: Need to experiment with factors here
@@ -185,13 +187,13 @@ def estimate_recipe(product):
     A = [0] * leaf_ingredient_count * 2
     for i in range(0, leaf_ingredient_count * 2):
         A[i] = -1 if i % 2 else 1
-    cons.append(LinearConstraint(A, lb = 99.99, ub = 100.01))
+    constraints.append(LinearConstraint(A, lb = 99.99, ub = 100.01))
     # cons.append({ 'type': 'ineq', 'fun': lambda x: sum(x[0::2]) - sum(x[1::2]) - 99.99})
     # cons.append({ 'type': 'ineq', 'fun': lambda x: 100.01 - (sum(x[0::2]) - sum(x[1::2]))})
 
     # COBYQA is very slow
     #solution = minimize(objective,x,method='COBYLA',bounds=bounds,constraints=cons,options={'maxiter': 10000})
-    solution = minimize(objective,x,method='SLSQP',bounds=bounds,constraints=cons) # Fastest
+    solution = minimize(objective,leaf_ingredients,method='SLSQP',bounds=bounds,constraints=constraints) # Fastest
     #solution = minimize(objective,x,method='trust-constr',bounds=bounds,constraints=cons)
     # May need to consider using global minimization as the objective function is probably not convex
     # Looks like shgo is the only one that supports constraints
