@@ -206,8 +206,8 @@ def estimate_recipe(product):
                 percent_estimate = set_percentages(ingredient['ingredients'])
             else:
                 index = ingredient['index']
-                ingredient['quantity_estimate'] = solution.x[index]
-                ingredient['lost_water'] = solution.x[index + 1]
+                ingredient['quantity_estimate'] = round(solution.x[index],2)
+                ingredient['lost_water'] = round(solution.x[index + 1],2)
                 percent_estimate = round(100 * solution.x[index] / total_quantity, 2)
 
             ingredient['percent_estimate'] = percent_estimate
@@ -217,7 +217,7 @@ def estimate_recipe(product):
 
     set_percentages(ingredients)
     end = time.perf_counter()
-    recipe_estimator['time'] = end - current
+    recipe_estimator['time'] = round(end - current, 2)
     recipe_estimator['status'] = 0
     recipe_estimator['status_message'] = solution.message
     if solution.status != 0:
