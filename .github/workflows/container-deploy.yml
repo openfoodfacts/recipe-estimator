@@ -115,8 +115,8 @@ jobs:
             echo "RESTART_POLICY=always" >> .env
             echo "COMPOSE_FILE=docker-compose.yml" >> .env
             echo "TAG=sha-${{ github.sha }}" >> .env
-            echo "COMMON_NET_NAME=${{COMMON_NET_NAME}}" >> .env
-            echo "OPENFOODFACTS_URL=${{OPENFOODFACTS_URL}}" >> .env
+            echo "COMMON_NET_NAME=${{ env.COMMON_NET_NAME }}" >> .env
+            echo "OPENFOODFACTS_URL=${{ env.OPENFOODFACTS_URL }}" >> .env
 
       - name: Start services
         uses: appleboy/ssh-action@master
@@ -145,7 +145,7 @@ jobs:
           script: |
             cd ${{ env.PROJECT_DIR }}
             exit_code=0
-            for service in `docker compose config  --service | tr '\n' ' '`; do 
+            for service in `docker compose config  --service | tr '\n' ' '`; do
               if [ -z `docker compose ps -q $service` ] || [ -z `docker ps -q --no-trunc | grep $(docker compose ${{ env.compose_args }} ps -q $service)` ]; then
                 echo "$service: DOWN"
                 exit_code=1
