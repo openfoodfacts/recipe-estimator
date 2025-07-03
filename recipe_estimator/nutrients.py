@@ -46,11 +46,13 @@ with open(os.path.join(os.path.dirname(__file__), "assets/ciqual/compo_2020_07_0
     compo_table = ET.fromstring(compo_file.read().replace(' < ', ' &lt; '))
 
 # Code below creates the ciqual_stats.csv file
+# TODO: Need to not do this here anymore as it won't take sugars into account
 # Note need to uncomment other lines below too
 # ciqual_csv_file = open(os.path.join(os.path.dirname(__file__), 'assets/ciqual/ciqual_stats.csv'), "w", newline="")
 # ciqual_csv = csv.writer(ciqual_csv_file)
 # ciqual_csv.writerow(['alim_code', 'alim_nom_eng', 'nutrient', 'min', 'nom', 'max', 'confidence', 'minus', 'plus'])
 
+# Populate the nutrients for each ingredient
 for compo in compo_table:
     const_code = compo.find('const_code').text.strip()
     nutrient = ciqual_to_off.get(const_code)
@@ -109,8 +111,34 @@ for compo in compo_table:
             'percent_nom': nom_value,
             'percent_min': min_value,
             'percent_max': max_value,
-            'confidence' : confidence.strip() if confidence is not None else 'D'
+            'confidence' : confidence.strip() if confidence is not None and teneur != '-' else '-'
         }
+
+# Post-process sugars as some items, like fructose, don't quote sugars but so quote the individual parts
+for ciqual_ingredient in ciqual_ingredients.values():
+    nutrients = ciqual_ingredient['nutrients']
+    sugars = nutrients.get('sugars')
+    if sugars and sugars.get('confidence') == '-':
+        # Loop through the other sugars and add them up
+        min = 0
+        max = 0
+        nom = 0
+        con = 0
+        for nutrient in ['fructose', 'galactose', 'lactose', 'maltose', 'sucrose']:
+            sugar = nutrients.get(nutrient)
+            if sugar:
+                min += sugar.get('percent_min', 0)
+                max += sugar.get('percent_max', 0)
+                nom += sugar.get('percent_nom', 0)
+                # For some reason max throws an exception here
+                newcon = '-ABCD'.index(sugar.get('confidence', '-'))
+                if newcon > con:
+                    con = newcon
+
+        sugars['percent_min'] = min
+        sugars['percent_max'] = max
+        sugars['percent_nom'] = nom
+        sugars['confidence'] = '-ABCD'[con]
 
 # Code below creates the ciqual_stats.csv file
 # ciqual_csv_file.close()

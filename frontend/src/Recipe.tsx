@@ -201,8 +201,8 @@ export default function Recipe({product}: RecipeProps) {
                     <TableCell align='center'>{!ingredient.ingredients &&
                       <Typography>{format(parseFloat(ingredient.lost_water), QUANTITY)}</Typography>}
                     </TableCell>
-                    <TableCell align='center'>{!ingredient.ingredients &&
-                      <Typography>{format(0.01 * parseFloat(ingredient.percent_estimate), PERCENT)}</Typography>}
+                    <TableCell align='center'>
+                      <Typography>{format(0.01 * parseFloat(ingredient.percent_estimate), PERCENT)}</Typography>
                     </TableCell>
                     {Object.keys(nutrients).map((nutrient: string) => (
                       <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] &&
