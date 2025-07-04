@@ -1,4 +1,4 @@
-off_id,countprep,ciqual_id,ciqual_unit,weighting,penalty_factor,comments
+off_id,countprep,ciqual_id,ciqual_unit,weighting,scipy_weighting,comments
 water,,"Water (g/100g)",g,,,Added manually
 energy,2086602,"Energy, Regulation EU No 1169/2011 (kJ/100g)",kj,,,Energy is derived
 proteins,2075645,Protein (g/100g),g,1,1

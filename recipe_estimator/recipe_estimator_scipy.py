@@ -50,7 +50,7 @@ def assign_penalty(
 # The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
 def estimate_recipe(product):
     current = time.perf_counter()
-    leaf_ingredient_count = prepare_nutrients(product)
+    leaf_ingredient_count = prepare_nutrients(product, True)
     ingredients = product["ingredients"]
     recipe_estimator = product["recipe_estimator"]
     nutrients = recipe_estimator["nutrients"]
@@ -107,11 +107,10 @@ def estimate_recipe(product):
     # Following is an array of nutrients each containing an array of data for that nutrient for each ingredient (not including the lost water leaves)
     nutrient_ingredients = []
     nutrient_weightings = []
-    nutrient_penalty_factors = []
     for nutrient_key in nutrients:
         nutrient = nutrients[nutrient_key]
 
-        weighting = nutrient.get("weighting")
+        weighting = nutrient.get('weighting')
 
         # Skip nutrients that don't have a weighting
         if weighting is None or weighting == 0:
@@ -121,7 +120,6 @@ def estimate_recipe(product):
         product_nutrients.append(nutrient["product_total"])
         nutrient_weightings.append(weighting)
         nutrient_ingredients.append([])
-        nutrient_penalty_factors.append(nutrient["penalty_factor"])
 
     def add_ingredients(total_percent, ingredients):
         leaf_ingredients_added = 0
@@ -220,7 +218,7 @@ def estimate_recipe(product):
                 100,
                 min_nutrient_total_from_ingredients,
                 max_nutrient_total_from_ingredients,
-                1000 * nutrient_penalty_factors[n],
+                1000,
             )
 
         # Now add a penalty for the constraints and the bounds

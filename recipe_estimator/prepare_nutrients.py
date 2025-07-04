@@ -27,7 +27,7 @@ def count_ingredients(ingredients, nutrients):
 
     return count
 
-def assign_weightings(product):
+def assign_weightings(product, scipy):
     # Determine which nutrients will be used in the analysis by assigning a weighting
     product_nutrients = product.get('nutriments', {})
     count = product['recipe_estimator']['ingredient_count']
@@ -52,14 +52,11 @@ def assign_weightings(product):
             continue
 
         nutrient = off_to_ciqual[nutrient_key]
-        weighting = nutrient['weighting']
+        weighting = nutrient['scipy_weighting'] if scipy else nutrient['weighting']
         if weighting == '':
             computed_nutrient['notes'] = nutrient['comments']
         else:
             computed_nutrient['weighting'] = float(weighting)
-
-        penalty_factor = nutrient['penalty_factor']
-        computed_nutrient['penalty_factor'] = 0 if penalty_factor == '' else float(penalty_factor)
         
     # Exclude carbohydrates if the following make up more than 50% of the countries in the countries_tags:
     # United States, Canada, South Africa, Gulf States (carbs could be gross rather than net)
@@ -79,9 +76,9 @@ def assign_weightings(product):
                 carbohydrates['notes'] = 'Might be total carbs'
 
 
-def prepare_nutrients(product):
+def prepare_nutrients(product, scipy = False):
     nutrients = {}
     count = count_ingredients(product['ingredients'], nutrients)
     product['recipe_estimator'] = {'nutrients':nutrients, 'ingredient_count': count}
-    assign_weightings(product)
+    assign_weightings(product, scipy)
     return count
