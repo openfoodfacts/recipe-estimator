@@ -37,6 +37,16 @@ def test_prepare_product_creates_a_max_range_entry_if_ingredient_not_found():
     assert carbs['percent_min'] >= 0
     assert carbs['percent_max'] <= 100
 
+def test_prepare_product_adds_up_sugars_if_not_specified():
+    product = {'ingredients': [{'id':'en:fructose'}]};
+    prepare_product(product)
+    nutrients = product['ingredients'][0].get('nutrients')
+    assert nutrients is not None
+    sugars = nutrients.get('sugars')
+    assert sugars is not None
+    assert sugars['percent_min'] >= 90
+    assert sugars['percent_max'] <= 100
+
 def test_get_ciqual_code_should_use_proxy_if_no_main_code():
     ciqual_code, ciqual_proxy_code = get_ciqual_code('en:tomato-sauce')
     assert ciqual_code is None

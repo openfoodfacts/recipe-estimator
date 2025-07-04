@@ -180,13 +180,14 @@ This will provide details of the computation performed, such as time taken and n
 To get nutrient types for nutrient_map.csv I used:
 
 ```js
-db.products.aggregate([
+db.products.aggregate(
+[
   {
     $project: {
       keys: {
         $map: {
           input: {
-            "$objectToArray": "$nutriments"
+            $objectToArray: "$nutriments"
           },
           in: "$$this.k"
         }
@@ -197,14 +198,50 @@ db.products.aggregate([
     $unwind: "$keys"
   },
   {
+    $match: {
+      $and: [
+        {
+          keys: {
+            $regex: "_100g$"
+          }
+        },
+        {
+          keys: {
+            $ne: {
+              $regex: "_serving_100g$"
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    $project:
+      {
+        keys: {
+          $replaceOne: {
+            input: "$keys",
+            find: "_100g",
+            replacement: ""
+          }
+        }
+      }
+  },
+  {
     $group: {
       _id: "$keys",
       count: {
-        "$sum": 1
+        $sum: 1
       }
     }
+  },
+  {
+    $sort:
+      {
+        count: -1
+      }
   }
-])
+]
+)
 ```
 
-Need to skip any nutrients where Ciqual value is '-' as this means not known, not zero

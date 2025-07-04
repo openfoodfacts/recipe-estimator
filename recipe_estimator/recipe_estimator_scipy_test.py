@@ -335,6 +335,7 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
     
 def test_estimate_recipe_subingredient_limits():
     product = {
+        'code': 'subingredients',
         'ingredients': [
             {
                 'id':'en:dummy-ingredients',
