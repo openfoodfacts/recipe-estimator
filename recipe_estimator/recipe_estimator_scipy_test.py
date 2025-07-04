@@ -20,7 +20,7 @@ def test_assign_penalty_value_steep_gradient_used_outside_tolerance():
 
 def test_estimate_recipe_accounts_for_lost_water():
     product = {
-        'code' : 1234567890123,
+        'code': 'test', 
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
@@ -55,7 +55,7 @@ def test_estimate_recipe_accounts_for_lost_water():
 
 def test_estimate_recipe_lost_water_is_constrained():
     product = {
-        'code' : 1234567890123,
+        'code': 'test', 
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
@@ -92,7 +92,7 @@ def test_estimate_recipe_simple_recipe():
     # A = 7 / 12 = 58%
 
     product = {
-        'code' : 1234567890123,
+        'code': 'test', 
         'ingredients': [
             {
                 'id':'one',
@@ -124,7 +124,7 @@ def test_estimate_recipe_simple_recipe():
 
 def test_estimate_recipe_simple_recipe_with_one_unmatched_ingredient():
     product = {
-        'code' : 1234567890123,
+        'code': 'test', 
         'ingredients': [
             {
                 'id':'one',
@@ -157,7 +157,7 @@ def test_estimate_recipe_simple_recipe_with_one_unmatched_ingredient():
 
 def test_estimate_recipe_simple_recipe_with_no_matched_ingredients():
     product = {
-        'code' : 1234567890123,
+        'code': 'test', 
         'ingredients': [
             {
                 'id':'one',
@@ -190,7 +190,7 @@ def test_estimate_recipe_simple_recipe_with_no_matched_ingredients():
 
 def test_estimate_recipe_simple_recipe_with_no_nutriments():
     product = {
-        'code' : 1234567890123,
+        'code': 'test', 
         'ingredients': [
             {
                 'id':'one',
@@ -219,36 +219,38 @@ def test_estimate_recipe_simple_recipe_with_no_nutriments():
 
 def test_estimate_recipe_subingredients():
     product = {
-        'code' : 1234567890123,
-        'ingredients': [{
-            'id':'en:tomato',
-            'nutrients': {
-                'fiber': {'percent_nom': 5, 'percent_min': 0, 'percent_max': 100},
-                'water': {'percent_nom': 90, 'percent_min': 0, 'percent_max': 100},
-                'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
-                'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
-            }
-        },
-        {
-            'id':'en:sugar-and-salt',
-            'ingredients': [{
-                'id':'en:sugar',
+        'code': 'test', 
+        'ingredients': [
+            {
+                'id':'en:tomato',
                 'nutrients': {
-                    'sugars': {'percent_nom': 100, 'percent_min': 0, 'percent_max': 100},
-                    'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 5, 'percent_min': 0, 'percent_max': 100},
+                    'water': {'percent_nom': 90, 'percent_min': 0, 'percent_max': 100},
+                    'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
                     'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
                 }
             },
             {
-                'id':'en:salt',
-                'nutrients': {
-                    'salt': {'percent_nom': 100, 'percent_min': 0, 'percent_max': 100},
-                    'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
-                    'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                'id':'en:sugar-and-salt',
+                'ingredients': [{
+                    'id':'en:sugar',
+                    'nutrients': {
+                        'sugars': {'percent_nom': 100, 'percent_min': 0, 'percent_max': 100},
+                        'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                        'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                    }
+                },
+                {
+                    'id':'en:salt',
+                    'nutrients': {
+                        'salt': {'percent_nom': 100, 'percent_min': 0, 'percent_max': 100},
+                        'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                        'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                    }
                 }
+                ]
             }
-            ]
-        }],
+        ],
         'nutriments': {
             'fiber_100g': 5,
             'sugars_100g': 10,
@@ -288,7 +290,7 @@ def test_estimate_recipe_subingredients():
 
 def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
     product = {
-        'code' : 1234567890123,
+        'code': 'test', 
         'ingredients': [
             {
                 'id':'one',
@@ -387,7 +389,7 @@ def test_estimate_recipe_subingredient_limits():
 
 def test_estimate_recipe_minimize_maximum_distance_between_ingredients_with_subingredients():
     product = {
-        'code' : 1234567890123,
+        'code': 'test', 
         'ingredients': [
             {
                 'id':'one',

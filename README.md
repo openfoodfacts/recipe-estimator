@@ -100,6 +100,13 @@ make refresh_ingredients_taxonomy
 
 Having found the ingredient in CIQUAL a nutrient map is added to each ingredient. Only the "main" nutrient is used (the one with a `_100g` suffix).
 
+If the `nutrient_map.csv` or any of the source CIQUAL XML files are updated then you need to run:
+
+```
+make build_ciqual_ingredients
+```
+Which will update the `ciqual_ingredients.json` file.
+
 ## Determine nutrients for computation
 
 Only nutrients that occur on every ingredient can be used. Energy is also eliminated as this combines multiple nutrients.
@@ -208,7 +215,7 @@ db.products.aggregate(
         {
           keys: {
             $ne: {
-              $regex: "_serving_100g$"
+              $regex: "_prepared_100g$"
             }
           }
         }

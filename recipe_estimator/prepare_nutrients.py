@@ -1,4 +1,4 @@
-from .nutrients import off_to_ciqual
+from .nutrient_map import off_to_ciqual
 
 
 # count the number of leaf ingredients in the product
