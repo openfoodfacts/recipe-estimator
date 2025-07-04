@@ -61,20 +61,22 @@ def assign_weightings(product):
         penalty_factor = nutrient['penalty_factor']
         computed_nutrient['penalty_factor'] = 0 if penalty_factor == '' else float(penalty_factor)
         
-    # Exclude carbohydrates if one of these is true
-    # 1. We have a value for both sugars and fibre
-    # 2. The countries_tags includes "en:united-states" (carbs could be gross rather than net)
+    # Exclude carbohydrates if the following make up more than 50% of the countries in the countries_tags:
+    # United States, Canada, South Africa, Gulf States (carbs could be gross rather than net)
     carbohydrates = computed_nutrients.get('carbohydrates')
-    if (carbohydrates and carbohydrates['weighting'] > 0):
-        if 'countries_tags' not in product or 'en:united-states' in product['countries_tags']:
-            carbohydrates['weighting'] = 0
-            carbohydrates['notes'] = 'Possible US product quoting gross carbs'
-        else:
+    if carbohydrates and carbohydrates['weighting'] > 0 and 'countries_tags' in product:
+        gross_countries = len(set(['en:united-states', 'en:canada', 'en:south-africa','en:bahrain','en:kuwait', 'en:iraq', 'en:iran', 'en:oman', 'en:qatar', 'en:saudi-arabia', 'en:united-arab-emirates']) & set(product['countries_tags']))
+        if gross_countries / len(product['countries_tags']) > 0.5:
+            # If we subtract the sugar and fiber from the carbs and get a negative result then it can't be gross carbs
             fiber = computed_nutrients.get('fiber')
             sugars = computed_nutrients.get('sugars')
-            if fiber and sugars and fiber['weighting'] > 0 and sugars['weighting'] > 0:
+            remaining_carbs = carbohydrates['product_total']
+            if fiber and sugars:
+                remaining_carbs = remaining_carbs - fiber.get('product_total',0) - sugars.get('product_total',0)
+
+            if remaining_carbs > 0:
                 carbohydrates['weighting'] = 0
-                carbohydrates['notes'] = 'Have sugar and fiber so ignore carbs'
+                carbohydrates['notes'] = 'Might be total carbs'
 
 
 def prepare_nutrients(product):
