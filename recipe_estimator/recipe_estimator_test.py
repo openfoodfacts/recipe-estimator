@@ -108,7 +108,7 @@ def test_estimate_recipe_simple_recipe():
 def test_estimate_recipe_simple_recipe_with_one_unmatched_ingredient():
     product = {
         'code' : 1234567890123,
-        ingredients': [
+        'ingredients': [
             {
                 'id':'one',
                 'nutrients': {

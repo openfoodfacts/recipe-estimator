@@ -18,4 +18,4 @@ up: build
 	docker compose up --wait
 
 tests:
-	pytest
+	pytest ${args}

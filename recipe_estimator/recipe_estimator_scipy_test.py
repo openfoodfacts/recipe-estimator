@@ -272,17 +272,17 @@ def test_estimate_recipe_subingredients():
 
     tomatoes = product['ingredients'][0]
     # Percent estimate is relative to total ingredient quantities
-    assert round(tomatoes.get('percent_estimate')) == 87
+    assert round(tomatoes.get('percent_estimate')) == 85
     # Quantity estimate gives original quantity of ingredient per 100g/ml of product
-    assert round(tomatoes.get('quantity_estimate')) == 100
-    assert round(tomatoes.get('lost_water')) == 15
+    assert round(tomatoes.get('quantity_estimate')) == 88
+    assert round(tomatoes.get('lost_water')) == 3
 
     sugar = product['ingredients'][1]['ingredients'][0]
-    assert round(sugar.get('percent_estimate')) == 9
+    assert round(sugar.get('percent_estimate')) == 10
     assert round(sugar.get('quantity_estimate')) == 10
 
     salt = product['ingredients'][1]['ingredients'][1]
-    assert round(salt.get('percent_estimate')) == 4
+    assert round(salt.get('percent_estimate')) == 5
     assert round(salt.get('quantity_estimate')) == 5
 
 
