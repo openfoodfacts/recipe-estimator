@@ -298,6 +298,6 @@ def estimate_recipe(product):
     recipe_estimator["time"] = round(end - current, 2)
     recipe_estimator["status"] = 0
     recipe_estimator["status_message"] = solution.message
-    print(f"Product: {product['code']}, time: {recipe_estimator['time']} s, status: {solution.message}, iterations: {solution.nit}")
+    print(f"Product: {product.get('code')}, time: {recipe_estimator['time']} s, status: {solution.message}, iterations: {solution.nit}")
 
     return solution

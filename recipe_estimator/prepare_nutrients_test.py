@@ -3,6 +3,7 @@ from .prepare_nutrients import prepare_nutrients
 
 def test_prepare_nutrients():
     product = {
+        'code' : 1234567890123,
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
@@ -50,6 +51,7 @@ def test_prepare_nutrients():
 
 def test_prepare_nutrients_copes_with_no_product_nutrients():
     product = {
+        'code' : 1234567890123,
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {

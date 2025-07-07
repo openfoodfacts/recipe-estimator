@@ -20,6 +20,7 @@ def test_assign_penalty_value_steep_gradient_used_outside_tolerance():
 
 def test_estimate_recipe_accounts_for_lost_water():
     product = {
+        'code' : 1234567890123,
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
@@ -54,6 +55,7 @@ def test_estimate_recipe_accounts_for_lost_water():
 
 def test_estimate_recipe_lost_water_is_constrained():
     product = {
+        'code' : 1234567890123,
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
@@ -90,6 +92,7 @@ def test_estimate_recipe_simple_recipe():
     # A = 7 / 12 = 58%
 
     product = {
+        'code' : 1234567890123,
         'ingredients': [
             {
                 'id':'one',
@@ -121,6 +124,7 @@ def test_estimate_recipe_simple_recipe():
 
 def test_estimate_recipe_simple_recipe_with_one_unmatched_ingredient():
     product = {
+        'code' : 1234567890123,
         'ingredients': [
             {
                 'id':'one',
@@ -153,6 +157,7 @@ def test_estimate_recipe_simple_recipe_with_one_unmatched_ingredient():
 
 def test_estimate_recipe_simple_recipe_with_no_matched_ingredients():
     product = {
+        'code' : 1234567890123,
         'ingredients': [
             {
                 'id':'one',
@@ -185,6 +190,7 @@ def test_estimate_recipe_simple_recipe_with_no_matched_ingredients():
 
 def test_estimate_recipe_simple_recipe_with_no_nutriments():
     product = {
+        'code' : 1234567890123,
         'ingredients': [
             {
                 'id':'one',
@@ -213,6 +219,7 @@ def test_estimate_recipe_simple_recipe_with_no_nutriments():
 
 def test_estimate_recipe_subingredients():
     product = {
+        'code' : 1234567890123,
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
@@ -281,6 +288,7 @@ def test_estimate_recipe_subingredients():
 
 def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
     product = {
+        'code' : 1234567890123,
         'ingredients': [
             {
                 'id':'one',
@@ -379,6 +387,7 @@ def test_estimate_recipe_subingredient_limits():
 
 def test_estimate_recipe_minimize_maximum_distance_between_ingredients_with_subingredients():
     product = {
+        'code' : 1234567890123,
         'ingredients': [
             {
                 'id':'one',
@@ -406,7 +415,8 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients_with_subi
         ],
         'nutriments': {
             'fiber_100g': 45,
-        }}
+        },
+    }
 
     # For 2 ingredients in the absence of anything better we want
     # the first ingredient to be (0.5 * 100) / (1 - 0.5 ^ 2) = 66.7%
