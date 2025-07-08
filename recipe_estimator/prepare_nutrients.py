@@ -1,4 +1,4 @@
-from .nutrients import off_to_ciqual
+from .nutrients import off_to_ciqual, ensure_float
 
 
 # count the number of leaf ingredients in the product
@@ -41,7 +41,7 @@ def assign_weightings(product):
             computed_nutrient['notes'] = 'Not listed on product'
             continue
 
-        computed_nutrient['product_total'] = product_nutrient
+        computed_nutrient['product_total'] = ensure_float(product_nutrient)
         
         if product_nutrient == 0 and computed_nutrient['unweighted_total'] == 0:
             computed_nutrient['notes'] = 'All zero values'
