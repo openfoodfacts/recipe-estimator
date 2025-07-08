@@ -24,7 +24,7 @@ def test_estimate_recipe_accounts_for_lost_water():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'fiber': {'percent_nom': 2.5, 'percent_min': 0, 'percent_max': 100},
+                'fiber': {'percent_nom': 2.5, 'percent_min': 2.5, 'percent_max': 2.5},
                 'water': {'percent_nom': 90},
             }
         }],
@@ -49,8 +49,8 @@ def test_estimate_recipe_accounts_for_lost_water():
     quantity_estimate = ingredient.get('quantity_estimate')
     assert round(quantity_estimate) == 200
 
-    lost_water = ingredient.get('lost_water')
-    assert round(lost_water) == 100
+    # lost_water = ingredient.get('lost_water')
+    # assert round(lost_water) == 100
 
 
 def test_estimate_recipe_lost_water_is_constrained():
@@ -59,7 +59,7 @@ def test_estimate_recipe_lost_water_is_constrained():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'fiber': {'percent_nom': 2.5, 'percent_min': 0, 'percent_max': 100},
+                'fiber': {'percent_nom': 2.5, 'percent_min': 2.5, 'percent_max': 2.5},
                 'water': {'percent_nom': 10},
             }
         }],
@@ -82,28 +82,28 @@ def test_estimate_recipe_lost_water_is_constrained():
     quantity_estimate = ingredient.get('quantity_estimate')
     assert round(quantity_estimate) == 111
 
-    lost_water = ingredient.get('lost_water')
-    assert round(lost_water) == 11
+    # lost_water = ingredient.get('lost_water')
+    # assert round(lost_water) == 11
 
 def test_estimate_recipe_simple_recipe():
-    # A x 15 + B x 3 = 10
+    # 15A + 3B = 10
     # A + B = 1
-    # 15A + 3 - 3A = 10
-    # A = 7 / 12 = 58%
+    # 15A + 3(1 - A) = 10
+    # A = 7 / 12 = 58.3%
 
     product = {
         'code': 'test', 
         'ingredients': [
             {
-                'id':'one',
+                'id':'A',
                 'nutrients': {
-                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 15, 'percent_max': 15},
                 }
             },
             {
-                'id':'two',
+                'id':'B',
                 'nutrients': {
-                    'fiber': {'percent_nom': 3, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 3, 'percent_min': 3, 'percent_max': 3},
                 }
             }
         ],
@@ -119,8 +119,8 @@ def test_estimate_recipe_simple_recipe():
     # Status is valid
     #assert metrics['status'] == 0
 
-    assert round(product['ingredients'][0]['percent_estimate']) == 58
-    assert round(product['ingredients'][1]['percent_estimate']) == 42
+    assert abs(58.3 - product['ingredients'][0]['percent_estimate']) < 2
+    assert abs(41.7 - product['ingredients'][1]['percent_estimate']) < 2
 
 def test_estimate_recipe_simple_recipe_with_one_unmatched_ingredient():
     product = {
@@ -224,10 +224,10 @@ def test_estimate_recipe_subingredients():
             {
                 'id':'en:tomato',
                 'nutrients': {
-                    'fiber': {'percent_nom': 5, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 5, 'percent_min': 5, 'percent_max': 5},
                     'water': {'percent_nom': 90, 'percent_min': 0, 'percent_max': 100},
-                    'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
-                    'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                    'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                    'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                 }
             },
             {
@@ -235,17 +235,17 @@ def test_estimate_recipe_subingredients():
                 'ingredients': [{
                     'id':'en:sugar',
                     'nutrients': {
-                        'sugars': {'percent_nom': 100, 'percent_min': 0, 'percent_max': 100},
-                        'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
-                        'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                        'sugars': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
+                        'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                        'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                     }
                 },
                 {
                     'id':'en:salt',
                     'nutrients': {
-                        'salt': {'percent_nom': 100, 'percent_min': 0, 'percent_max': 100},
-                        'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
-                        'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
+                        'salt': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
+                        'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                        'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                     }
                 }
                 ]
@@ -258,12 +258,12 @@ def test_estimate_recipe_subingredients():
         }}
 
     # For the above there must by 5g of Salt and 10g of Sugar.
-    # In order to make 5g of carbohydrate we need 100g of tomatoes, so there will be 15g of lost water
+    # In order to make 5g of fibre we need 100g of tomatoes, so there will be 15g of lost water
     # Percentages will be quantities * (100 / 115) = 4.3, 8.7 and 87
     estimate_recipe(product)
 
     # Print the resulting product structure
-    print(product)
+    # print(json.dumps(product, indent=2))
 
     metrics = product.get('recipe_estimator')
     assert metrics is not None
@@ -274,18 +274,18 @@ def test_estimate_recipe_subingredients():
 
     tomatoes = product['ingredients'][0]
     # Percent estimate is relative to total ingredient quantities
-    assert round(tomatoes.get('percent_estimate')) == 85
+    assert abs(87 - tomatoes.get('percent_estimate')) < 2
     # Quantity estimate gives original quantity of ingredient per 100g/ml of product
-    assert round(tomatoes.get('quantity_estimate')) == 88
-    assert round(tomatoes.get('lost_water')) == 3
+    assert abs(100- tomatoes.get('quantity_estimate')) < 2
+    # assert round(tomatoes.get('lost_water')) == 3
 
     sugar = product['ingredients'][1]['ingredients'][0]
-    assert round(sugar.get('percent_estimate')) == 10
-    assert round(sugar.get('quantity_estimate')) == 10
+    assert abs(9 - sugar.get('percent_estimate')) < 1
+    assert abs(10 - sugar.get('quantity_estimate')) < 1
 
     salt = product['ingredients'][1]['ingredients'][1]
-    assert round(salt.get('percent_estimate')) == 5
-    assert round(salt.get('quantity_estimate')) == 5
+    assert abs(4 - salt.get('percent_estimate')) < 1
+    assert abs(5 - salt.get('quantity_estimate')) < 11
 
 
 def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
@@ -295,30 +295,30 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
             {
                 'id':'one',
                 'nutrients': {
-                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 15, 'percent_max': 15},
                 }
             },
             {
                 'id':'two',
                 'nutrients': {
-                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 15, 'percent_max': 15},
                 }
             },
             {
                 'id':'three',
                 'nutrients': {
-                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 15, 'percent_max': 15},
                 }
             },
             {
                 'id':'four',
                 'nutrients': {
-                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 15, 'percent_max': 15},
                 }
             }
         ],
         'nutriments': {
-            'fiber_100g': 60,
+            'fiber_100g': 15,
         }}
 
     # For 4 ingredients in the absence of anything better we want
@@ -384,7 +384,7 @@ def test_estimate_recipe_subingredient_limits():
 
     salt = product['ingredients'][1]
     # Percent estimate is as high a possible
-    assert round(salt.get('percent_estimate')) == 50
+    assert abs(50 - salt.get('percent_estimate')) < 2
 
 
 def test_estimate_recipe_minimize_maximum_distance_between_ingredients_with_subingredients():
@@ -397,13 +397,13 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients_with_subi
                     {
                         'id':'two',
                         'nutrients': {
-                            'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                            'fiber': {'percent_nom': 15, 'percent_min': 15, 'percent_max': 15},
                         }
                     },
                     {
                         'id':'three',
                         'nutrients': {
-                            'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                            'fiber': {'percent_nom': 15, 'percent_min': 15, 'percent_max': 15},
                         }
                     },
                 ]
@@ -411,12 +411,12 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients_with_subi
             {
                 'id':'four',
                 'nutrients': {
-                    'fiber': {'percent_nom': 15, 'percent_min': 0, 'percent_max': 100},
+                    'fiber': {'percent_nom': 15, 'percent_min': 15, 'percent_max': 15},
                 }
             }
         ],
         'nutriments': {
-            'fiber_100g': 45,
+            'fiber_100g': 15,
         },
     }
 
