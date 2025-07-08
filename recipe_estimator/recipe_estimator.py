@@ -2,6 +2,7 @@ import time
 from ortools.linear_solver import pywraplp
 
 from .prepare_nutrients import prepare_nutrients
+from .nutrients import ensure_float
 
 precision = 0.01
 
@@ -219,13 +220,14 @@ def estimate_recipe(product):
     add_maximum_quantity_constraints(solver, ingredient_numvars)
 
     nutriments = product.get('nutriments', {})
-    salt = nutriments.get('salt_100g', 0)
+    salt = ensure_float(nutriments.get('salt_100g', 0))
+
     salt_constraint = solver.Constraint(0, salt)
 
-    sugar = nutriments.get('sugars_100g', 0)
+    sugar = ensure_float(nutriments.get('sugars_100g', 0))
     sugar_constraint = solver.Constraint(0, sugar)
     
-    fat = nutriments.get('fat_100g', 0)
+    fat = ensure_float(nutriments.get('fat_100g', 0))
     fat_constraint = solver.Constraint(0, fat)
 
     add_maximum_limits_on_salt_and_sugar(solver, ingredient_numvars, salt_constraint, sugar_constraint, fat_constraint)
@@ -303,6 +305,10 @@ def estimate_recipe(product):
             return status
 
     total_quantity = get_quantity_estimate(ingredient_numvars)
+    if (total_quantity == 0):
+        print("No leaf ingredients found, cannot estimate recipe")
+        return status
+    
     set_percent_estimate(ingredients, total_quantity)
 
     end = time.perf_counter()
