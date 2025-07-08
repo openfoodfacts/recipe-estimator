@@ -10,7 +10,7 @@
             "request": "launch",
             "module": "uvicorn",
             "args": [
-                "main:app",
+                "recipe_estimator.main:app",
                 "--reload"
             ],
             "jinja": true
