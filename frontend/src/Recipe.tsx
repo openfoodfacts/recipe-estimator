@@ -199,7 +199,7 @@ export default function Recipe({product}: RecipeProps) {
                       <Typography>{format(0.01 * parseFloat(ingredient.percent_estimate), PERCENT)}</Typography>
                     </TableCell>
                     {Object.keys(nutrients).map((nutrient: string) => (
-                      <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] &&
+                      <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] && ingredient.nutrients?.[nutrient].confidence != '-' ?
                         <>
                           <Typography variant="caption">
                             {ingredient.nutrients?.[nutrient].percent_min < ingredient.nutrients?.[nutrient].percent_nom ? format(ingredient.nutrients?.[nutrient].percent_min, QUANTITY) + '<' : ''}
@@ -207,6 +207,9 @@ export default function Recipe({product}: RecipeProps) {
                             {ingredient.nutrients?.[nutrient].percent_max > ingredient.nutrients?.[nutrient].percent_nom ? '<' + format(ingredient.nutrients?.[nutrient].percent_max, QUANTITY) : ''}
                           </Typography>
                           <Typography variant="body1">{format(ingredient.quantity_estimate * ingredient.nutrients?.[nutrient].percent_nom / 100, QUANTITY)}</Typography>
+                        </> : <>
+                          <Typography variant="caption">[-]</Typography>
+                          <Typography variant="body1">?</Typography>
                         </>
                       }
                       </TableCell>
