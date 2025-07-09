@@ -133,6 +133,9 @@ def estimate_recipe(product):
                     initial_estimate, ingredient["ingredients"]
                 )
             else:
+                # Initial estimate. 0.5 of previous ingredient
+                leaf_ingredients.append(initial_estimate)
+
                 # Set lost water constraint
                 water = ingredient["nutrients"].get("water", {})
                 maximum_water_content = water.get("percent_nom", 0) * 0.01
@@ -140,13 +143,9 @@ def estimate_recipe(product):
                 #     water_constraint(leaf_ingredient_index, maximum_water_content)
                 # )
 
-                # Initial estimate. 0.5 of previous ingredient
-                leaf_ingredients.append(initial_estimate)
-                maximum_weight = (
-                    None
-                    if maximum_water_content == 1
-                    else 100 / (1 - maximum_water_content)
-                )
+                # Assume no more than 50% of the water is lost
+                # TODO: See if we can justify this assumption with some product statistics
+                maximum_weight = 100 / (1 - (0.5 * maximum_water_content))
                 maximum_percentages.append(maximum_weight)
 
                 # # Water loss. Initial estimate is zero
@@ -160,6 +159,7 @@ def estimate_recipe(product):
                     ingredient_nutrient = ingredient["nutrients"][nutrient_key]
                     nutrient_ingredients[n].append(
                         {
+                            "conf": ingredient_nutrient.get("confidence", '-'),
                             "nom": ingredient_nutrient["percent_nom"] / 100,
                             "min": ingredient_nutrient["percent_min"] / 100,
                             "max": ingredient_nutrient["percent_max"] / 100,
@@ -197,25 +197,26 @@ def estimate_recipe(product):
             min_nutrient_total_from_ingredients = 0
             max_nutrient_total_from_ingredients = 0
             for i, nutrient_ingredient in enumerate(nutrient_ingredients[n]):
-                nom_nutrient_total_from_ingredients += (
-                    ingredient_percentages[i] * nutrient_ingredient["nom"]
-                )
-                min_nutrient_total_from_ingredients += (
-                    ingredient_percentages[i] * nutrient_ingredient["min"]
-                )
-                max_nutrient_total_from_ingredients += (
-                    ingredient_percentages[i] * nutrient_ingredient["max"]
-                )
+                if nutrient_ingredient["nom"] != '-':
+                    nom_nutrient_total_from_ingredients += (
+                        ingredient_percentages[i] * nutrient_ingredient["nom"]
+                    )
+                    min_nutrient_total_from_ingredients += (
+                        ingredient_percentages[i] * nutrient_ingredient["min"]
+                    )
+                    max_nutrient_total_from_ingredients += (
+                        ingredient_percentages[i] * nutrient_ingredient["max"]
+                    )
 
             # Factors need to quite large as the algorithms only make tiny changes to the variables to determine gradients
             # TODO: Need to experiment with factors here
             penalty += nutrient_weightings[n] * assign_penalty(
                 nutrient_total,
                 nom_nutrient_total_from_ingredients,
-                1000,
+                100,
                 min_nutrient_total_from_ingredients,
                 max_nutrient_total_from_ingredients,
-                10000,
+                1000,
             )
 
         # Now add a penalty for the constraints
@@ -261,7 +262,7 @@ def estimate_recipe(product):
                 if ratio_to_parent > 1:
                     # Apply a steep gradient
                     # the 0.5 * 1 is the initial shallow gradient penalty at a ratio of 1 to avoid a discontinuity
-                    penalty += (0.5 * 1) + (ratio_to_parent - 1) * 10000
+                    penalty += (0.5 * 1) + (ratio_to_parent - 1) * 100000
                 elif previous_total > 0:
                     # nominally aim for this ingredient to be 50% of the previous one
                     penalty += abs(0.5 - ratio_to_parent) * 1

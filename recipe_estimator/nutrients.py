@@ -62,7 +62,7 @@ def setup_ingredients(ingredients, nutrients):
                     # TODO: Could use value ranges that occur in actual data
                     ingredient['alim_nom_eng'] = 'Unknown'
                     for off_id in off_to_ciqual:
-                        ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_nom': 0, 'percent_max': 100}
+                        ingredient_nutrients[off_id] = {'percent_min': 0, 'percent_nom': 0, 'percent_max': 0, 'confidence': '-'}
                 else:
                     ingredient['alim_nom_eng'] = ciqual_ingredient['alim_nom_eng']
                     ingredient_nutrients = ciqual_ingredient['nutrients']
