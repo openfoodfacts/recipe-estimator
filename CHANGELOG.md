@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/openfoodfacts/recipe-estimator/compare/v0.1.0...v0.2.0) (2025-07-10)
+
+
+### Features
+
+* Update SciPy to always return success and use penalties rather than constraints ([#92](https://github.com/openfoodfacts/recipe-estimator/issues/92)) ([3d3bdbf](https://github.com/openfoodfacts/recipe-estimator/commit/3d3bdbf460d3da239ec4a696189c9ab23b8875b4))
+
 ## [0.1.0](https://github.com/openfoodfacts/recipe-estimator/compare/v0.0.1...v0.1.0) (2025-07-07)
 
 
