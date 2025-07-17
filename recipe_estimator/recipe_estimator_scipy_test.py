@@ -24,7 +24,7 @@ def test_estimate_recipe_accounts_for_lost_water():
         'ingredients': [{
             'id':'en:tomato',
             'nutrients': {
-                'fiber': {'percent_nom': 2.5, 'percent_min': 2.5, 'percent_max': 2.5},
+                'fiber': {'percent_nom': 4, 'percent_min': 4, 'percent_max': 4},
                 'water': {'percent_nom': 90},
             }
         }],
@@ -47,7 +47,7 @@ def test_estimate_recipe_accounts_for_lost_water():
 
     # Quantity estimate gives original quantity of ingredient per 100g/ml of product
     quantity_estimate = ingredient.get('quantity_estimate')
-    assert round(quantity_estimate) == 200
+    assert round(quantity_estimate) == 125
 
     # lost_water = ingredient.get('lost_water')
     # assert round(lost_water) == 100
@@ -78,9 +78,10 @@ def test_estimate_recipe_lost_water_is_constrained():
 
     ingredient = product['ingredients'][0]
 
-    # If tomatoes have a maximum water content of 10% then an original quantity of N times 90% = 100%, so N = 100 / 90 = 111
+    # Tomatoes have a maximum water content of 10% and the algorithm only expects at most 50% of this to evaporate
+    # So an original quantity of N times 95% = 100%, so N = 100 / (100 - (0.5 * 10)) = 105
     quantity_estimate = ingredient.get('quantity_estimate')
-    assert round(quantity_estimate) == 111
+    assert round(quantity_estimate) == 105
 
     # lost_water = ingredient.get('lost_water')
     # assert round(lost_water) == 11
@@ -161,15 +162,11 @@ def test_estimate_recipe_simple_recipe_with_no_matched_ingredients():
         'ingredients': [
             {
                 'id':'one',
-                'nutrients': {
-                    'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
-                }
+                'nutrients': {}
             },
             {
                 'id':'two',
-                'nutrients': {
-                    'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 100},
-                }
+                'nutrients': {}
             }
         ],
         'nutriments': {
@@ -183,9 +180,11 @@ def test_estimate_recipe_simple_recipe_with_no_matched_ingredients():
 
     # Status is valid
     #assert metrics['status'] == 0
+    
+    # Default estimate should be such that ingredient 1 is 2 times ingredient 2. So percentages should be 67% and 33%
 
-    assert round(product['ingredients'][0]['percent_estimate']) >= 50
-    assert round(product['ingredients'][1]['percent_estimate']) <= 50
+    assert abs(67 - product['ingredients'][0]['percent_estimate']) < 1
+    assert abs(33 - product['ingredients'][1]['percent_estimate']) < 1
     assert round(product['ingredients'][0]['percent_estimate'] + product['ingredients'][1]['percent_estimate']) == 100
 
 def test_estimate_recipe_simple_recipe_with_no_nutriments():
@@ -435,3 +434,52 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients_with_subi
     assert 40 < product['ingredients'][0]['ingredients'][0]['percent_estimate'] < 50 # 44.4
     assert 20 < product['ingredients'][0]['ingredients'][1]['percent_estimate'] < 25 # 22.2
     assert 30 < product['ingredients'][1]['percent_estimate'] < 40 # 33.3
+
+def test_estimate_recipe_one_matched_in_the_middle():
+    product = {
+        'code': 'test', 
+        'ingredients': [
+            {
+                'id':'one',
+                'nutrients': {}
+            },
+            {
+                'id':'two',
+                'nutrients': {}
+            },
+            {
+                'id':'three',
+                'nutrients': {'fiber': {'percent_nom': 40, 'percent_min': 40, 'percent_max': 40}}
+            },
+            {
+                'id':'four',
+                'nutrients': {}
+            },
+            {
+                'id':'five',
+                'nutrients': {}
+            },
+        ],
+        'nutriments': {
+            'fiber_100g': 10,
+        }}
+
+    estimate_recipe(product)
+
+    metrics = product.get('recipe_estimator')
+    assert metrics is not None
+
+    assert round(sum([ingredient['percent_estimate'] for ingredient in product['ingredients']])) == 100
+
+    # There has to be 25% of the third ingredient as it is the only one the contains fiber
+    assert abs(25 - product['ingredients'][2]['percent_estimate']) < 2
+
+    # The others should be aiming for 50% of the previous ingredient but this would give
+    # 100%, 50%, 25%, 12.5%, 6.75% which is more than 100%.
+    # Not sure what the best guess is so following are fairly approximate
+
+    assert abs(35 - product['ingredients'][0]['percent_estimate']) < 2
+    assert abs(26 - product['ingredients'][1]['percent_estimate']) < 2
+
+    assert abs(11 - product['ingredients'][3]['percent_estimate']) < 2
+    assert abs(5 - product['ingredients'][4]['percent_estimate']) < 2

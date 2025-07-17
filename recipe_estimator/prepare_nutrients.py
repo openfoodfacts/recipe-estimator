@@ -17,7 +17,7 @@ def count_ingredients(ingredients, nutrients):
             ingredient_nutrients = ingredient.get('nutrients')
             if (ingredient_nutrients is not None):
                 for off_id in ingredient_nutrients:
-                    if ingredient_nutrients[off_id]['confidence'] != '-':
+                    if ingredient_nutrients[off_id].get('confidence') != '-':
                         proportion = ingredient_nutrients[off_id]['percent_nom']
                         existing_nutrient = nutrients.get(off_id)
                         if (existing_nutrient is None):

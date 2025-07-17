@@ -58,7 +58,7 @@ export default function Recipe({product}: RecipeProps) {
   const [nutrients, setNutrients] = useState<any>();
   const [algorithm, setAlgorithm] = useState<boolean>();
 
-  const getRecipe = useCallback((product: any, scipy = false) => {
+  const getRecipe = useCallback((product: any, scipy = true) => {
     if (!product || !product.ingredients)
       return;
     async function fetchData() {
@@ -199,7 +199,8 @@ export default function Recipe({product}: RecipeProps) {
                       <Typography>{format(0.01 * parseFloat(ingredient.percent_estimate), PERCENT)}</Typography>
                     </TableCell>
                     {Object.keys(nutrients).map((nutrient: string) => (
-                      <TableCell key={nutrient}>{!ingredient.ingredients && ingredient.nutrients?.[nutrient] && ingredient.nutrients?.[nutrient].confidence != '-' ?
+                      <TableCell key={nutrient}>{!!ingredient.ingredients ? <></>
+                        : (ingredient.nutrients?.[nutrient] && ingredient.nutrients?.[nutrient].confidence !== '-' ?
                         <>
                           <Typography variant="caption">
                             {ingredient.nutrients?.[nutrient].percent_min < ingredient.nutrients?.[nutrient].percent_nom ? format(ingredient.nutrients?.[nutrient].percent_min, QUANTITY) + '<' : ''}
@@ -210,7 +211,7 @@ export default function Recipe({product}: RecipeProps) {
                         </> : <>
                           <Typography variant="caption">[-]</Typography>
                           <Typography variant="body1">?</Typography>
-                        </>
+                        </>)
                       }
                       </TableCell>
                     ))}
