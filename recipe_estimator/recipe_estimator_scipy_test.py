@@ -1,4 +1,6 @@
 import json
+
+from recipe_estimator.nutrients import prepare_product
 from .recipe_estimator_scipy import estimate_recipe, assign_penalty
 
 def test_assign_penalty_value_equals_nominal():
@@ -483,3 +485,24 @@ def test_estimate_recipe_one_matched_in_the_middle():
 
     assert abs(11 - product['ingredients'][3]['percent_estimate']) < 2
     assert abs(5 - product['ingredients'][4]['percent_estimate']) < 2
+
+def test_ingredients_dont_add_up():
+    product = {
+        'code' : 'test',
+        'ingredients': [
+            {'id':'en:sugar'},
+            {'id':'en:salt'},
+        ],
+        'nutriments': {
+            'sugars_100g': 80
+        }
+    }
+
+    prepare_product(product)
+    estimate_recipe(product)
+    metrics = product.get('recipe_estimator')
+    assert metrics is not None
+    
+    assert abs(80 - product['ingredients'][0]['percent_estimate']) < 2
+    assert abs(20 - product['ingredients'][1]['percent_estimate']) < 2
+

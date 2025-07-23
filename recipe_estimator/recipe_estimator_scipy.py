@@ -1,7 +1,14 @@
 import sys
 import time
 import warnings
-from scipy.optimize import minimize, dual_annealing, shgo, basinhopping, differential_evolution, direct
+from scipy.optimize import (
+    minimize,
+    dual_annealing,
+    shgo,
+    basinhopping,
+    differential_evolution,
+    direct,
+)
 
 from .prepare_nutrients import prepare_nutrients
 
@@ -75,6 +82,7 @@ def estimate_recipe(product):
     ingredient_order_multipliers = []
     water_loss_multipliers = []
     maximum_percentages = []
+    penalties = {}
 
     def water_constraint(ingredient_index, maximum_water_content):
         # return { 'type': 'ineq', 'fun': lambda x: x[i] * maximum_water_content - x[i + 1]}
@@ -160,14 +168,14 @@ def estimate_recipe(product):
                     if ingredient_nutrient:
                         nutrient_ingredients[n].append(
                             {
-                                "conf": ingredient_nutrient.get("confidence", '?'),
+                                "conf": ingredient_nutrient.get("confidence", "?"),
                                 "nom": ingredient_nutrient["percent_nom"] / 100,
                                 "min": ingredient_nutrient["percent_min"] / 100,
                                 "max": ingredient_nutrient["percent_max"] / 100,
                             }
                         )
                     else:
-                        nutrient_ingredients[n].append({"conf": '-'})
+                        nutrient_ingredients[n].append({"conf": "-"})
 
             # Set order constraint
             if i > 0:
@@ -196,18 +204,18 @@ def estimate_recipe(product):
     NUTRIENT_OUTSIDE_BOUNDS_PENALTY = 100000
     INGREDIENT_BIGGER_THAN_PREVIOUS_PENALTY = 1000000
     INGREDIENT_NOT_HALF_PREVIOUS_PENALTY = 10
-    TOTAL_MASS_LESS_THAN_100_PENALTY = 1000000
-    TOTAL_MASS_MORE_THAN_100_PENALTY = 10
-    
-    def objective(ingredient_percentages):
-        penalty = 0
+    TOTAL_MASS_LESS_THAN_100_PENALTY = 10000000
+    TOTAL_MASS_MORE_THAN_100_PENALTY = 100
+
+    def objective(ingredient_percentages, args):
+        nutrient_penalty = 0
 
         for n, nutrient_total in enumerate(product_nutrients):
             nom_nutrient_total_from_ingredients = 0
             min_nutrient_total_from_ingredients = 0
             max_nutrient_total_from_ingredients = 0
             for i, nutrient_ingredient in enumerate(nutrient_ingredients[n]):
-                if nutrient_ingredient["conf"] != '-':
+                if nutrient_ingredient["conf"] != "-":
                     nom_nutrient_total_from_ingredients += (
                         ingredient_percentages[i] * nutrient_ingredient["nom"]
                     )
@@ -220,7 +228,7 @@ def estimate_recipe(product):
 
             # Factors need to quite large as the algorithms only make tiny changes to the variables to determine gradients
             # TODO: Need to experiment with factors here
-            penalty += nutrient_weightings[n] * assign_penalty(
+            nutrient_penalty += nutrient_weightings[n] * assign_penalty(
                 nutrient_total,
                 nom_nutrient_total_from_ingredients,
                 NUTRIENT_WITHIN_BOUNDS_PENALTY,
@@ -229,6 +237,8 @@ def estimate_recipe(product):
                 NUTRIENT_OUTSIDE_BOUNDS_PENALTY,
             )
 
+        ingredient_not_half_previous_penalty = 0
+        ingredient_more_than_previous_penalty = 0
         # Now add a penalty for the constraints
         for multipliers in ingredient_order_multipliers:
             previous_total = sum(
@@ -264,12 +274,19 @@ def estimate_recipe(product):
             #                          50%      100% (this >= parent)
 
             if this_total < previous_total:
-                penalty += abs(this_total - (previous_total * 0.5)) * INGREDIENT_NOT_HALF_PREVIOUS_PENALTY
+                ingredient_not_half_previous_penalty += (
+                    abs(this_total - (previous_total * 0.5))
+                    * INGREDIENT_NOT_HALF_PREVIOUS_PENALTY
+                )
             else:
                 # This is greater than previous. Add the above penalty for this = previous
-                penalty += abs(0.5 * this_total) * INGREDIENT_NOT_HALF_PREVIOUS_PENALTY
+                ingredient_more_than_previous_penalty += (
+                    abs(0.5 * this_total) * INGREDIENT_NOT_HALF_PREVIOUS_PENALTY
+                )
                 # And then add a steep gradient for percent above previous
-                penalty += (this_total - previous_total) * INGREDIENT_BIGGER_THAN_PREVIOUS_PENALTY
+                ingredient_more_than_previous_penalty += (
+                    this_total - previous_total
+                ) * INGREDIENT_BIGGER_THAN_PREVIOUS_PENALTY
 
         # for multipliers in water_loss_multipliers:
         #     water_loss_test = sum([ingredient_quantity * multipliers[n] for n, ingredient_quantity in enumerate(ingredient_percentages)])
@@ -277,13 +294,20 @@ def estimate_recipe(product):
         #     if water_loss_test < 0:
         #         penalty += (-water_loss_test) * 1000
 
+        # Total mass penalty. Scale by number of ingredients so in the same order as other penalties
         total_mass = sum(ingredient_percentages)
+        mass_more_than_100_penalty = 0
+        mass_less_than_100_penalty = 0
         if total_mass < 100:
             # Add a high penalty as the total mass is less than 100g
-            penalty += (100 - total_mass) * TOTAL_MASS_LESS_THAN_100_PENALTY
+            mass_less_than_100_penalty += (
+                100 - total_mass
+            ) * TOTAL_MASS_LESS_THAN_100_PENALTY * leaf_ingredient_count
         else:
             # Add a very small penalty as the mass increases above 100g
-            penalty += (total_mass - 100) * TOTAL_MASS_MORE_THAN_100_PENALTY
+            mass_more_than_100_penalty += (
+                total_mass - 100
+            ) * TOTAL_MASS_MORE_THAN_100_PENALTY * leaf_ingredient_count
 
         # Although we could also model bounds using penalties the optimizers seem to work better if they have bounds
 
@@ -295,7 +319,18 @@ def estimate_recipe(product):
         #         # Add a moderate penalty if an ingredient is bigger than what we think it's maximum should be
         #         penalty += (ingredient_percentages[n] - maximum_percentage) * 1000
 
-        return penalty
+        args['nutrient_penalty'] = nutrient_penalty
+        args['ingredient_not_half_previous_penalty'] = ingredient_not_half_previous_penalty
+        args['ingredient_more_than_previous_penalty'] = ingredient_more_than_previous_penalty
+        args['mass_more_than_100_penalty'] = mass_more_than_100_penalty
+        args['mass_less_than_100_penalty'] = mass_less_than_100_penalty
+        return (
+            nutrient_penalty
+            + ingredient_not_half_previous_penalty
+            + ingredient_more_than_previous_penalty
+            + mass_more_than_100_penalty
+            + mass_less_than_100_penalty
+        )
 
     # constraints = [
     #     LinearConstraint(A, lb=0)
@@ -315,7 +350,7 @@ def estimate_recipe(product):
     #     bounds=bounds,
     #     # constraints=constraints,
     # )  # Fastest
-    
+
     # solution = minimize(
     #     objective,
     #     leaf_ingredients,
@@ -323,11 +358,10 @@ def estimate_recipe(product):
     #     bounds=bounds,
     #     # constraints=constraints,
     # )  # Fastest
-    
-    
+
     # solution = minimize(objective,x,method='trust-constr',bounds=bounds,constraints=cons)
     # May need to consider using global minimization as the objective function is probably not convex
-    
+
     # solution = shgo(objective, bounds=bounds, minimizer_kwargs={'method': 'SLSQP', 'bounds': bounds})
 
     # solution = dual_annealing(
@@ -356,17 +390,19 @@ def estimate_recipe(product):
     # DIRECT algorithm seems to cope best with our non-linear objective functions and the potentially large number of local minima
     # It also gives consistent results where other algorithms use randomization a lot which gives different results from one run to the next
     # For details of arguments see: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.direct.html
+    MAXITER = 5000
     solution = direct(
         objective,
         bounds,
-        eps=0.1, # Bit of trial and error here but going too much higher seems to find the wrong local minimum
-        locally_biased=True, # False is recommended for problems with lots of local minima, but True passes tests and goes much faster
-        f_min=0, # Global minimum. Our objective function will never go negative
+        args=[penalties],
+        eps=0.1,  # Bit of trial and error here but going too much higher seems to find the wrong local minimum
+        locally_biased=True,  # False is recommended for problems with lots of local minima, but True passes tests and goes much faster
+        f_min=0,  # Global minimum. Our objective function will never go negative
         # f_min_rtol=0.1, # Changing this didn't seem to make a lot of difference
-        len_tol=0.00001, # If this is too small then the number of iterations will be exceeded, but too large gives inaccurate results
+        len_tol=0.00001,  # If this is too small then the number of iterations will be exceeded, but too large gives inaccurate results
         # Following two give a trade-off between performance and accuracy. Have much more of an impact on performance if locally_biased is False
         maxfun=10000 * len(leaf_ingredients),
-        maxiter=5000,
+        maxiter=MAXITER,
     )
 
     total_quantity = sum(solution.x)
@@ -393,7 +429,7 @@ def estimate_recipe(product):
     recipe_estimator["status"] = 0
     recipe_estimator["status_message"] = solution.message
     message = f"Product: {product.get('code')}, time: {recipe_estimator['time']} s, status: {solution.get('message')}, iterations: {solution.get('nit')}"
-    if solution.success and solution.get('nit',0) < 1000:
+    if solution.success and solution.get("nit", 0) < MAXITER:
         print(message)
     else:
         warnings.warn(message)
