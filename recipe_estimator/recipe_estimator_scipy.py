@@ -145,6 +145,8 @@ def estimate_recipe(product):
             # For example if a product has 4 ingredients but the first ingredient is a group of 3 ingredients then the overall first ingredient group can't be less than
             # 25% but the first ingredient in that group could be 25 % / 3
             # These rules don't fully hold when evaporation is taken into consideration but that would get very complicated so is ignored for now.
+            
+            # Got error with 3327272107969
             max_percent = parent_max_percent / (i + 1)
             min_percent = parent_min_percent / num_ingredients if i == 0 else 0
 
@@ -206,6 +208,9 @@ def estimate_recipe(product):
         return leaf_ingredients_added
 
     add_ingredients(ingredients, 100, 100, 100)
+    if len(bounds) == 1 and bounds[0][1] == 100:
+        # If there is only one ingredient with no known water content the bounds will be 100, 100 which the optimizer doesn't like, so fudge the max a bit
+        bounds[0][1] = 105
 
     # # Total mass of all ingredients less all lost water must be 100g
     # total_mass_multipliers = [0] * leaf_ingredient_count * 2
@@ -219,6 +224,9 @@ def estimate_recipe(product):
     TOTAL_MASS_LESS_THAN_100_PENALTY = 10000000
     TOTAL_MASS_MORE_THAN_100_PENALTY = 100
 
+
+    # TODO: Try using quadratic / cubic penalty functions so that gradients are smoother and may be easier for optimizer to spot path to minimum
+    # TODO: Use matrix libraries for objective calculations to speed things up
     def objective(ingredient_percentages, args):
         nutrient_penalty = 0
 
@@ -267,8 +275,8 @@ def estimate_recipe(product):
                     if multipliers[n] < 0
                 ]
             )
-            # In the absence of anything else we want this total to be 50% of the previous total so we apply a very small penalty
-            # for deviations from that. However, once this total gets bigger than previous we want to apply a higher penalty
+            # In the absence of anything else we want this_total to be 50% of the previous_total so we apply a very small penalty
+            # for deviations from that. However, once this_total gets bigger than previous_total we want to apply a higher penalty
 
             # penalty
             #    ^                                        *
@@ -293,7 +301,7 @@ def estimate_recipe(product):
             else:
                 # This is greater than previous. Add the above penalty for this = previous
                 ingredient_more_than_previous_penalty += (
-                    abs(0.5 * this_total) * INGREDIENT_NOT_HALF_PREVIOUS_PENALTY
+                    (0.5 * this_total) * INGREDIENT_NOT_HALF_PREVIOUS_PENALTY
                 )
                 # And then add a steep gradient for percent above previous
                 ingredient_more_than_previous_penalty += (

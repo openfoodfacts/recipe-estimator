@@ -506,3 +506,22 @@ def test_ingredients_dont_add_up():
     assert abs(80 - product['ingredients'][0]['percent_estimate']) < 2
     assert abs(20 - product['ingredients'][1]['percent_estimate']) < 2
 
+
+def test_one_unknown_ingredient():
+    product = {
+        'code': 'test', 
+        'ingredients': [{
+            'id':'en:tomato',
+            'nutrients': {}
+        }],
+        'nutriments': {
+            'fiber_100g': 5,
+        }}
+
+
+    estimate_recipe(product)
+
+    metrics = product.get('recipe_estimator')
+    assert metrics is not None
+    assert round(product['ingredients'][0]['percent_estimate']) == 100
+
