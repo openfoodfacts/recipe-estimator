@@ -81,7 +81,7 @@ def estimate_recipe(product):
     leaf_ingredients = []
     ingredient_order_multipliers = []
     water_loss_multipliers = []
-    maximum_percentages = []
+    bounds = []
     penalties = {}
 
     def water_constraint(ingredient_index, maximum_water_content):
@@ -126,19 +126,31 @@ def estimate_recipe(product):
         nutrient_weightings.append(weighting)
         nutrient_ingredients.append([])
 
-    def add_ingredients(total_percent, ingredients):
+    def add_ingredients(ingredients, parent_estimate, parent_min_percent, parent_max_percent):
         leaf_ingredients_added = 0
         # Initial estimate of ingredients is a geometric progression where each is half the previous one
         # Sum of a  geometric progression is Sn = a(1 - r^n) / (1 - r)
         # In our case Sn = 100 and r = 0.5 so our first ingredient (a) will be
         # (100 * 0.5) / (1 - 0.5 ^ n)
-        initial_estimate = (total_percent * 0.5) / (1 - 0.5 ** len(ingredients))
+        num_ingredients = len(ingredients)
+        initial_estimate = (parent_estimate * 0.5) / (1 - 0.5 ** num_ingredients)
         for i, ingredient in enumerate(ingredients):
             leaf_ingredient_index = len(leaf_ingredients)
+            
+            # If there are, say, 3 ingredients then the 1st can be between 100% and 33%, second can be between 50% and 0%, third can be between 33% and 0%
+            # So in general the max percentage is 100% / ingredient_number and the min percentage is 100% / num_ingredients for the first ingredient and 0 for others
+            # Where there are sub-ingredients the max percent follows the same formula except replacing 100% with the max percent of the parent
+            # For the min percent this only applies to the very first leaf ingredient and needs to consider the number of ingredients in its sub-group
+            # along with the total number of ingredients in the root group.
+            # For example if a product has 4 ingredients but the first ingredient is a group of 3 ingredients then the overall first ingredient group can't be less than
+            # 25% but the first ingredient in that group could be 25 % / 3
+            # These rules don't fully hold when evaporation is taken into consideration but that would get very complicated so is ignored for now.
+            max_percent = parent_max_percent / (i + 1)
+            min_percent = parent_min_percent / num_ingredients if i == 0 else 0
 
             if "ingredients" in ingredient and len(ingredient["ingredients"]) > 0:
                 sub_ingredient_count = add_ingredients(
-                    initial_estimate, ingredient["ingredients"]
+                    ingredient["ingredients"], initial_estimate, min_percent, max_percent
                 )
             else:
                 # Initial estimate. 0.5 of previous ingredient
@@ -153,8 +165,8 @@ def estimate_recipe(product):
 
                 # Assume no more than 50% of the water is lost
                 # TODO: See if we can justify this assumption with some product statistics
-                maximum_weight = 100 / (1 - (0.5 * maximum_water_content))
-                maximum_percentages.append(maximum_weight)
+                maximum_weight = max_percent / (1 - (0.5 * maximum_water_content))
+                bounds.append([min_percent, maximum_weight])
 
                 # # Water loss. Initial estimate is zero
                 # leaf_ingredients.append(0)
@@ -193,7 +205,7 @@ def estimate_recipe(product):
             start_of_previous_parent = leaf_ingredient_index
         return leaf_ingredients_added
 
-    add_ingredients(100, ingredients)
+    add_ingredients(ingredients, 100, 100, 100)
 
     # # Total mass of all ingredients less all lost water must be 100g
     # total_mass_multipliers = [0] * leaf_ingredient_count * 2
@@ -319,6 +331,7 @@ def estimate_recipe(product):
         #         # Add a moderate penalty if an ingredient is bigger than what we think it's maximum should be
         #         penalty += (ingredient_percentages[n] - maximum_percentage) * 1000
 
+        # These are good for debugging and don't seem to but slow things down a lot
         args['nutrient_penalty'] = nutrient_penalty
         args['ingredient_not_half_previous_penalty'] = ingredient_not_half_previous_penalty
         args['ingredient_more_than_previous_penalty'] = ingredient_more_than_previous_penalty
@@ -338,8 +351,6 @@ def estimate_recipe(product):
     # ]
     # # For COBYLA can't use eq constraint
     # constraints.append(LinearConstraint(total_mass_multipliers, lb=99.99, ub=100.01))
-
-    bounds = [[0, maximum_percentage] for maximum_percentage in maximum_percentages]
 
     # COBYQA is very slow
     # solution = minimize(objective,x,method='COBYLA',bounds=bounds,constraints=cons,options={'maxiter': 10000})
