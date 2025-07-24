@@ -145,8 +145,6 @@ def estimate_recipe(product):
             # For example if a product has 4 ingredients but the first ingredient is a group of 3 ingredients then the overall first ingredient group can't be less than
             # 25% but the first ingredient in that group could be 25 % / 3
             # These rules don't fully hold when evaporation is taken into consideration but that would get very complicated so is ignored for now.
-            
-            # Got error with 3327272107969
             max_percent = parent_max_percent / (i + 1)
             min_percent = parent_min_percent / num_ingredients if i == 0 else 0
 
