@@ -168,6 +168,54 @@ export default function Recipe({product}: RecipeProps) {
                     </TableCell>
                   ))}
                 </TableRow>
+                <TableRow>
+                  <TableCell colSpan={4}><Typography>Quoted product nutrients</Typography></TableCell>
+                  {Object.keys(nutrients).map((nutrient_key: string) => (
+                    <TableCell key={nutrient_key}>
+                      <Typography variant="body1">{format(nutrients[nutrient_key].product_total, QUANTITY)}</Typography>
+                    </TableCell>
+                  ))}
+                </TableRow>
+                <TableRow className='total'>
+                  <TableCell colSpan={2}><Typography>Ingredients totals</Typography></TableCell>
+                  <TableCell><Typography>{format(getTotal('_total'), QUANTITY)}</Typography></TableCell>
+                  <TableCell><Typography align='center'>{format(getTotal('_percent'), PERCENT)}</Typography></TableCell>
+                  {Object.keys(nutrients).map((nutrient_key: string) => (
+                    <TableCell key={nutrient_key}>
+                        <Typography variant="caption">{format(getTotal(nutrient_key, 'min'), QUANTITY)}</Typography>
+                        <Typography variant="body1">{format(getTotal(nutrient_key), QUANTITY)}</Typography>
+                        <Typography variant="caption">{format(getTotal(nutrient_key, 'max'), QUANTITY)}</Typography>
+                    </TableCell>
+                  ))}
+                </TableRow>
+                <TableRow className='total'>
+                  <TableCell>
+                    <Typography>Variance</Typography>
+                  </TableCell>
+                  <TableCell padding='normal'>
+                    <Button variant={algorithm ? 'outlined' : 'contained'} onClick={()=>recalculateRecipe(false)}>GLOP</Button>
+                    &nbsp;
+                    <Button variant={algorithm ? 'contained' : 'outlined'} onClick={()=>recalculateRecipe(true)}>SciPy</Button>
+                  </TableCell>
+                  <TableCell colSpan={2}>
+                    <Typography variant="caption">Weighted</Typography>
+                    <Typography>{format(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
+                    total + (!nutrients[nutrient_key].notes 
+                      ? nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total) ** 2
+                      : 0), 0), VARIANCE)}
+                    </Typography>
+                  </TableCell>
+                  {Object.keys(nutrients).map((nutrient_key: string) => (
+                    <TableCell key={nutrient_key}>
+                        <Typography variant="caption">{format(getTotal(nutrient_key) - nutrients[nutrient_key].product_total, VARIANCE)}</Typography>
+                        <br/>
+                        {!nutrients[nutrient_key].notes && nutrients[nutrient_key].weighting > 0
+                          ? <Typography>{format(nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total), VARIANCE)}</Typography>
+                          : <Typography variant="caption">{nutrients[nutrient_key].notes ?? 'Not used'}</Typography>
+                        }
+                    </TableCell>
+                  ))}
+                </TableRow>
               </TableHead>
               <TableBody>
                 {flattenIngredients(ingredients).map((ingredient: any, index: number)=>(
@@ -217,54 +265,6 @@ export default function Recipe({product}: RecipeProps) {
                     ))}
                   </TableRow>
                 ))}
-                  <TableRow className='total'>
-                    <TableCell colSpan={2}><Typography>Ingredients totals</Typography></TableCell>
-                    <TableCell><Typography>{format(getTotal('_total'), QUANTITY)}</Typography></TableCell>
-                    <TableCell><Typography align='center'>{format(getTotal('_percent'), PERCENT)}</Typography></TableCell>
-                    {Object.keys(nutrients).map((nutrient_key: string) => (
-                      <TableCell key={nutrient_key}>
-                          <Typography variant="caption">{format(getTotal(nutrient_key, 'min'), QUANTITY)}</Typography>
-                          <Typography variant="body1">{format(getTotal(nutrient_key), QUANTITY)}</Typography>
-                          <Typography variant="caption">{format(getTotal(nutrient_key, 'max'), QUANTITY)}</Typography>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                  <TableRow>
-                    <TableCell colSpan={4}><Typography>Quoted product nutrients</Typography></TableCell>
-                    {Object.keys(nutrients).map((nutrient_key: string) => (
-                      <TableCell key={nutrient_key}>
-                        <Typography variant="body1">{format(nutrients[nutrient_key].product_total, QUANTITY)}</Typography>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                  <TableRow className='total'>
-                    <TableCell>
-                      <Typography>Variance</Typography>
-                    </TableCell>
-                    <TableCell padding='normal'>
-                      <Button variant={algorithm ? 'outlined' : 'contained'} onClick={()=>recalculateRecipe(false)}>GLOP</Button>
-                      &nbsp;
-                      <Button variant={algorithm ? 'contained' : 'outlined'} onClick={()=>recalculateRecipe(true)}>SciPy</Button>
-                    </TableCell>
-                    <TableCell colSpan={2}>
-                      <Typography variant="caption">Weighted</Typography>
-                      <Typography>{format(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
-                      total + (!nutrients[nutrient_key].notes 
-                        ? nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total) ** 2
-                        : 0), 0), VARIANCE)}
-                      </Typography>
-                    </TableCell>
-                    {Object.keys(nutrients).map((nutrient_key: string) => (
-                      <TableCell key={nutrient_key}>
-                          <Typography variant="caption">{format(getTotal(nutrient_key) - nutrients[nutrient_key].product_total, VARIANCE)}</Typography>
-                          <br/>
-                          {!nutrients[nutrient_key].notes && nutrients[nutrient_key].weighting > 0
-                            ? <Typography>{format(nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total), VARIANCE)}</Typography>
-                            : <Typography variant="caption">{nutrients[nutrient_key].notes ?? 'Not used'}</Typography>
-                          }
-                      </TableCell>
-                    ))}
-                  </TableRow>
               </TableBody>
             </Table>
         </div>
