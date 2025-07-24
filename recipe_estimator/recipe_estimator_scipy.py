@@ -55,10 +55,7 @@ def assign_penalty(
     return 0
 
 
-# estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
-# The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
-def estimate_recipe(product):
-    current = time.perf_counter()
+def get_objective_function(product):
     leaf_ingredient_count = prepare_nutrients(product, True)
     ingredients = product["ingredients"]
     recipe_estimator = product["recipe_estimator"]
@@ -82,7 +79,6 @@ def estimate_recipe(product):
     ingredient_order_multipliers = []
     water_loss_multipliers = []
     bounds = []
-    penalties = {}
 
     def water_constraint(ingredient_index, maximum_water_content):
         # return { 'type': 'ineq', 'fun': lambda x: x[i] * maximum_water_content - x[i + 1]}
@@ -126,17 +122,18 @@ def estimate_recipe(product):
         nutrient_weightings.append(weighting)
         nutrient_ingredients.append([])
 
-    def add_ingredients(ingredients, parent_estimate, parent_min_percent, parent_max_percent):
+    def add_ingredients(
+        ingredients, parent_min_percent, parent_max_percent
+    ):
         leaf_ingredients_added = 0
         # Initial estimate of ingredients is a geometric progression where each is half the previous one
         # Sum of a  geometric progression is Sn = a(1 - r^n) / (1 - r)
         # In our case Sn = 100 and r = 0.5 so our first ingredient (a) will be
         # (100 * 0.5) / (1 - 0.5 ^ n)
         num_ingredients = len(ingredients)
-        initial_estimate = (parent_estimate * 0.5) / (1 - 0.5 ** num_ingredients)
         for i, ingredient in enumerate(ingredients):
             leaf_ingredient_index = len(leaf_ingredients)
-            
+
             # If there are, say, 3 ingredients then the 1st can be between 100% and 33%, second can be between 50% and 0%, third can be between 33% and 0%
             # So in general the max percentage is 100% / ingredient_number and the min percentage is 100% / num_ingredients for the first ingredient and 0 for others
             # Where there are sub-ingredients the max percent follows the same formula except replacing 100% with the max percent of the parent
@@ -150,11 +147,13 @@ def estimate_recipe(product):
 
             if "ingredients" in ingredient and len(ingredient["ingredients"]) > 0:
                 sub_ingredient_count = add_ingredients(
-                    ingredient["ingredients"], initial_estimate, min_percent, max_percent
+                    ingredient["ingredients"],
+                    min_percent,
+                    max_percent,
                 )
             else:
                 # Initial estimate. 0.5 of previous ingredient
-                leaf_ingredients.append(initial_estimate)
+                leaf_ingredients.append(ingredient)
 
                 # Set lost water constraint
                 water = ingredient["nutrients"].get("water", {})
@@ -200,12 +199,11 @@ def estimate_recipe(product):
                     )
                 )
 
-            initial_estimate /= 2
             leaf_ingredients_added += sub_ingredient_count
             start_of_previous_parent = leaf_ingredient_index
         return leaf_ingredients_added
 
-    add_ingredients(ingredients, 100, 100, 100)
+    add_ingredients(ingredients, 100, 100)
     if len(bounds) == 1 and bounds[0][1] == 100:
         # If there is only one ingredient with no known water content the bounds will be 100, 100 which the optimizer doesn't like, so fudge the max a bit
         bounds[0][1] = 105
@@ -221,7 +219,6 @@ def estimate_recipe(product):
     INGREDIENT_NOT_HALF_PREVIOUS_PENALTY = 10
     TOTAL_MASS_LESS_THAN_100_PENALTY = 10000000
     TOTAL_MASS_MORE_THAN_100_PENALTY = 100
-
 
     # TODO: Try using quadratic / cubic penalty functions so that gradients are smoother and may be easier for optimizer to spot path to minimum
     # TODO: Use matrix libraries for objective calculations to speed things up
@@ -299,8 +296,8 @@ def estimate_recipe(product):
             else:
                 # This is greater than previous. Add the above penalty for this = previous
                 ingredient_more_than_previous_penalty += (
-                    (0.5 * this_total) * INGREDIENT_NOT_HALF_PREVIOUS_PENALTY
-                )
+                    0.5 * this_total
+                ) * INGREDIENT_NOT_HALF_PREVIOUS_PENALTY
                 # And then add a steep gradient for percent above previous
                 ingredient_more_than_previous_penalty += (
                     this_total - previous_total
@@ -319,13 +316,17 @@ def estimate_recipe(product):
         if total_mass < 100:
             # Add a high penalty as the total mass is less than 100g
             mass_less_than_100_penalty += (
-                100 - total_mass
-            ) * TOTAL_MASS_LESS_THAN_100_PENALTY * leaf_ingredient_count
+                (100 - total_mass)
+                * TOTAL_MASS_LESS_THAN_100_PENALTY
+                * leaf_ingredient_count
+            )
         else:
             # Add a very small penalty as the mass increases above 100g
             mass_more_than_100_penalty += (
-                total_mass - 100
-            ) * TOTAL_MASS_MORE_THAN_100_PENALTY * leaf_ingredient_count
+                (total_mass - 100)
+                * TOTAL_MASS_MORE_THAN_100_PENALTY
+                * leaf_ingredient_count
+            )
 
         # Although we could also model bounds using penalties the optimizers seem to work better if they have bounds
 
@@ -337,20 +338,34 @@ def estimate_recipe(product):
         #         # Add a moderate penalty if an ingredient is bigger than what we think it's maximum should be
         #         penalty += (ingredient_percentages[n] - maximum_percentage) * 1000
 
-        # These are good for debugging and don't seem to but slow things down a lot
-        args['nutrient_penalty'] = nutrient_penalty
-        args['ingredient_not_half_previous_penalty'] = ingredient_not_half_previous_penalty
-        args['ingredient_more_than_previous_penalty'] = ingredient_more_than_previous_penalty
-        args['mass_more_than_100_penalty'] = mass_more_than_100_penalty
-        args['mass_less_than_100_penalty'] = mass_less_than_100_penalty
-        return (
+        penalty = (
             nutrient_penalty
             + ingredient_not_half_previous_penalty
             + ingredient_more_than_previous_penalty
             + mass_more_than_100_penalty
             + mass_less_than_100_penalty
         )
+        # These are good for debugging and don't seem to but slow things down a lot
+        args["nutrient_penalty"] = nutrient_penalty
+        args["ingredient_not_half_previous_penalty"] = (
+            ingredient_not_half_previous_penalty
+        )
+        args["ingredient_more_than_previous_penalty"] = (
+            ingredient_more_than_previous_penalty
+        )
+        args["mass_more_than_100_penalty"] = mass_more_than_100_penalty
+        args["mass_less_than_100_penalty"] = mass_less_than_100_penalty
+        args["total"] = penalty
+        return penalty
 
+    return [objective, bounds, leaf_ingredients]
+
+
+# estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
+# The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
+def estimate_recipe(product):
+    current = time.perf_counter()
+    [objective, bounds, leaf_ingredients] = get_objective_function(product)
     # constraints = [
     #     LinearConstraint(A, lb=0)
     #     for A in ingredient_order_multipliers + water_loss_multipliers
@@ -407,6 +422,7 @@ def estimate_recipe(product):
     # DIRECT algorithm seems to cope best with our non-linear objective functions and the potentially large number of local minima
     # It also gives consistent results where other algorithms use randomization a lot which gives different results from one run to the next
     # For details of arguments see: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.direct.html
+    penalties = {}
     MAXITER = 5000
     solution = direct(
         objective,
@@ -440,11 +456,12 @@ def estimate_recipe(product):
 
         return total_percent
 
-    set_percentages(ingredients)
-    end = time.perf_counter()
-    recipe_estimator["time"] = round(end - current, 2)
+    set_percentages(product["ingredients"])
+    recipe_estimator = product["recipe_estimator"]
     recipe_estimator["status"] = 0
     recipe_estimator["status_message"] = solution.message
+    recipe_estimator['penalties'] = penalties
+    recipe_estimator["time"] = round(time.perf_counter() - current, 2)
     message = f"Product: {product.get('code')}, time: {recipe_estimator['time']} s, status: {solution.get('message')}, iterations: {solution.get('nit')}"
     if solution.success and solution.get("nit", 0) < MAXITER:
         print(message)

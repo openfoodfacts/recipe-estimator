@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .nutrients import ciqual_ingredients, prepare_product
 from .product import get_product
 from .recipe_estimator import estimate_recipe
-from .recipe_estimator_scipy import estimate_recipe as estimate_recipe_scipy
+from .recipe_estimator_scipy import estimate_recipe as estimate_recipe_scipy, get_objective_function
 
 app = FastAPI()
 
@@ -46,4 +46,15 @@ async def recipe(request: Request):
     product = await request.json()
     prepare_product(product)
     estimate_recipe_scipy(product)
+    return product
+
+@app.post("/api/v3/get_penalties")
+async def recipe(request: Request):
+    product = await request.json()
+    prepare_product(product)
+    [objective, _, leaf_ingredients] = get_objective_function(product)
+    quantities = [float(ingredient['quantity_estimate']) for ingredient in leaf_ingredients]
+    penalties = {}
+    objective(quantities, penalties)
+    product['recipe_estimator']['penalties'] = penalties
     return product

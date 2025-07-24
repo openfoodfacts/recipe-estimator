@@ -57,6 +57,7 @@ export default function Recipe({product}: RecipeProps) {
   const [ingredients, setIngredients] = useState<any>();
   const [nutrients, setNutrients] = useState<any>();
   const [algorithm, setAlgorithm] = useState<boolean>();
+  const [penalties, setPenalties] = useState<any>();
 
   const getRecipe = useCallback((product: any, scipy = true) => {
     if (!product || !product.ingredients)
@@ -73,6 +74,20 @@ export default function Recipe({product}: RecipeProps) {
     fetchData();
   }, []);
 
+  const refreshPenalties = useCallback((product: any) => {
+    async function fetchData() {
+      const results = await (await fetch(`${API_PATH}api/v3/get_penalties`, {method: 'POST', body: JSON.stringify(product)})).json();
+      setIngredients(results.ingredients);
+      setNutrients(Object.fromEntries(
+        Object.entries(results.recipe_estimator.nutrients).filter(
+           ([key, val])=>(val as any).product_total > 0
+        )));
+      setPenalties(results.recipe_estimator.penalties)
+    }
+    fetchData();
+  }, []);
+
+
   useEffect(()=>{
     getRecipe(product);
   }, [product, getRecipe]);
@@ -84,6 +99,16 @@ export default function Recipe({product}: RecipeProps) {
   function recalculateRecipe(useScipy: boolean) {
     product.ingredients = ingredients;
     getRecipe(product, useScipy);
+  }
+
+  function ingredientsEdited() {
+    if (algorithm) {
+      // Re-evaluate objective function if we are using SciPy
+      product.ingredients = ingredients;
+      refreshPenalties(product);
+    } else {
+      setIngredients([...ingredients]);
+    }
   }
 
   function getTotalForParent(nutrient_key: string, parent: any[], bound: string) {
@@ -138,7 +163,6 @@ export default function Recipe({product}: RecipeProps) {
   function ingredientChange(ingredient: any, value: any) {
     if (value) {
       // print ingredient to console
-      console.log(value);
       ingredient.id = value.id;
       ingredient.ciqual_food_code_used = value.ciqual_food_code;
       ingredient.ciqual_food_code = value.ciqual_food_code;
@@ -146,7 +170,7 @@ export default function Recipe({product}: RecipeProps) {
       ingredient.alim_nom_eng = value.alim_nom_eng;
       ingredient.nutrients = value.nutrients;
       ingredient.searchTerm = ingredientDisplayName(value);
-      setIngredients([...ingredients]);
+      ingredientsEdited()
     }
   }
 
@@ -240,7 +264,7 @@ export default function Recipe({product}: RecipeProps) {
                     }
                     </TableCell>
                     <TableCell>{!ingredient.ingredients &&
-                      <TextField variant="standard" type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);setIngredients([...ingredients]);}}/>
+                      <TextField variant="standard" type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);ingredientsEdited();}}/>
                     }
                     </TableCell>
                     <TableCell align='center'>
