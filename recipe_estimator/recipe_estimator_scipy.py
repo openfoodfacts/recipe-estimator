@@ -123,7 +123,7 @@ def get_objective_function(product):
         nutrient_ingredients.append([])
 
     def add_ingredients(
-        ingredients, parent_min_percent, parent_max_percent
+        ingredients, parent_estimate, parent_min_percent, parent_max_percent
     ):
         leaf_ingredients_added = 0
         # Initial estimate of ingredients is a geometric progression where each is half the previous one
@@ -131,6 +131,7 @@ def get_objective_function(product):
         # In our case Sn = 100 and r = 0.5 so our first ingredient (a) will be
         # (100 * 0.5) / (1 - 0.5 ^ n)
         num_ingredients = len(ingredients)
+        initial_estimate = (parent_estimate * 0.5) / (1 - 0.5 ** num_ingredients)
         for i, ingredient in enumerate(ingredients):
             leaf_ingredient_index = len(leaf_ingredients)
 
@@ -148,12 +149,16 @@ def get_objective_function(product):
             if "ingredients" in ingredient and len(ingredient["ingredients"]) > 0:
                 sub_ingredient_count = add_ingredients(
                     ingredient["ingredients"],
+                    initial_estimate,
                     min_percent,
                     max_percent,
                 )
             else:
                 # Initial estimate. 0.5 of previous ingredient
                 leaf_ingredients.append(ingredient)
+                ingredient["index"] = leaf_ingredient_index
+                ingredient["initial_estimate"] = initial_estimate
+                sub_ingredient_count = 1
 
                 # Set lost water constraint
                 water = ingredient["nutrients"].get("water", {})
@@ -170,9 +175,6 @@ def get_objective_function(product):
                 # # Water loss. Initial estimate is zero
                 # leaf_ingredients.append(0)
                 # maximum_percentages.append(None if maximum_water_content == 1 else maximum_water_content * maximum_weight)
-
-                ingredient["index"] = leaf_ingredient_index
-                sub_ingredient_count = 1
 
                 for n, nutrient_key in enumerate(nutrient_names):
                     ingredient_nutrient = ingredient["nutrients"].get(nutrient_key)
@@ -199,11 +201,12 @@ def get_objective_function(product):
                     )
                 )
 
+            initial_estimate /= 2
             leaf_ingredients_added += sub_ingredient_count
             start_of_previous_parent = leaf_ingredient_index
         return leaf_ingredients_added
 
-    add_ingredients(ingredients, 100, 100)
+    add_ingredients(ingredients, 100, 100, 100)
     if len(bounds) == 1 and bounds[0][1] == 100:
         # If there is only one ingredient with no known water content the bounds will be 100, 100 which the optimizer doesn't like, so fudge the max a bit
         bounds[0][1] = 105
@@ -366,6 +369,10 @@ def get_objective_function(product):
 def estimate_recipe(product):
     current = time.perf_counter()
     [objective, bounds, leaf_ingredients] = get_objective_function(product)
+    penalties = {}
+    MAXITER = 5000
+    x0 = [ingredient["initial_estimate"] for ingredient in leaf_ingredients]
+
     # constraints = [
     #     LinearConstraint(A, lb=0)
     #     for A in ingredient_order_multipliers + water_loss_multipliers
@@ -413,30 +420,39 @@ def estimate_recipe(product):
     #     minimizer_kwargs={"method": "SLSQP", "bounds": bounds},
     # )
 
-    # solution = differential_evolution(
-    #     objective,
-    #     bounds,
-    #     x0=leaf_ingredients,
-    # )
-
-    # DIRECT algorithm seems to cope best with our non-linear objective functions and the potentially large number of local minima
-    # It also gives consistent results where other algorithms use randomization a lot which gives different results from one run to the next
-    # For details of arguments see: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.direct.html
-    penalties = {}
-    MAXITER = 5000
-    solution = direct(
+    solution = differential_evolution(
         objective,
         bounds,
         args=[penalties],
-        eps=0.1,  # Bit of trial and error here but going too much higher seems to find the wrong local minimum
-        locally_biased=True,  # False is recommended for problems with lots of local minima, but True passes tests and goes much faster
-        f_min=0,  # Global minimum. Our objective function will never go negative
-        # f_min_rtol=0.1, # Changing this didn't seem to make a lot of difference
-        len_tol=0.00001,  # If this is too small then the number of iterations will be exceeded, but too large gives inaccurate results
-        # Following two give a trade-off between performance and accuracy. Have much more of an impact on performance if locally_biased is False
-        maxfun=10000 * len(leaf_ingredients),
-        maxiter=MAXITER,
+        x0=x0,
+        polish=False, # Don't polish results to help with performance
+        rng=0, # Seed random number generator so we get consistent results between tests
+        # workers=-1, # Can't use this at the moment as the objective function needs to be top level "picklable"
+        # popsize=100, # Default is 15. Increasing this really slows things down
+        # init='sobol', # Changing this didn't seem to make much difference
+        tol=0.001, # Needed a lower value here to pass tests. Didn't seem to affect performance much
+        atol=1, # Going higher than 1 seems to break tests
+        # mutation=(1.5, 1.9), # Tried increasing this but gave poor results
+        recombination=0.89 # Higher values seem to improve performance. This was highest I could go and still pass tests
     )
+
+    # # DIRECT algorithm seems to cope best with our non-linear objective functions and the potentially large number of local minima
+    # # It also gives consistent results where other algorithms use randomization a lot which gives different results from one run to the next
+    # # For details of arguments see: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.direct.html
+    # solution = direct(
+    #     objective,
+    #     bounds,
+    #     args=[penalties],
+    #     eps=0.01,  # Bit of trial and error here but going too much higher seems to find the wrong local minimum
+    #     locally_biased=False,  # False is recommended for problems with lots of local minima. True passes tests but is less good for real life recipes
+    #     f_min=0,  # Global minimum. Our objective function will never go negative
+    #     #f_min_rtol=0.1, # Changing this didn't seem to make a lot of difference
+    #     #len_tol=0.00001,  # If this is too small then the number of iterations will be exceeded, but too large gives inaccurate results
+    #     #vol_tol=1e-32,
+    #     # Following two give a trade-off between performance and accuracy. Have much more of an impact on performance if locally_biased is False
+    #     maxfun=10000 * len(leaf_ingredients),
+    #     maxiter=MAXITER,
+    # )
 
     total_quantity = sum(solution.x)
 
@@ -460,6 +476,8 @@ def estimate_recipe(product):
     recipe_estimator = product["recipe_estimator"]
     recipe_estimator["status"] = 0
     recipe_estimator["status_message"] = solution.message
+    # Note that for some algorithms penalties won't be set to the value from the best solution, so call the objective function again to get it
+    objective(solution.x, penalties)
     recipe_estimator['penalties'] = penalties
     recipe_estimator["time"] = round(time.perf_counter() - current, 2)
     message = f"Product: {product.get('code')}, time: {recipe_estimator['time']} s, status: {solution.get('message')}, iterations: {solution.get('nit')}"
