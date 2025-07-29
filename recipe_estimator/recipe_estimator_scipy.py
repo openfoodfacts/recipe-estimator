@@ -55,7 +55,7 @@ def assign_penalty(
     return 0
 
 
-def get_objective_function(product):
+def get_objective_function_args(product):
     leaf_ingredient_count = prepare_nutrients(product, True)
     ingredients = product["ingredients"]
     recipe_estimator = product["recipe_estimator"]
@@ -216,160 +216,161 @@ def get_objective_function(product):
     # for i in range(0, leaf_ingredient_count * 2):
     #     total_mass_multipliers[i] = -1 if i % 2 else 1
 
-    NUTRIENT_WITHIN_BOUNDS_PENALTY = 10000
-    NUTRIENT_OUTSIDE_BOUNDS_PENALTY = 100000
-    INGREDIENT_BIGGER_THAN_PREVIOUS_PENALTY = 1000000
-    INGREDIENT_NOT_HALF_PREVIOUS_PENALTY = 10
-    TOTAL_MASS_LESS_THAN_100_PENALTY = 10000000
-    TOTAL_MASS_MORE_THAN_100_PENALTY = 100
+    args = [{}, product_nutrients, nutrient_ingredients, nutrient_weightings, ingredient_order_multipliers, leaf_ingredient_count]
+    return [bounds, leaf_ingredients, args]
 
-    # TODO: Try using quadratic / cubic penalty functions so that gradients are smoother and may be easier for optimizer to spot path to minimum
-    # TODO: Use matrix libraries for objective calculations to speed things up
-    def objective(ingredient_percentages, args):
-        nutrient_penalty = 0
 
-        for n, nutrient_total in enumerate(product_nutrients):
-            nom_nutrient_total_from_ingredients = 0
-            min_nutrient_total_from_ingredients = 0
-            max_nutrient_total_from_ingredients = 0
-            for i, nutrient_ingredient in enumerate(nutrient_ingredients[n]):
-                if nutrient_ingredient["conf"] != "-":
-                    nom_nutrient_total_from_ingredients += (
-                        ingredient_percentages[i] * nutrient_ingredient["nom"]
-                    )
-                    min_nutrient_total_from_ingredients += (
-                        ingredient_percentages[i] * nutrient_ingredient["min"]
-                    )
-                    max_nutrient_total_from_ingredients += (
-                        ingredient_percentages[i] * nutrient_ingredient["max"]
-                    )
+NUTRIENT_WITHIN_BOUNDS_PENALTY = 10000
+NUTRIENT_OUTSIDE_BOUNDS_PENALTY = 100000
+INGREDIENT_BIGGER_THAN_PREVIOUS_PENALTY = 1000000
+INGREDIENT_NOT_HALF_PREVIOUS_PENALTY = 10
+TOTAL_MASS_LESS_THAN_100_PENALTY = 10000000
+TOTAL_MASS_MORE_THAN_100_PENALTY = 100
 
-            # Factors need to quite large as the algorithms only make tiny changes to the variables to determine gradients
-            # TODO: Need to experiment with factors here
-            nutrient_penalty += nutrient_weightings[n] * assign_penalty(
-                nutrient_total,
-                nom_nutrient_total_from_ingredients,
-                NUTRIENT_WITHIN_BOUNDS_PENALTY,
-                min_nutrient_total_from_ingredients,
-                max_nutrient_total_from_ingredients,
-                NUTRIENT_OUTSIDE_BOUNDS_PENALTY,
-            )
+# TODO: Try using quadratic / cubic penalty functions so that gradients are smoother and may be easier for optimizer to spot path to minimum
+# TODO: Use matrix libraries for objective calculations to speed things up
+def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ingredients, nutrient_weightings, ingredient_order_multipliers, leaf_ingredient_count):
+    nutrient_penalty = 0
 
-        ingredient_not_half_previous_penalty = 0
-        ingredient_more_than_previous_penalty = 0
-        # Now add a penalty for the constraints
-        for multipliers in ingredient_order_multipliers:
-            previous_total = sum(
-                [
-                    ingredient_quantity * multipliers[n]
-                    for n, ingredient_quantity in enumerate(ingredient_percentages)
-                    if multipliers[n] > 0
-                ]
-            )
-            this_total = sum(
-                [
-                    ingredient_quantity * -(multipliers[n])
-                    for n, ingredient_quantity in enumerate(ingredient_percentages)
-                    if multipliers[n] < 0
-                ]
-            )
-            # In the absence of anything else we want this_total to be 50% of the previous_total so we apply a very small penalty
-            # for deviations from that. However, once this_total gets bigger than previous_total we want to apply a higher penalty
-
-            # penalty
-            #    ^                                        *
-            #    |        steep_gradient --------------> *
-            #    |                                      *
-            #    |                                     *
-            #    |                                    *
-            #    |                                   *
-            #    |                                  *
-            #    |*****                            *
-            #    |     ******                     *
-            #    |           ******        ******
-            #    |-----------------********------------------------------------------> this / parent
-            #                           ^        ^
-            #                          50%      100% (this >= parent)
-
-            if this_total < previous_total:
-                ingredient_not_half_previous_penalty += (
-                    abs(this_total - (previous_total * 0.5))
-                    * INGREDIENT_NOT_HALF_PREVIOUS_PENALTY
+    for n, nutrient_total in enumerate(product_nutrients):
+        nom_nutrient_total_from_ingredients = 0
+        min_nutrient_total_from_ingredients = 0
+        max_nutrient_total_from_ingredients = 0
+        for i, nutrient_ingredient in enumerate(nutrient_ingredients[n]):
+            if nutrient_ingredient["conf"] != "-":
+                nom_nutrient_total_from_ingredients += (
+                    ingredient_percentages[i] * nutrient_ingredient["nom"]
                 )
-            else:
-                # This is greater than previous. Add the above penalty for this = previous
-                ingredient_more_than_previous_penalty += (
-                    0.5 * this_total
-                ) * INGREDIENT_NOT_HALF_PREVIOUS_PENALTY
-                # And then add a steep gradient for percent above previous
-                ingredient_more_than_previous_penalty += (
-                    this_total - previous_total
-                ) * INGREDIENT_BIGGER_THAN_PREVIOUS_PENALTY
+                min_nutrient_total_from_ingredients += (
+                    ingredient_percentages[i] * nutrient_ingredient["min"]
+                )
+                max_nutrient_total_from_ingredients += (
+                    ingredient_percentages[i] * nutrient_ingredient["max"]
+                )
 
-        # for multipliers in water_loss_multipliers:
-        #     water_loss_test = sum([ingredient_quantity * multipliers[n] for n, ingredient_quantity in enumerate(ingredient_percentages)])
-        #     # If the test is negative (water loss is more than the expected maximum water content of the ingredient) then add a moderate penalty
-        #     if water_loss_test < 0:
-        #         penalty += (-water_loss_test) * 1000
+        # Factors need to quite large as the algorithms only make tiny changes to the variables to determine gradients
+        # TODO: Need to experiment with factors here
+        nutrient_penalty += nutrient_weightings[n] * assign_penalty(
+            nutrient_total,
+            nom_nutrient_total_from_ingredients,
+            NUTRIENT_WITHIN_BOUNDS_PENALTY,
+            min_nutrient_total_from_ingredients,
+            max_nutrient_total_from_ingredients,
+            NUTRIENT_OUTSIDE_BOUNDS_PENALTY,
+        )
 
-        # Total mass penalty. Scale by number of ingredients so in the same order as other penalties
-        total_mass = sum(ingredient_percentages)
-        mass_more_than_100_penalty = 0
-        mass_less_than_100_penalty = 0
-        if total_mass < 100:
-            # Add a high penalty as the total mass is less than 100g
-            mass_less_than_100_penalty += (
-                (100 - total_mass)
-                * TOTAL_MASS_LESS_THAN_100_PENALTY
-                * leaf_ingredient_count
+    ingredient_not_half_previous_penalty = 0
+    ingredient_more_than_previous_penalty = 0
+    # Now add a penalty for the constraints
+    for multipliers in ingredient_order_multipliers:
+        previous_total = sum(
+            [
+                ingredient_quantity * multipliers[n]
+                for n, ingredient_quantity in enumerate(ingredient_percentages)
+                if multipliers[n] > 0
+            ]
+        )
+        this_total = sum(
+            [
+                ingredient_quantity * -(multipliers[n])
+                for n, ingredient_quantity in enumerate(ingredient_percentages)
+                if multipliers[n] < 0
+            ]
+        )
+        # In the absence of anything else we want this_total to be 50% of the previous_total so we apply a very small penalty
+        # for deviations from that. However, once this_total gets bigger than previous_total we want to apply a higher penalty
+
+        # penalty
+        #    ^                                        *
+        #    |        steep_gradient --------------> *
+        #    |                                      *
+        #    |                                     *
+        #    |                                    *
+        #    |                                   *
+        #    |                                  *
+        #    |*****                            *
+        #    |     ******                     *
+        #    |           ******        ******
+        #    |-----------------********------------------------------------------> this / parent
+        #                           ^        ^
+        #                          50%      100% (this >= parent)
+
+        if this_total < previous_total:
+            ingredient_not_half_previous_penalty += (
+                abs(this_total - (previous_total * 0.5))
+                * INGREDIENT_NOT_HALF_PREVIOUS_PENALTY
             )
         else:
-            # Add a very small penalty as the mass increases above 100g
-            mass_more_than_100_penalty += (
-                (total_mass - 100)
-                * TOTAL_MASS_MORE_THAN_100_PENALTY
-                * leaf_ingredient_count
-            )
+            # This is greater than previous. Add the above penalty for this = previous
+            ingredient_more_than_previous_penalty += (
+                0.5 * this_total
+            ) * INGREDIENT_NOT_HALF_PREVIOUS_PENALTY
+            # And then add a steep gradient for percent above previous
+            ingredient_more_than_previous_penalty += (
+                this_total - previous_total
+            ) * INGREDIENT_BIGGER_THAN_PREVIOUS_PENALTY
 
-        # Although we could also model bounds using penalties the optimizers seem to work better if they have bounds
+    # for multipliers in water_loss_multipliers:
+    #     water_loss_test = sum([ingredient_quantity * multipliers[n] for n, ingredient_quantity in enumerate(ingredient_percentages)])
+    #     # If the test is negative (water loss is more than the expected maximum water content of the ingredient) then add a moderate penalty
+    #     if water_loss_test < 0:
+    #         penalty += (-water_loss_test) * 1000
 
-        # for n, maximum_percentage in enumerate(maximum_percentages):
-        #     if ingredient_percentages[n] < 0:
-        #         # Add a big penalty for negative ingredients
-        #         penalty += (-ingredient_percentages[n]) * 100000
-        #     if maximum_percentage and ingredient_percentages[n] > maximum_percentage:
-        #         # Add a moderate penalty if an ingredient is bigger than what we think it's maximum should be
-        #         penalty += (ingredient_percentages[n] - maximum_percentage) * 1000
-
-        penalty = (
-            nutrient_penalty
-            + ingredient_not_half_previous_penalty
-            + ingredient_more_than_previous_penalty
-            + mass_more_than_100_penalty
-            + mass_less_than_100_penalty
+    # Total mass penalty. Scale by number of ingredients so in the same order as other penalties
+    total_mass = sum(ingredient_percentages)
+    mass_more_than_100_penalty = 0
+    mass_less_than_100_penalty = 0
+    if total_mass < 100:
+        # Add a high penalty as the total mass is less than 100g
+        mass_less_than_100_penalty += (
+            (100 - total_mass)
+            * TOTAL_MASS_LESS_THAN_100_PENALTY
+            * leaf_ingredient_count
         )
-        # These are good for debugging and don't seem to but slow things down a lot
-        args["nutrient_penalty"] = nutrient_penalty
-        args["ingredient_not_half_previous_penalty"] = (
-            ingredient_not_half_previous_penalty
+    else:
+        # Add a very small penalty as the mass increases above 100g
+        mass_more_than_100_penalty += (
+            (total_mass - 100)
+            * TOTAL_MASS_MORE_THAN_100_PENALTY
+            * leaf_ingredient_count
         )
-        args["ingredient_more_than_previous_penalty"] = (
-            ingredient_more_than_previous_penalty
-        )
-        args["mass_more_than_100_penalty"] = mass_more_than_100_penalty
-        args["mass_less_than_100_penalty"] = mass_less_than_100_penalty
-        args["total"] = penalty
-        return penalty
 
-    return [objective, bounds, leaf_ingredients]
+    # Although we could also model bounds using penalties the optimizers seem to work better if they have bounds
+
+    # for n, maximum_percentage in enumerate(maximum_percentages):
+    #     if ingredient_percentages[n] < 0:
+    #         # Add a big penalty for negative ingredients
+    #         penalty += (-ingredient_percentages[n]) * 100000
+    #     if maximum_percentage and ingredient_percentages[n] > maximum_percentage:
+    #         # Add a moderate penalty if an ingredient is bigger than what we think it's maximum should be
+    #         penalty += (ingredient_percentages[n] - maximum_percentage) * 1000
+
+    penalty = (
+        nutrient_penalty
+        + ingredient_not_half_previous_penalty
+        + ingredient_more_than_previous_penalty
+        + mass_more_than_100_penalty
+        + mass_less_than_100_penalty
+    )
+    # These are good for debugging and don't seem to but slow things down a lot
+    penalties["nutrient_penalty"] = nutrient_penalty
+    penalties["ingredient_not_half_previous_penalty"] = (
+        ingredient_not_half_previous_penalty
+    )
+    penalties["ingredient_more_than_previous_penalty"] = (
+        ingredient_more_than_previous_penalty
+    )
+    penalties["mass_more_than_100_penalty"] = mass_more_than_100_penalty
+    penalties["mass_less_than_100_penalty"] = mass_less_than_100_penalty
+    penalties["total"] = penalty
+    return penalty
 
 
 # estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
 # The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
 def estimate_recipe(product):
     current = time.perf_counter()
-    [objective, bounds, leaf_ingredients] = get_objective_function(product)
-    penalties = {}
+    [bounds, leaf_ingredients, args] = get_objective_function_args(product)
     MAXITER = 5000
     x0 = [ingredient["initial_estimate"] for ingredient in leaf_ingredients]
 
@@ -423,11 +424,12 @@ def estimate_recipe(product):
     solution = differential_evolution(
         objective,
         bounds,
-        args=[penalties],
+        args=args,
         x0=x0,
         polish=False, # Don't polish results to help with performance
         rng=0, # Seed random number generator so we get consistent results between tests
-        # workers=-1, # Can't use this at the moment as the objective function needs to be top level "picklable"
+        workers=-1 if len(leaf_ingredients) > 10 else 1, # Gives a bit of an improvement with more complex products but not worth it for simple ones
+        updating='deferred', # Need to set this if we are going to set workers
         # popsize=100, # Default is 15. Increasing this really slows things down
         # init='sobol', # Changing this didn't seem to make much difference
         tol=0.001, # Needed a lower value here to pass tests. Didn't seem to affect performance much
@@ -477,8 +479,8 @@ def estimate_recipe(product):
     recipe_estimator["status"] = 0
     recipe_estimator["status_message"] = solution.message
     # Note that for some algorithms penalties won't be set to the value from the best solution, so call the objective function again to get it
-    objective(solution.x, penalties)
-    recipe_estimator['penalties'] = penalties
+    objective(solution.x, *args)
+    recipe_estimator['penalties'] = args[0]
     recipe_estimator["time"] = round(time.perf_counter() - current, 2)
     message = f"Product: {product.get('code')}, time: {recipe_estimator['time']} s, status: {solution.get('message')}, iterations: {solution.get('nit')}"
     if solution.success and solution.get("nit", 0) < MAXITER:
