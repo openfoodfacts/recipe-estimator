@@ -69,6 +69,7 @@ export default function Recipe({product}: RecipeProps) {
         Object.entries(results.recipe_estimator.nutrients).filter(
            ([key, val])=>(val as any).product_total > 0
         )));
+      setPenalties(results.recipe_estimator.penalties)
       setAlgorithm(scipy)
     }
     fetchData();
@@ -176,6 +177,47 @@ export default function Recipe({product}: RecipeProps) {
 
   return (
     <div>
+      <Table size='small' sx={{'& .MuiTableCell-sizeSmall': {padding: '1px 4px'}}}>
+        <TableBody>
+          <TableRow>
+            <TableCell>
+              <Typography>
+                {product.product_name} (
+                <a
+                  href={`https://world.openfoodfacts.org/product/${product.code}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {product.code}
+                </a>
+                )
+              </Typography>
+              <Typography>{product.ingredients_text}</Typography>
+            </TableCell>
+            <TableCell>
+              <Button variant={algorithm ? 'outlined' : 'contained'} onClick={()=>recalculateRecipe(false)}>GLOP</Button>
+              &nbsp;
+              <Button variant={algorithm ? 'contained' : 'outlined'} onClick={()=>recalculateRecipe(true)}>SciPy</Button>
+            </TableCell>
+            <TableCell>
+              <Table size='small' sx={{'& .MuiTableCell-sizeSmall': {padding: '1px 4px'}}}>
+                <TableBody>
+                  {penalties && Object.keys(penalties).map((penalty_key: string) => (
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="caption">{penalty_key}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="caption">{penalties[penalty_key]}</Typography>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
       {nutrients && ingredients &&
         <div>
             <Table size='small' stickyHeader sx={{'& .MuiTableCell-sizeSmall': {padding: '1px 4px'}}}>
@@ -213,13 +255,8 @@ export default function Recipe({product}: RecipeProps) {
                   ))}
                 </TableRow>
                 <TableRow className='total'>
-                  <TableCell>
+                  <TableCell colSpan={2}>
                     <Typography>Variance</Typography>
-                  </TableCell>
-                  <TableCell padding='normal'>
-                    <Button variant={algorithm ? 'outlined' : 'contained'} onClick={()=>recalculateRecipe(false)}>GLOP</Button>
-                    &nbsp;
-                    <Button variant={algorithm ? 'contained' : 'outlined'} onClick={()=>recalculateRecipe(true)}>SciPy</Button>
                   </TableCell>
                   <TableCell colSpan={2}>
                     <Typography variant="caption">Weighted</Typography>
