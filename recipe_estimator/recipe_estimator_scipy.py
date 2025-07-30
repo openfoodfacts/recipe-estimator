@@ -1,6 +1,7 @@
 import sys
 import time
 import warnings
+import numpy as np
 from scipy.optimize import (
     minimize,
     dual_annealing,
@@ -76,7 +77,8 @@ def get_objective_function_args(product):
 
     # Leaf ingredients are those that do not have sub-ingredients.
     leaf_ingredients = []
-    ingredient_order_multipliers = []
+    ingredient_order_previous_multipliers = []
+    ingredient_order_this_multipliers = []
     water_loss_multipliers = []
     bounds = []
 
@@ -91,22 +93,25 @@ def get_objective_function_args(product):
         start_of_previous_parent, leaf_ingredient_index, sub_ingredient_count
     ):
         # return { 'type': 'ineq', 'fun': lambda x: sum(x[previous_start : this_start : 2]) - sum(x[this_start : this_start + this_count * 2 : 2])}
-        ingredient_multipliers = [0] * leaf_ingredient_count
+        previous_ingredient_multipliers = [0] * leaf_ingredient_count
+        next_ingredient_multipliers = [0] * leaf_ingredient_count
         for i in range(0, leaf_ingredient_count):
             if i >= start_of_previous_parent and i < leaf_ingredient_index:
-                ingredient_multipliers[i] = 1
+                previous_ingredient_multipliers[i] = 1
             if (
                 i >= leaf_ingredient_index
                 and i < leaf_ingredient_index + sub_ingredient_count
             ):
-                ingredient_multipliers[i] = -1
-        return ingredient_multipliers
+                next_ingredient_multipliers[i] = 1
+        return [previous_ingredient_multipliers, next_ingredient_multipliers]
 
     # Prepare nutrients information in arrays for fast objective function
     nutrient_names = []
     product_nutrients = []
     # Following is an array of nutrients each containing an array of data for that nutrient for each ingredient (not including the lost water leaves)
-    nutrient_ingredients = []
+    nutrient_ingredients_nom = []
+    nutrient_ingredients_min = []
+    nutrient_ingredients_max = []
     nutrient_weightings = []
     for nutrient_key in nutrients:
         nutrient = nutrients[nutrient_key]
@@ -120,7 +125,9 @@ def get_objective_function_args(product):
         nutrient_names.append(nutrient_key)
         product_nutrients.append(nutrient["product_total"])
         nutrient_weightings.append(weighting)
-        nutrient_ingredients.append([])
+        nutrient_ingredients_nom.append([])
+        nutrient_ingredients_min.append([])
+        nutrient_ingredients_max.append([])
 
     def add_ingredients(
         ingredients, parent_estimate, parent_min_percent, parent_max_percent
@@ -179,35 +186,25 @@ def get_objective_function_args(product):
                 for n, nutrient_key in enumerate(nutrient_names):
                     ingredient_nutrient = ingredient["nutrients"].get(nutrient_key)
                     if ingredient_nutrient:
-                        nutrient_ingredients[n].append(
-                            {
-                                "conf": ingredient_nutrient.get("confidence", "?"),
-                                "nom": ingredient_nutrient["percent_nom"] / 100,
-                                "min": ingredient_nutrient["percent_min"] / 100,
-                                "max": ingredient_nutrient["percent_max"] / 100,
-                            }
-                        )
+                        nutrient_ingredients_nom[n].append(ingredient_nutrient["percent_nom"] / 100)
+                        nutrient_ingredients_min[n].append(ingredient_nutrient["percent_min"] / 100)
+                        nutrient_ingredients_max[n].append(ingredient_nutrient["percent_max"] / 100)
                     else:
                         # Allow unknown nutrients to vary between 0 and 100% with a preference for 0
-                        nutrient_ingredients[n].append(
-                            {
-                                "conf": "?",
-                                "nom": 0,
-                                "min": 0,
-                                "max": 1,
-                            }
-                        )
+                        nutrient_ingredients_nom[n].append(0)
+                        nutrient_ingredients_min[n].append(0)
+                        nutrient_ingredients_max[n].append(1)
 
             # Set order constraint
             if i > 0:
                 # Sum of children must be less than previous ingredient (or sum of its children)
-                ingredient_order_multipliers.append(
-                    ingredient_order_constraint(
+                [previous_ingredient_multipliers, next_ingredient_multipliers] = ingredient_order_constraint(
                         start_of_previous_parent,
                         leaf_ingredient_index,
                         sub_ingredient_count,
                     )
-                )
+                ingredient_order_previous_multipliers.append(previous_ingredient_multipliers)
+                ingredient_order_this_multipliers.append(next_ingredient_multipliers)
 
             initial_estimate /= 2
             leaf_ingredients_added += sub_ingredient_count
@@ -229,7 +226,7 @@ def get_objective_function_args(product):
     # for i in range(0, leaf_ingredient_count * 2):
     #     total_mass_multipliers[i] = -1 if i % 2 else 1
 
-    args = [{}, product_nutrients, nutrient_ingredients, nutrient_weightings, ingredient_order_multipliers, leaf_ingredient_count]
+    args = [{}, np.array(product_nutrients), np.array(nutrient_ingredients_nom), np.array(nutrient_ingredients_min), np.array(nutrient_ingredients_max), np.array(nutrient_weightings), np.array(ingredient_order_previous_multipliers), np.array(ingredient_order_this_multipliers), leaf_ingredient_count]
     return [bounds, leaf_ingredients, args]
 
 
@@ -242,23 +239,13 @@ TOTAL_MASS_MORE_THAN_100_PENALTY = 100
 
 # TODO: Try using quadratic / cubic penalty functions so that gradients are smoother and may be easier for optimizer to spot path to minimum
 # TODO: Use matrix libraries for objective calculations to speed things up
-def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ingredients, nutrient_weightings, ingredient_order_multipliers, leaf_ingredient_count):
+def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ingredients_nom, nutrient_ingredients_min, nutrient_ingredients_max, nutrient_weightings, ingredient_order_previous_multipliers, ingredient_order_this_multipliers, leaf_ingredient_count):
     nutrient_penalty = 0
 
     for n, nutrient_total in enumerate(product_nutrients):
-        nom_nutrient_total_from_ingredients = 0
-        min_nutrient_total_from_ingredients = 0
-        max_nutrient_total_from_ingredients = 0
-        for i, nutrient_ingredient in enumerate(nutrient_ingredients[n]):
-            nom_nutrient_total_from_ingredients += (
-                ingredient_percentages[i] * nutrient_ingredient["nom"]
-            )
-            min_nutrient_total_from_ingredients += (
-                ingredient_percentages[i] * nutrient_ingredient["min"]
-            )
-            max_nutrient_total_from_ingredients += (
-                ingredient_percentages[i] * nutrient_ingredient["max"]
-            )
+        nom_nutrient_total_from_ingredients = (ingredient_percentages * nutrient_ingredients_nom[n]).sum()
+        min_nutrient_total_from_ingredients = (ingredient_percentages * nutrient_ingredients_min[n]).sum()
+        max_nutrient_total_from_ingredients = (ingredient_percentages * nutrient_ingredients_max[n]).sum()
 
         # Factors need to quite large as the algorithms only make tiny changes to the variables to determine gradients
         # TODO: Need to experiment with factors here
@@ -274,21 +261,9 @@ def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ing
     ingredient_not_half_previous_penalty = 0
     ingredient_more_than_previous_penalty = 0
     # Now add a penalty for the constraints
-    for multipliers in ingredient_order_multipliers:
-        previous_total = sum(
-            [
-                ingredient_quantity * multipliers[n]
-                for n, ingredient_quantity in enumerate(ingredient_percentages)
-                if multipliers[n] > 0
-            ]
-        )
-        this_total = sum(
-            [
-                ingredient_quantity * -(multipliers[n])
-                for n, ingredient_quantity in enumerate(ingredient_percentages)
-                if multipliers[n] < 0
-            ]
-        )
+    for n, previous_multipliers in enumerate(ingredient_order_previous_multipliers):
+        previous_total = (previous_multipliers * ingredient_percentages).sum()
+        this_total = (ingredient_order_this_multipliers[n] * ingredient_percentages).sum()
         # In the absence of anything else we want this_total to be 50% of the previous_total so we apply a very small penalty
         # for deviations from that. However, once this_total gets bigger than previous_total we want to apply a higher penalty
 
