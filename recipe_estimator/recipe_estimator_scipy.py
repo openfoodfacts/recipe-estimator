@@ -190,10 +190,11 @@ def get_objective_function_args(product):
                         nutrient_ingredients_min[n].append(ingredient_nutrient["percent_min"] / 100)
                         nutrient_ingredients_max[n].append(ingredient_nutrient["percent_max"] / 100)
                     else:
-                        # Allow unknown nutrients to vary between 0 and 100% with a preference for 0
+                        # Treat unknown nutrients as having 0% of each nutrient
+                        # TODO: Might be able to refine this, e.g. use a nominal small value appropriate to the nutrient type
                         nutrient_ingredients_nom[n].append(0)
                         nutrient_ingredients_min[n].append(0)
-                        nutrient_ingredients_max[n].append(1)
+                        nutrient_ingredients_max[n].append(0)
 
             # Set order constraint
             if i > 0:
@@ -408,7 +409,6 @@ def estimate_recipe(product):
     #     minimizer_kwargs={"method": "SLSQP", "bounds": bounds},
     # )
 
-    # Problem with: fr-1000-some-specified-popular/5038862134729.json
     solution = differential_evolution(
         objective,
         bounds,
