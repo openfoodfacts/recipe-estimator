@@ -207,9 +207,14 @@ def get_objective_function_args(product):
         return leaf_ingredients_added
 
     add_ingredients(ingredients, 100, 100, 100)
-    if len(bounds) == 1 and bounds[0][1] == 100:
-        # If there is only one ingredient with no known water content the bounds will be 100, 100 which the optimizer doesn't like, so fudge the max a bit
-        bounds[0][1] = 105
+    if len(bounds) == 1:
+        if bounds[0][1] == 100:
+            # If there is only one ingredient with no known water content the bounds will be 100, 100 which the optimizer doesn't like, so fudge the max a bit
+            bounds[0][1] = 105
+        else:
+            # Can get issues where rounding inside the algorithm makes the initial guess outside of bounds
+            # So tweak the lower bound very slightly
+            bounds[0][0] = 100 - 1e-10
 
     # # Total mass of all ingredients less all lost water must be 100g
     # total_mass_multipliers = [0] * leaf_ingredient_count * 2
@@ -421,6 +426,7 @@ def estimate_recipe(product):
     #     minimizer_kwargs={"method": "SLSQP", "bounds": bounds},
     # )
 
+    # Problem with: fr-1000-some-specified-popular/5038862134729.json
     solution = differential_evolution(
         objective,
         bounds,

@@ -512,7 +512,11 @@ def test_one_unknown_ingredient():
         'code': 'test', 
         'ingredients': [{
             'id':'en:tomato',
-            'nutrients': {}
+            'nutrients': {
+                'water': {
+                    'percent_nom': 88.2, # Picked this number as it seems to give an out of bounds error due to rounding
+                }
+            }
         }],
         'nutriments': {
             'fiber_100g': 5,
