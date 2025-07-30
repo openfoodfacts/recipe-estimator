@@ -162,11 +162,12 @@ def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint,
             add_nutrient_distance(ingredient_numvar['child_numvars'], nutrient_key, positive_constraint, negative_constraint, weighting)
         else:
             # TODO: Figure out whether to do anything special with < ...
-            ingredient_nutrient =  ingredient['nutrients'][nutrient_key]
+            # Currently treat unknown nutrients as zero percent
+            ingredient_nutrient_percent =  ingredient['nutrients'].get(nutrient_key, {}).get('percent_nom', 0)
             #print(ingredient['indent'] + ' - ' + ingredient['text'] + ' (' + ingredient['ciqual_code'] + ') : ' + str(ingredient_nutrient))
-            print("nutrient_distance:", ingredient['id'], nutrient_key, ingredient_nutrient['percent_nom'])
-            negative_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_nom'] / 100)
-            positive_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_nom'] / 100)
+            print("nutrient_distance:", ingredient['id'], nutrient_key, ingredient_nutrient_percent)
+            negative_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient_percent / 100)
+            positive_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient_percent / 100)
 
 
 # Add an objective to minimize the difference between the quantity of each ingredient and the next ingredient (and 0 for the last ingredient)

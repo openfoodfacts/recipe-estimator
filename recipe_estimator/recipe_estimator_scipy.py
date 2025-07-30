@@ -188,7 +188,15 @@ def get_objective_function_args(product):
                             }
                         )
                     else:
-                        nutrient_ingredients[n].append({"conf": "-"})
+                        # Allow unknown nutrients to vary between 0 and 100% with a preference for 0
+                        nutrient_ingredients[n].append(
+                            {
+                                "conf": "?",
+                                "nom": 0,
+                                "min": 0,
+                                "max": 1,
+                            }
+                        )
 
             # Set order constraint
             if i > 0:
@@ -242,16 +250,15 @@ def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ing
         min_nutrient_total_from_ingredients = 0
         max_nutrient_total_from_ingredients = 0
         for i, nutrient_ingredient in enumerate(nutrient_ingredients[n]):
-            if nutrient_ingredient["conf"] != "-":
-                nom_nutrient_total_from_ingredients += (
-                    ingredient_percentages[i] * nutrient_ingredient["nom"]
-                )
-                min_nutrient_total_from_ingredients += (
-                    ingredient_percentages[i] * nutrient_ingredient["min"]
-                )
-                max_nutrient_total_from_ingredients += (
-                    ingredient_percentages[i] * nutrient_ingredient["max"]
-                )
+            nom_nutrient_total_from_ingredients += (
+                ingredient_percentages[i] * nutrient_ingredient["nom"]
+            )
+            min_nutrient_total_from_ingredients += (
+                ingredient_percentages[i] * nutrient_ingredient["min"]
+            )
+            max_nutrient_total_from_ingredients += (
+                ingredient_percentages[i] * nutrient_ingredient["max"]
+            )
 
         # Factors need to quite large as the algorithms only make tiny changes to the variables to determine gradients
         # TODO: Need to experiment with factors here

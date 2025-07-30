@@ -63,6 +63,7 @@ export default function Recipe({product}: RecipeProps) {
     if (!product || !product.ingredients)
       return;
     async function fetchData() {
+      setIngredients(null);
       const results = await (await fetch(`${API_PATH}api/v3/estimate_recipe${scipy ? '_scipy' : ''}`, {method: 'POST', body: JSON.stringify(product)})).json();
       setIngredients(results.ingredients);
       setNutrients(Object.fromEntries(
@@ -318,7 +319,6 @@ export default function Recipe({product}: RecipeProps) {
                           </Typography>
                           <Typography variant="body1">{format(ingredient.quantity_estimate * ingredient.nutrients?.[nutrient].percent_nom / 100, QUANTITY)}</Typography>
                         </> : <>
-                          <Typography variant="caption">[-]</Typography>
                           <Typography variant="body1">?</Typography>
                         </>)
                       }
