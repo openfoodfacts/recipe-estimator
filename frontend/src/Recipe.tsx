@@ -249,22 +249,28 @@ export default function Recipe({product}: RecipeProps) {
                   <TableCell><Typography align='center'>{format(getTotal('_percent'), PERCENT)}</Typography></TableCell>
                   {Object.keys(nutrients).map((nutrient_key: string) => (
                     <TableCell key={nutrient_key}>
-                        <Typography variant="caption">{format(getTotal(nutrient_key, 'min'), QUANTITY)}</Typography>
+                        <Typography variant="caption">{format(getTotal(nutrient_key, 'min'), QUANTITY)}&lt;{format(getTotal(nutrient_key, 'max'), QUANTITY)}</Typography>
                         <Typography variant="body1">{format(getTotal(nutrient_key), QUANTITY)}</Typography>
-                        <Typography variant="caption">{format(getTotal(nutrient_key, 'max'), QUANTITY)}</Typography>
                     </TableCell>
                   ))}
                 </TableRow>
                 <TableRow className='total'>
-                  <TableCell colSpan={2}>
-                    <Typography>Variance</Typography>
+                  <TableCell>
+                    <Typography>Difference</Typography>
                   </TableCell>
-                  <TableCell colSpan={2}>
-                    <Typography variant="caption">Weighted</Typography>
+                  <TableCell>
+                    <Typography variant="caption">Unweighted</Typography>
+                    <Typography>Weighted</Typography>
+                  </TableCell>
+                  <TableCell  colSpan={2}>
+                    <Typography variant="caption">{format(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
+                    total + (!nutrients[nutrient_key].notes 
+                      ? Math.abs(getTotal(nutrient_key)- nutrients[nutrient_key].product_total)
+                      : 0), 0), QUANTITY)}</Typography>
                     <Typography>{format(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
                     total + (!nutrients[nutrient_key].notes 
-                      ? nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total) ** 2
-                      : 0), 0), VARIANCE)}
+                      ? nutrients[nutrient_key].weighting * Math.abs(getTotal(nutrient_key)- nutrients[nutrient_key].product_total)
+                      : 0), 0), QUANTITY)}
                     </Typography>
                   </TableCell>
                   {Object.keys(nutrients).map((nutrient_key: string) => (

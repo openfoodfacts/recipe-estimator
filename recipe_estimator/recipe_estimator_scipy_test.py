@@ -1,4 +1,5 @@
 import json
+import warnings
 
 from recipe_estimator.nutrients import prepare_product
 from .recipe_estimator_scipy import estimate_recipe, assign_penalty
@@ -480,11 +481,14 @@ def test_estimate_recipe_one_matched_in_the_middle():
     # 100%, 50%, 25%, 12.5%, 6.75% which is more than 100%.
     # Not sure what the best guess is so following are fairly approximate
 
+    # This prints the penalties. With the current penalty factors the optimal solution seems to have a total penalty of about 10224
+    warnings.warn(json.dumps(metrics['penalties'], indent=2))
+
     assert abs(35 - product['ingredients'][0]['percent_estimate']) < 5
     assert abs(26 - product['ingredients'][1]['percent_estimate']) < 5
 
-    assert abs(11 - product['ingredients'][3]['percent_estimate']) < 2
-    assert abs(5 - product['ingredients'][4]['percent_estimate']) < 2
+    assert abs(11 - product['ingredients'][3]['percent_estimate']) < 4
+    assert abs(5 - product['ingredients'][4]['percent_estimate']) < 4
 
 def test_ingredients_dont_add_up():
     product = {

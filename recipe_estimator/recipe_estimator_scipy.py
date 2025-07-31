@@ -356,28 +356,29 @@ def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ing
 
 # estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
 # The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
+# A lot of manual testing was done with product 20023751 which seems to have a lot of local minima.
+# The optimal solution for this product has a total penalty of about 130900
 def estimate_recipe(product):
     current = time.perf_counter()
     [bounds, leaf_ingredients, args] = get_objective_function_args(product)
     MAXITER = 5000
     x0 = [ingredient["initial_estimate"] for ingredient in leaf_ingredients]
 
-    # constraints = [
-    #     LinearConstraint(A, lb=0)
-    #     for A in ingredient_order_multipliers + water_loss_multipliers
-    # ]
-    # # For COBYLA can't use eq constraint
-    # constraints.append(LinearConstraint(total_mass_multipliers, lb=99.99, ub=100.01))
+    # Some of the global optimizers don't pass args easily
+    def local_objective(x):
+        return objective(x, *args)
 
-    # COBYQA is very slow
-    # solution = minimize(objective,x,method='COBYLA',bounds=bounds,constraints=cons,options={'maxiter': 10000})
+    # Simple optimization not able to get past local minima
     # solution = minimize(
-    #     objective,
-    #     leaf_ingredients,
+    #     local_objective,
+    #     x0=x0,
     #     method="SLSQP",
     #     bounds=bounds,
     #     # constraints=constraints,
     # )  # Fastest
+
+    # COBYQA is very slow
+    # solution = minimize(objective,x,method='COBYLA',bounds=bounds,constraints=cons,options={'maxiter': 10000})
 
     # solution = minimize(
     #     objective,
@@ -388,51 +389,83 @@ def estimate_recipe(product):
     # )  # Fastest
 
     # solution = minimize(objective,x,method='trust-constr',bounds=bounds,constraints=cons)
+
     # May need to consider using global minimization as the objective function is probably not convex
 
-    # solution = shgo(objective, bounds=bounds, minimizer_kwargs={'method': 'SLSQP', 'bounds': bounds})
-
-    # solution = dual_annealing(
-    #     objective,
+    # # Doesn't get close to passing most tests
+    # solution = shgo(
+    #     local_objective,
     #     bounds=bounds,
-    #     x0=leaf_ingredients,
+    #     # options={
+    #     #     'f_min': 0
+    #     # }
+    #     minimizer_kwargs={'method': 'L-BFGS-B'}
+    # )
+
+    # # Not bad but still not as good as differential_evolution
+    # solution = dual_annealing(
+    #     local_objective,
+    #     bounds=bounds,
+    #     x0=x0,
+    #     rng=0,
     #     maxiter=1000,
-    #     # initial_temp=100,
-    #     visit=1.5, # This was found by trial and error
-    #     # no_local_search=True,
-    #     minimizer_kwargs={"method": "SLSQP", "bounds": bounds},
+    #     # initial_temp=10000,
+    #     # visit=2, # Default seems to work best
+    #     # no_local_search=True, # Makes things a bit faster, but less optimal
+    #     # L-BFGS-B (default): 53s but close to optimal. Down to 20s with 100 iterations
+    #     # COBYLA: 17s and less optimal
+    #     # SLSQP: 85s and not optimal
+    #     minimizer_kwargs={"method": "L-BFGS-B"},
     # )
 
+    # # COBYLA seemed to be the best minimizer to use with this and gave OK results on 20023751 130900
+    # # but didn't pass tests
     # solution = basinhopping(
-    #     objective,
-    #     x0=leaf_ingredients,
-    #     minimizer_kwargs={"method": "SLSQP", "bounds": bounds},
+    #     local_objective,
+    #     x0=x0,
+    #     rng=0, # Seed random number generation to get consistent results between runs
+    #     # niter=100, # Increasing slowed down but didn't massively improve results
+    #     # stepsize=0.1, # Default of 0.5 seemed to work best
+    #     # T=10, # Can't seem to improve on the default
+    #     # target_accept_rate=0.9, # Changing this didn't seem to help much
+    #     # stepwise_factor=0.3, # Bit of trial and error to get this
+    #     # Tried the following minimizers without changing specific arguments on product 20023751
+    #     # Nelder-Mead: 71s and not optimal.
+    #     # L-BFGS-B: 211s but a bit more optimal
+    #     # COBYLA: 7s and reasonably optimal
+    #     # COBYQA: 233s and a bit less optimal
+    #     # SLSQP: 1.4s but not close to optimal
+    #     # trust-constr: 494s but was optimal
+        
+    #     minimizer_kwargs={"method": "COBYLA", "bounds": bounds},
     # )
 
+    # This seems to give optimum results but can take some time
     solution = differential_evolution(
         objective,
         bounds,
         args=args,
         x0=x0,
-        polish=False, # Don't polish results to help with performance
+        polish=False, # Don't polish results to help with performance. Results are only slightly less optimal
         rng=0, # Seed random number generator so we get consistent results between tests
         workers=-1 if len(leaf_ingredients) > 10 else 1, # Gives a bit of an improvement with more complex products but not worth it for simple ones
         updating='deferred', # Need to set this if we are going to set workers
-        # popsize=100, # Default is 15. Increasing this really slows things down
+        # popsize=10, # Default is 15. Increasing this really slows things down
         # init='sobol', # Changing this didn't seem to make much difference
         tol=0.001, # Needed a lower value here to pass tests. Didn't seem to affect performance much
-        atol=1, # Going higher than 1 seems to break tests
+        atol=2, # Going much higher seems to break tests
         # mutation=(1.5, 1.9), # Tried increasing this but gave poor results
-        recombination=0.89 # Higher values seem to improve performance. This was highest I could go and still pass tests
+        recombination=0.88 # Higher values seem to improve performance. This was highest I could go and still pass tests
     )
 
-    # # DIRECT algorithm seems to cope best with our non-linear objective functions and the potentially large number of local minima
-    # # It also gives consistent results where other algorithms use randomization a lot which gives different results from one run to the next
+    # # Initially thought this was promising but was not finding optimal solution in a number of cases
+    # # Gives consistent results where other algorithms use randomization a lot which gives different results from one run to the next
+    # # but can get around this by seeding the random number generator in other algorithms
     # # For details of arguments see: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.direct.html
     # solution = direct(
     #     objective,
     #     bounds,
-    #     args=[penalties],
+    #     args=args,
     #     eps=0.01,  # Bit of trial and error here but going too much higher seems to find the wrong local minimum
     #     locally_biased=False,  # False is recommended for problems with lots of local minima. True passes tests but is less good for real life recipes
     #     f_min=0,  # Global minimum. Our objective function will never go negative
