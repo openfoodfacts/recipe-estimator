@@ -1,6 +1,8 @@
 import time  
 from ortools.linear_solver import pywraplp
 
+from .fitness import get_objective_function_args, objective as objective_function
+
 from .prepare_nutrients import prepare_nutrients
 
 precision = 0.01
@@ -312,5 +314,12 @@ def estimate_recipe(product):
     recipe_estimator['iterations'] = solver.iterations()
 
     print('Time spent in solver: ', recipe_estimator['time'], 'seconds')
+
+    # Calculate objective function so we can compare with SciPy
+    [_, leaf_ingredients, args] = get_objective_function_args(product)
+    quantities = [float(ingredient['quantity_estimate']) for ingredient in leaf_ingredients]
+    objective_function(quantities, *args)
+    recipe_estimator['penalties'] = args[0]
+
 
     return status

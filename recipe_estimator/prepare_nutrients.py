@@ -80,6 +80,8 @@ def assign_weightings(product, scipy):
 def prepare_nutrients(product, scipy = False):
     nutrients = {}
     count = count_ingredients(product['ingredients'], nutrients)
-    product['recipe_estimator'] = {'nutrients':nutrients, 'ingredient_count': count}
+    recipe_estimator = product.setdefault('recipe_estimator', {})
+    recipe_estimator['nutrients'] = nutrients
+    recipe_estimator['ingredient_count'] = count
     assign_weightings(product, scipy)
     return count

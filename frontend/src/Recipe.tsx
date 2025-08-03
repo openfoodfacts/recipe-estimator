@@ -104,13 +104,9 @@ export default function Recipe({product}: RecipeProps) {
   }
 
   function ingredientsEdited() {
-    if (algorithm) {
-      // Re-evaluate objective function if we are using SciPy
-      product.ingredients = ingredients;
-      refreshPenalties(product);
-    } else {
-      setIngredients([...ingredients]);
-    }
+    // Re-evaluate objective function
+    product.ingredients = ingredients;
+    refreshPenalties(product);
   }
 
   function getTotalForParent(nutrient_key: string, parent: any[], bound: string) {
@@ -259,17 +255,17 @@ export default function Recipe({product}: RecipeProps) {
                     <Typography>Difference</Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="caption">Unweighted</Typography>
-                    <Typography>Weighted</Typography>
+                    <Typography variant="caption">Unweighted variance</Typography>
+                    <Typography>Weighted variance</Typography>
                   </TableCell>
-                  <TableCell  colSpan={2}>
+                  <TableCell colSpan={2}>
                     <Typography variant="caption">{format(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
                     total + (!nutrients[nutrient_key].notes 
-                      ? Math.abs(getTotal(nutrient_key)- nutrients[nutrient_key].product_total)
+                      ? (getTotal(nutrient_key)- nutrients[nutrient_key].product_total) ** 2
                       : 0), 0), QUANTITY)}</Typography>
                     <Typography>{format(Object.keys(nutrients).reduce((total: number,nutrient_key: any) => 
                     total + (!nutrients[nutrient_key].notes 
-                      ? nutrients[nutrient_key].weighting * Math.abs(getTotal(nutrient_key)- nutrients[nutrient_key].product_total)
+                      ? nutrients[nutrient_key].weighting * (getTotal(nutrient_key)- nutrients[nutrient_key].product_total) ** 2
                       : 0), 0), QUANTITY)}
                     </Typography>
                   </TableCell>
