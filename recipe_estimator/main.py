@@ -6,7 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from .nutrients import ciqual_ingredients, prepare_product
 from .product import get_product
 from .recipe_estimator import estimate_recipe
-from .recipe_estimator_scipy import estimate_recipe as estimate_recipe_scipy, get_objective_function_args, objective
+from .recipe_estimator_scipy import estimate_recipe as estimate_recipe_scipy
+from .fitness import get_objective_function_args, objective
 
 app = FastAPI()
 
