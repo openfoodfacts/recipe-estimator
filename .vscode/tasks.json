@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "austin",
+            "args": [
+                "python",
+                "-m",
+                "recipe_estimator.main_test",
+            ],
+            "label": "Profile main_test.py",
+        }
+    ]
+}
