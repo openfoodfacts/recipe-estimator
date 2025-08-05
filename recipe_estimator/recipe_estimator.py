@@ -1,4 +1,5 @@
 import time  
+import numpy as np
 from ortools.linear_solver import pywraplp
 
 from .fitness import get_objective_function_args, objective as objective_function
@@ -317,7 +318,7 @@ def estimate_recipe(product):
 
     # Calculate objective function so we can compare with SciPy
     [_, leaf_ingredients, args] = get_objective_function_args(product)
-    quantities = [float(ingredient['quantity_estimate']) for ingredient in leaf_ingredients]
+    quantities = np.array([float(ingredient['quantity_estimate']) for ingredient in leaf_ingredients])
     objective_function(quantities, *args)
     recipe_estimator['penalties'] = args[0]
 

@@ -105,14 +105,18 @@ def estimate_recipe(product):
         x0=x0,
         polish=False, # Don't polish results to help with performance. Results are only slightly less optimal
         rng=0, # Seed random number generator so we get consistent results between tests
-        workers=-1 if len(leaf_ingredients) > 10 else 1, # Gives a bit of an improvement with more complex products but not worth it for simple ones
+        workers=-1 if len(leaf_ingredients) > 20 else 1, # Gives a bit of an improvement with more complex products but not worth it for simple ones
         updating='deferred', # Need to set this if we are going to set workers
         # popsize=10, # Default is 15. Increasing this really slows things down
         # init='sobol', # Changing this didn't seem to make much difference
-        tol=0.001, # Needed a lower value here to pass tests. Didn't seem to affect performance much
-        atol=2, # Going much higher seems to break tests
+        # Following three seem to work together. Approach to set them was as follows:
+        # 1. set atol to 0 and recombination to 0.8 then find the maximum value of tol that passes tests
+        # 2. increase atol to the maximum size before tests start to fail again
+        # 3. increase recombination to the maximum size before tests start to fail again
+        tol=0.0004,
+        atol=9,
+        recombination=0.93 # Higher values seem to improve performance. This was highest I could go and still pass tests
         # mutation=(1.5, 1.9), # Tried increasing this but gave poor results
-        recombination=0.88 # Higher values seem to improve performance. This was highest I could go and still pass tests
     )
 
     # # Initially thought this was promising but was not finding optimal solution in a number of cases
