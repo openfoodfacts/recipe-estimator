@@ -109,13 +109,11 @@ def estimate_recipe(product):
         updating='deferred', # Need to set this if we are going to set workers
         # popsize=10, # Default is 15. Increasing this really slows things down
         # init='sobol', # Changing this didn't seem to make much difference
-        # Following three seem to work together. Approach to set them was as follows:
-        # 1. set atol to 0 and recombination to 0.8 then find the maximum value of tol that passes tests
-        # 2. increase atol to the maximum size before tests start to fail again
-        # 3. increase recombination to the maximum size before tests start to fail again
-        tol=0.0004,
-        atol=9,
-        recombination=0.93 # Higher values seem to improve performance. This was highest I could go and still pass tests
+        # Following three seem to work together. Values were trial and error
+        # Aiming to get best performance while still passing tests
+        tol=0.01, # Much higher than this seems to give poor results on real products
+        atol=100, # Has a marginal impact on accuracy and performance
+        recombination=0.8 # Higher values seem to improve performance. This was highest I could go and still pass tests
         # mutation=(1.5, 1.9), # Tried increasing this but gave poor results
     )
 

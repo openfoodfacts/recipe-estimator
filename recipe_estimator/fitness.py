@@ -212,7 +212,7 @@ def get_objective_function_args(product):
 
 
 NUTRIENT_WITHIN_BOUNDS_PENALTY = 10000
-NUTRIENT_OUTSIDE_BOUNDS_PENALTY = 100000
+NUTRIENT_OUTSIDE_BOUNDS_PENALTY = 130000
 INGREDIENT_BIGGER_THAN_PREVIOUS_PENALTY = 1000000
 INGREDIENT_NOT_HALF_PREVIOUS_PENALTY = 10
 TOTAL_MASS_LESS_THAN_100_PENALTY = 10000000
@@ -221,7 +221,7 @@ TOTAL_MASS_MORE_THAN_100_PENALTY = 100
 # TODO: Try using quadratic / cubic penalty functions so that gradients are smoother and may be easier for optimizer to spot path to minimum
 # TODO: Use matrix libraries for objective calculations to speed things up
 def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ingredients_nom, nutrient_ingredients_min, nutrient_ingredients_max, nutrient_weightings, ingredient_order_previous_indices, ingredient_order_this_indices, leaf_ingredient_count):
-    nutrient_penalty = 0
+    nutrient_variance = 0
     # This seems to be a bit faster than for n, nutrient_total in enumerate(product_nutrients)
     num_nutrients = len(product_nutrients)
     for n in range(num_nutrients):
@@ -231,19 +231,23 @@ def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ing
         # nom_nutrient_total_from_ingredients = sum(ingredient_percentage * nutrient_ingredient_nom for ingredient_percentage, nutrient_ingredient_nom in zip(ingredient_percentages, nutrient_ingredients_nom[n]))
         # nutrient_ingredients_nom_n = nutrient_ingredients_nom[n]
         nom_nutrient_total_from_ingredients = (ingredient_percentages * nutrient_ingredients_nom[n]).sum()
-        min_nutrient_total_from_ingredients = (ingredient_percentages * nutrient_ingredients_min[n]).sum()
-        max_nutrient_total_from_ingredients = (ingredient_percentages * nutrient_ingredients_max[n]).sum()
+        # min_nutrient_total_from_ingredients = (ingredient_percentages * nutrient_ingredients_min[n]).sum()
+        # max_nutrient_total_from_ingredients = (ingredient_percentages * nutrient_ingredients_max[n]).sum()
 
         # Factors need to quite large as the algorithms only make tiny changes to the variables to determine gradients
         # TODO: Need to experiment with factors here
-        nutrient_penalty += nutrient_weightings[n] * assign_penalty(
-            nutrient_total,
-            nom_nutrient_total_from_ingredients,
-            NUTRIENT_WITHIN_BOUNDS_PENALTY,
-            min_nutrient_total_from_ingredients,
-            max_nutrient_total_from_ingredients,
-            NUTRIENT_OUTSIDE_BOUNDS_PENALTY,
-        )
+        # nutrient_penalty += nutrient_weightings[n] * assign_penalty(
+        #     nutrient_total,
+        #     nom_nutrient_total_from_ingredients,
+        #     NUTRIENT_WITHIN_BOUNDS_PENALTY,
+        #     min_nutrient_total_from_ingredients,
+        #     max_nutrient_total_from_ingredients,
+        #     NUTRIENT_OUTSIDE_BOUNDS_PENALTY,
+        # )
+        
+        nutrient_variance += nutrient_weightings[n] * (nutrient_total - nom_nutrient_total_from_ingredients) ** 2
+
+    nutrient_penalty = NUTRIENT_OUTSIDE_BOUNDS_PENALTY * nutrient_variance
 
     ingredient_not_half_previous_penalty = 0
     ingredient_more_than_previous_penalty = 0
