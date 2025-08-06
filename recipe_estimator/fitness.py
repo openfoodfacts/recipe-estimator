@@ -1,5 +1,10 @@
 import numpy as np
 
+# Tried using numba to improve performance but went slower
+# from numba import jit
+# from numba.typed import Dict
+# from numba.core import types
+
 from .prepare_nutrients import prepare_nutrients
 
 # Penalty function returns zero if the target matches the nominal value and returns
@@ -207,7 +212,8 @@ def get_objective_function_args(product):
     # for i in range(0, leaf_ingredient_count * 2):
     #     total_mass_multipliers[i] = -1 if i % 2 else 1
 
-    args = [{}, np.array(product_nutrients), np.array(nutrient_ingredients_nom), np.array(nutrient_ingredients_min), np.array(nutrient_ingredients_max), np.array(nutrient_weightings), ingredient_order_previous_indices, ingredient_order_this_indices, leaf_ingredient_count]
+    penalties = {} # Need this if using numba: Dict.empty(key_type=types.unicode_type, value_type=types.float64)
+    args = [penalties, np.array(product_nutrients), np.array(nutrient_ingredients_nom), np.array(nutrient_ingredients_min), np.array(nutrient_ingredients_max), np.array(nutrient_weightings), ingredient_order_previous_indices, ingredient_order_this_indices, leaf_ingredient_count]
     return [bounds, leaf_ingredients, args]
 
 
@@ -220,6 +226,7 @@ TOTAL_MASS_MORE_THAN_100_PENALTY = 100
 
 # TODO: Try using quadratic / cubic penalty functions so that gradients are smoother and may be easier for optimizer to spot path to minimum
 # TODO: Use matrix libraries for objective calculations to speed things up
+# @jit # pre-compile with numba
 def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ingredients_nom, nutrient_ingredients_min, nutrient_ingredients_max, nutrient_weightings, ingredient_order_previous_indices, ingredient_order_this_indices, leaf_ingredient_count):
     nutrient_variance = 0
     # This seems to be a bit faster than for n, nutrient_total in enumerate(product_nutrients)
