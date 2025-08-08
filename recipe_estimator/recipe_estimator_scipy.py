@@ -1,14 +1,5 @@
 import time
 import warnings
-from scipy.optimize import (
-    # minimize,
-    # dual_annealing,
-    # shgo,
-    # basinhopping,
-    differential_evolution,
-    # direct,
-)
-# import pygad
 
 from .fitness import get_objective_function_args, objective
 
@@ -27,6 +18,7 @@ def estimate_recipe(product):
         return objective(x, *args)
 
     # Simple optimization not able to get past local minima
+    # from scipy.optimize import minimize
     # solution = minimize(
     #     local_objective,
     #     x0=x0,
@@ -51,6 +43,7 @@ def estimate_recipe(product):
     # May need to consider using global minimization as the objective function is probably not convex
 
     # # Doesn't get close to passing most tests
+    # from scipy.optimize import shgo
     # solution = shgo(
     #     local_objective,
     #     bounds=bounds,
@@ -61,6 +54,7 @@ def estimate_recipe(product):
     # )
 
     # # Not bad but still not as good as differential_evolution
+    # from scipy.optimize import dual_annealing
     # solution = dual_annealing(
     #     local_objective,
     #     bounds=bounds,
@@ -78,6 +72,7 @@ def estimate_recipe(product):
 
     # # COBYLA seemed to be the best minimizer to use with this and gave OK results on 20023751 130900
     # # but didn't pass tests
+    # from scipy.optimize import basinhopping
     # solution = basinhopping(
     #     local_objective,
     #     x0=x0,
@@ -102,6 +97,7 @@ def estimate_recipe(product):
     # # Gives consistent results where other algorithms use randomization a lot which gives different results from one run to the next
     # # but can get around this by seeding the random number generator in other algorithms
     # # For details of arguments see: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.direct.html
+    # from scipy.optimize import direct
     # solution = direct(
     #     objective,
     #     bounds,
@@ -111,13 +107,15 @@ def estimate_recipe(product):
     #     f_min=0,  # Global minimum. Our objective function will never go negative
     #     #f_min_rtol=0.1, # Changing this didn't seem to make a lot of difference
     #     #len_tol=0.00001,  # If this is too small then the number of iterations will be exceeded, but too large gives inaccurate results
-    #     #vol_tol=1e-32,
+    #     vol_tol=1e-32,
     #     # Following two give a trade-off between performance and accuracy. Have much more of an impact on performance if locally_biased is False
     #     maxfun=10000 * len(leaf_ingredients),
     #     maxiter=MAXITER,
     # )
+    # solution_x = solution.x
 
     # This seems to give optimum results but can take some time
+    from scipy.optimize import differential_evolution
     solution = differential_evolution(
         objective,
         bounds,
@@ -139,6 +137,7 @@ def estimate_recipe(product):
     solution_x = solution.x
 
     # # Tried PyGAD but couldn't get it to converge on the best solution
+    # import pygad
     # num_iterations = 0
     # def pygad_objective(ga_instance, x, solution_idx):
     #     #global num_iterations
