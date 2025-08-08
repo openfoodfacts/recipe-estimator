@@ -7,6 +7,9 @@ import numpy as np
 
 from .prepare_nutrients import prepare_nutrients
 
+# NOTE: The following is not used at the moment. We currently just minimize the variance from the nominal nutrient value
+# and don't use min and max. This gives roughly similar results but is less computation, so faster.
+
 # Penalty function returns zero if the target matches the nominal value and returns
 # a positive value based on tolerance_penalty where there is divergence. If the divergence is more than
 # the min / max then the steep gradient is used.

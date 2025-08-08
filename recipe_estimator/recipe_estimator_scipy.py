@@ -1,13 +1,14 @@
 import time
 import warnings
 from scipy.optimize import (
-    minimize,
-    dual_annealing,
-    shgo,
-    basinhopping,
+    # minimize,
+    # dual_annealing,
+    # shgo,
+    # basinhopping,
     differential_evolution,
-    direct,
+    # direct,
 )
+# import pygad
 
 from .fitness import get_objective_function_args, objective
 
@@ -97,26 +98,6 @@ def estimate_recipe(product):
     #     minimizer_kwargs={"method": "COBYLA", "bounds": bounds},
     # )
 
-    # This seems to give optimum results but can take some time
-    solution = differential_evolution(
-        objective,
-        bounds,
-        args=args,
-        x0=x0,
-        polish=False, # Don't polish results to help with performance. Results are only slightly less optimal
-        rng=0, # Seed random number generator so we get consistent results between tests
-        workers=-1 if len(leaf_ingredients) > 20 else 1, # Gives a bit of an improvement with more complex products but not worth it for simple ones
-        updating='deferred', # Need to set this if we are going to set workers
-        # popsize=10, # Default is 15. Increasing this really slows things down
-        # init='sobol', # Changing this didn't seem to make much difference
-        # Following three seem to work together. Values were trial and error
-        # Aiming to get best performance while still passing tests
-        tol=0.01, # Much higher than this seems to give poor results on real products
-        atol=100, # Has a marginal impact on accuracy and performance
-        recombination=0.8 # Higher values seem to improve performance. This was highest I could go and still pass tests
-        # mutation=(1.5, 1.9), # Tried increasing this but gave poor results
-    )
-
     # # Initially thought this was promising but was not finding optimal solution in a number of cases
     # # Gives consistent results where other algorithms use randomization a lot which gives different results from one run to the next
     # # but can get around this by seeding the random number generator in other algorithms
@@ -136,7 +117,63 @@ def estimate_recipe(product):
     #     maxiter=MAXITER,
     # )
 
-    total_quantity = sum(solution.x)
+    # This seems to give optimum results but can take some time
+    solution = differential_evolution(
+        objective,
+        bounds,
+        args=args,
+        x0=x0,
+        polish=False, # Don't polish results to help with performance. Results are only slightly less optimal
+        rng=0, # Seed random number generator so we get consistent results between tests
+        workers=-1 if len(leaf_ingredients) > 20 else 1, # Gives a bit of an improvement with more complex products but not worth it for simple ones
+        updating='deferred', # Need to set this if we are going to set workers
+        popsize=15, # Default is 15. Increasing this really slows things down. This is the minimum to currently pass tests. Might be able to reduce this for complex products
+        # init='sobol', # Changing this didn't seem to make much difference
+        # Following three seem to work together. Values were trial and error
+        # Aiming to get best performance while still passing tests
+        tol=0.01, # Much higher than this seems to give poor results on real products
+        atol=100, # Has a marginal impact on accuracy and performance
+        recombination=0.8 # Higher values seem to improve performance. This was highest I could go and still pass tests
+        # mutation=(1.5, 1.9), # Tried increasing this but gave poor results
+    )
+    solution_x = solution.x
+
+    # # Tried PyGAD but couldn't get it to converge on the best solution
+    # num_iterations = 0
+    # def pygad_objective(ga_instance, x, solution_idx):
+    #     #global num_iterations
+    #     #num_iterations += 1
+    #     return -objective(x, *args)
+    # pop_size = 10
+    # ga_instance = pygad.GA(
+    #     num_generations=1000,
+    #     num_parents_mating=pop_size,
+    #     #keep_parents=int(pop_size / 2),
+    #     keep_elitism=int(pop_size / 2),
+    #     fitness_func=pygad_objective,
+    #     random_seed=0,
+    #     #initial_population=[x0],
+    #     num_genes=len(x0),
+    #     sol_per_pop=pop_size,
+    #     # random_mutation_min_val=-10,
+    #     # random_mutation_max_val=+10,
+    #     # mutation_type='random',
+    #     # mutation_type='random',
+    #     # mutation_num_genes=int(len(x0)/2),
+    #     mutation_type='adaptive', # Adaptive seems best
+    #     mutation_percent_genes=[100, 10],
+    #     #mutation_probability=[0.5, 0.1],
+    #     parent_selection_type='sss', # This seemed to be best
+    #     crossover_type='single_point', # This seems to work best
+    #     # crossover_probability=0.8, # Changing this didn't seem to help
+    #     gene_space=[{'low': bound[0], 'high': bound[1]} for bound in bounds]
+    # )
+    # ga_instance.run()
+    # print(repr(ga_instance.best_solutions_fitness))
+    # solution_x, _, _ = ga_instance.best_solution()
+    # solution = {'x': solution_x, 'nit': num_iterations, 'success': ga_instance.run_completed}
+
+    total_quantity = sum(solution_x)
 
     def set_percentages(ingredients):
         total_percent = 0
@@ -145,9 +182,9 @@ def estimate_recipe(product):
                 percent_estimate = set_percentages(ingredient["ingredients"])
             else:
                 index = ingredient["index"]
-                ingredient["quantity_estimate"] = round(solution.x[index], 2)
+                ingredient["quantity_estimate"] = round(solution_x[index], 2)
                 # ingredient["lost_water"] = round(solution.x[index + 1], 2)
-                percent_estimate = round(100 * solution.x[index] / total_quantity, 2)
+                percent_estimate = round(100 * solution_x[index] / total_quantity, 2)
 
             ingredient["percent_estimate"] = percent_estimate
             total_percent += percent_estimate
@@ -157,13 +194,13 @@ def estimate_recipe(product):
     set_percentages(product["ingredients"])
     recipe_estimator = product["recipe_estimator"]
     recipe_estimator["status"] = 0
-    recipe_estimator["status_message"] = solution.message
+    recipe_estimator["status_message"] = solution.get('message')
     # Note that for some algorithms penalties won't be set to the value from the best solution, so call the objective function again to get it
-    objective(solution.x, *args)
+    objective(solution_x, *args)
     recipe_estimator['penalties'] = args[0]
     recipe_estimator["time"] = round(time.perf_counter() - current, 2)
     message = f"Product: {product.get('code')}, time: {recipe_estimator['time']} s, status: {solution.get('message')}, iterations: {solution.get('nit')}"
-    if solution.success and solution.get("nit", 0) < MAXITER:
+    if solution.get('success') and solution.get("nit", 0) < MAXITER:
         print(message)
     else:
         warnings.warn(message)
