@@ -283,7 +283,7 @@ export default function Recipe({product}: RecipeProps) {
               </TableHead>
               <TableBody>
                 {flattenIngredients(ingredients).map((ingredient: any, index: number)=>(
-                  <TableRow key={index}>
+                  <TableRow key={index} className={!ingredient.ingredients ? 'leaf' : 'parent'}>
                     <TableCell><Typography sx={{paddingLeft: (ingredient.depth)}}>{ingredient.text}</Typography></TableCell>
                     <TableCell>{!ingredient.ingredients &&
                       <Autocomplete
@@ -303,8 +303,9 @@ export default function Recipe({product}: RecipeProps) {
                       />
                     }
                     </TableCell>
-                    <TableCell>{!ingredient.ingredients &&
-                      <TextField variant="standard" type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);ingredientsEdited();}}/>
+                    <TableCell>{!ingredient.ingredients
+                      ? <TextField variant="standard" type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);ingredientsEdited();}}/>
+                      : <Typography>{format(parseFloat(ingredient.quantity_estimate), QUANTITY)}</Typography>
                     }
                     </TableCell>
                     <TableCell align='center'>

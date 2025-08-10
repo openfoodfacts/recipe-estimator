@@ -116,6 +116,9 @@ def estimate_recipe(product):
 
     # This seems to give optimum results but can take some time
     from scipy.optimize import differential_evolution
+    # Following is a bit of a fudge. For tests 0.8 works best but for real products
+    # seem to converge more quickly with 0.98
+    recombination = 0.8 if len(leaf_ingredients) < 4 else 0.98
     solution = differential_evolution(
         objective,
         bounds,
@@ -131,9 +134,11 @@ def estimate_recipe(product):
         # Aiming to get best performance while still passing tests
         tol=0.01, # Much higher than this seems to give poor results on real products
         atol=100, # Has a marginal impact on accuracy and performance
-        recombination=0.8 # Higher values seem to improve performance. This was highest I could go and still pass tests
+        # maxiter=2000,
+        recombination=recombination
         # mutation=(1.5, 1.9), # Tried increasing this but gave poor results
     )
+    print(f"{len(leaf_ingredients)}: {recombination}")
     solution_x = solution.x
 
     # # Tried PyGAD but couldn't get it to converge on the best solution
@@ -172,23 +177,26 @@ def estimate_recipe(product):
     # solution_x, _, _ = ga_instance.best_solution()
     # solution = {'x': solution_x, 'nit': num_iterations, 'success': ga_instance.run_completed}
 
-    total_quantity = sum(solution_x)
+    product_total_quantity = sum(solution_x)
 
     def set_percentages(ingredients):
         total_percent = 0
+        total_quantity = 0
         for ingredient in ingredients:
             if "ingredients" in ingredient and len(ingredient["ingredients"]) > 0:
-                percent_estimate = set_percentages(ingredient["ingredients"])
+                percent_estimate, quantity_estimate = set_percentages(ingredient["ingredients"])
             else:
                 index = ingredient["index"]
-                ingredient["quantity_estimate"] = round(solution_x[index], 2)
+                quantity_estimate = round(solution_x[index], 2)
                 # ingredient["lost_water"] = round(solution.x[index + 1], 2)
-                percent_estimate = round(100 * solution_x[index] / total_quantity, 2)
+                percent_estimate = round(100 * solution_x[index] / product_total_quantity, 2)
 
             ingredient["percent_estimate"] = percent_estimate
+            ingredient["quantity_estimate"] = quantity_estimate
             total_percent += percent_estimate
+            total_quantity += quantity_estimate
 
-        return total_percent
+        return total_percent, total_quantity
 
     set_percentages(product["ingredients"])
     recipe_estimator = product["recipe_estimator"]

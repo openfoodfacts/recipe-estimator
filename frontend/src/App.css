@@ -49,3 +49,7 @@ thead {
 thead :last-child th {
     border-bottom: double !important;
 }
+.parent {
+  background-color: #eee;
+  font-style: italic;
+}
