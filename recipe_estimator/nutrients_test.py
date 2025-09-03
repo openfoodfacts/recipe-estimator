@@ -30,18 +30,18 @@ def test_prepare_product_looks_up_ciqual_code():
     assert nutrients is not None
 
 
-def test_prepare_product_creates_a_max_range_entry_if_ingredient_not_found():
+def test_prepare_product_creates_an_unknown_entry_if_ingredient_not_found():
     product = {
         'code' : 1234567890123,
         'ingredients': [{'id':'en:does_not_exist'}],
     }
     prepare_product(product)
-    nutrients = product['ingredients'][0].get('nutrients')
+    ingredient = product['ingredients'][0]
+    assert ingredient.get('alim_nom_eng') == 'Unknown'
+    nutrients = ingredient.get('nutrients')
     assert nutrients is not None
     carbs = nutrients.get('carbohydrates')
-    assert carbs is not None
-    assert carbs['percent_min'] >= 0
-    assert carbs['percent_max'] <= 100
+    assert carbs is None
 
 def test_prepare_product_adds_up_sugars_if_not_specified():
     product = {'code' : 1234567890123, 'ingredients': [{'id':'en:fructose'}]}

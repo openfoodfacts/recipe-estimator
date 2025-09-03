@@ -17,13 +17,14 @@ def count_ingredients(ingredients, nutrients):
             ingredient_nutrients = ingredient.get('nutrients')
             if (ingredient_nutrients is not None):
                 for off_id in ingredient_nutrients:
-                    proportion = ingredient_nutrients[off_id]['percent_nom']
-                    existing_nutrient = nutrients.get(off_id)
-                    if (existing_nutrient is None):
-                         nutrients[off_id] = {'ingredient_count': 1, 'unweighted_total': proportion, 'weighting': 0}
-                    else:
-                        existing_nutrient['ingredient_count'] = existing_nutrient['ingredient_count'] + 1
-                        existing_nutrient['unweighted_total'] = existing_nutrient['unweighted_total'] + proportion
+                    if ingredient_nutrients[off_id].get('confidence') != '-':
+                        proportion = ingredient_nutrients[off_id]['percent_nom']
+                        existing_nutrient = nutrients.get(off_id)
+                        if (existing_nutrient is None):
+                            nutrients[off_id] = {'ingredient_count': 1, 'unweighted_total': proportion, 'weighting': 0}
+                        else:
+                            existing_nutrient['ingredient_count'] = existing_nutrient['ingredient_count'] + 1
+                            existing_nutrient['unweighted_total'] = existing_nutrient['unweighted_total'] + proportion
 
     return count
 
@@ -47,8 +48,8 @@ def assign_weightings(product, scipy):
             computed_nutrient['notes'] = 'All zero values'
             continue
 
-        if computed_nutrient['ingredient_count'] != count:
-            computed_nutrient['notes'] = 'Not available for all ingredients'
+        if computed_nutrient['ingredient_count'] == 0:
+            computed_nutrient['notes'] = 'Not available on any ingredient'
             continue
 
         nutrient = off_to_ciqual[nutrient_key]
@@ -79,6 +80,8 @@ def assign_weightings(product, scipy):
 def prepare_nutrients(product, scipy = False):
     nutrients = {}
     count = count_ingredients(product['ingredients'], nutrients)
-    product['recipe_estimator'] = {'nutrients':nutrients, 'ingredient_count': count}
+    recipe_estimator = product.setdefault('recipe_estimator', {})
+    recipe_estimator['nutrients'] = nutrients
+    recipe_estimator['ingredient_count'] = count
     assign_weightings(product, scipy)
     return count

@@ -3,10 +3,12 @@ from fastapi import Body, FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+import numpy as np
 from .nutrients import ciqual_ingredients, prepare_product
 from .product import get_product
 from .recipe_estimator import estimate_recipe
 from .recipe_estimator_scipy import estimate_recipe as estimate_recipe_scipy
+from .fitness import get_objective_function_args, objective
 
 app = FastAPI()
 
@@ -46,4 +48,14 @@ async def recipe(request: Request):
     product = await request.json()
     prepare_product(product)
     estimate_recipe_scipy(product)
+    return product
+
+@app.post("/api/v3/get_penalties")
+async def recipe(request: Request):
+    product = await request.json()
+    prepare_product(product)
+    [_, leaf_ingredients, args] = get_objective_function_args(product)
+    quantities = np.array([float(ingredient['quantity_estimate']) for ingredient in leaf_ingredients])
+    objective(quantities, *args)
+    product['recipe_estimator']['penalties'] = args[0]
     return product

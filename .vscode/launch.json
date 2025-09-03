@@ -11,7 +11,9 @@
             "module": "uvicorn",
             "args": [
                 "recipe_estimator.main:app",
-                "--reload"
+                "--reload",
+                "--port",
+                "5521"
             ],
             "jinja": true
         }

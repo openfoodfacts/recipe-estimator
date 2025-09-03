@@ -1,5 +1,8 @@
 import time  
+import numpy as np
 from ortools.linear_solver import pywraplp
+
+from .fitness import get_objective_function_args, objective as objective_function
 
 from .prepare_nutrients import prepare_nutrients
 
@@ -162,11 +165,12 @@ def add_nutrient_distance(ingredient_numvars, nutrient_key, positive_constraint,
             add_nutrient_distance(ingredient_numvar['child_numvars'], nutrient_key, positive_constraint, negative_constraint, weighting)
         else:
             # TODO: Figure out whether to do anything special with < ...
-            ingredient_nutrient =  ingredient['nutrients'][nutrient_key]
+            # Currently treat unknown nutrients as zero percent
+            ingredient_nutrient_percent =  ingredient['nutrients'].get(nutrient_key, {}).get('percent_nom', 0)
             #print(ingredient['indent'] + ' - ' + ingredient['text'] + ' (' + ingredient['ciqual_code'] + ') : ' + str(ingredient_nutrient))
-            print("nutrient_distance:", ingredient['id'], nutrient_key, ingredient_nutrient['percent_nom'])
-            negative_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_nom'] / 100)
-            positive_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient['percent_nom'] / 100)
+            print("nutrient_distance:", ingredient['id'], nutrient_key, ingredient_nutrient_percent)
+            negative_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient_percent / 100)
+            positive_constraint.SetCoefficient(ingredient_numvar['numvar'], ingredient_nutrient_percent / 100)
 
 
 # Add an objective to minimize the difference between the quantity of each ingredient and the next ingredient (and 0 for the last ingredient)
@@ -311,5 +315,12 @@ def estimate_recipe(product):
     recipe_estimator['iterations'] = solver.iterations()
 
     print('Time spent in solver: ', recipe_estimator['time'], 'seconds')
+
+    # Calculate objective function so we can compare with SciPy
+    [_, leaf_ingredients, args] = get_objective_function_args(product)
+    quantities = np.array([float(ingredient['quantity_estimate']) for ingredient in leaf_ingredients])
+    objective_function(quantities, *args)
+    recipe_estimator['penalties'] = args[0]
+
 
     return status
