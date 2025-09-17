@@ -30,8 +30,9 @@ The Recipe Estimator is part of the Open Food Facts ecosystem, helping to estima
 ## 💬 Community & Support
 
 ### Slack Channel
-- **Channel**: [#recipe-estimator](https://openfoodfacts.slack.com/archives/C08BDAWPJP7)
-- **Join Slack**: [slack.openfoodfacts.org](https://slack.openfoodfacts.org)
+- **Join the Open Food Facts Slack**: [slack.openfoodfacts.org](https://slack.openfoodfacts.org)
+- **Join the #recipe-estimator Channel**: [#recipe-estimator](https://openfoodfacts.slack.com/archives/C08BDAWPJP7)
+
 
 The Slack channel is the best place to:
 - Ask questions about the project
