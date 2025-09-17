@@ -1,254 +1,104 @@
-# Install dependencies
+# Recipe Estimator 🍽️
 
-## Frontend
+[![Tests](https://github.com/openfoodfacts/recipe-estimator/workflows/Tests/badge.svg)](https://github.com/openfoodfacts/recipe-estimator/actions)
 
-This is a create-react-app project.
+The Recipe Estimator analyzes food products to estimate ingredient proportions based on nutritional information. It's part of the [Open Food Facts](https://openfoodfacts.org) ecosystem, helping to understand what's really in our food.
 
-To set up:
+## 🚀 Try It Now
 
-```
-cd ./frontend
-npm install
-npm run build
-```
+- **Production**: [recipe-estimator.openfoodfacts.org](https://recipe-estimator.openfoodfacts.org/static/#3017620422003)
+- **Staging**: [recipe-estimator.openfoodfacts.net](https://recipe-estimator.openfoodfacts.net/static/#3017620422003)
 
-This creates the static folder in the backend so that static files can be served by FastAPI. (Path is set in the .env file)
+## 🎯 What Does It Do?
 
-## Backend
+Given a food product with:
+- Ingredient list (e.g., "tomatoes, water, sugar, salt")  
+- Nutritional information (e.g., "3.2g protein per 100g")
 
-This is using Python3.
+The Recipe Estimator calculates the likely proportion of each ingredient using optimization algorithms that match the nutritional profile.
 
-Create a virtualenv.
-```
-python -m venv venv 
-```
+## 📚 Documentation
 
-Enter virtualenv (Windows).
-```
-venv/Scripts/activate
-```
-or (Linux)
-```
-source venv/bin/activate
-```
+- **[Installation Guide](docs/INSTALLATION.md)** - Set up your development environment
+- **[Development Guide](docs/DEVELOPMENT.md)** - Run locally, test, and contribute  
+- **[How It Works](docs/HOW_IT_WORKS.md)** - Technical details and algorithms
+- **[Community Resources](docs/COMMUNITY.md)** - Links, deployments, and support
 
-Install requirements.
-```
-pip install -r requirements.txt
-```
+## ⚡ Quick Start
 
-# Running Locally
+1. **Install dependencies:**
+   ```bash
+   make install
+   ```
 
-To run the API server:
+2. **Run the application:**
+   ```bash
+   # Backend (API server)
+   make watch
+   
+   # Frontend (in another terminal)
+   make watch_frontend
+   ```
 
-```
-uvicorn recipe_estimator.main:app --reload
-```
+3. **Test it:**
+   - Backend: `http://localhost:5521/static/#0677294998025`
+   - Frontend: `http://localhost:3000/#0677294998025`
 
-The static pages can be accessed like this:
+## 🧪 Running Tests
 
-To test:
-http://localhost:8000/static/#product_code
-
-e.g.
-
-http://localhost:8000/static/#0677294998025
-
-(or if you use the docker compose, it might be http://localhost:5520/static/#0677294998025)
-
-To run the frontend with dynamic reloading (in a new terminal):
-```
-cd ./frontend
-npm start
+```bash
+pytest
+# or
+make tests
 ```
 
-To test:
-http://localhost:3000/#product_code
+## 🐳 Docker
 
-e.g.
-
-http://localhost:3000/#0677294998025
-
-# Running Unit Tests
-
-The server unit tests can be run with `pytest` at the command line or using the Testing panel in the Python VSCode plugin.
-
-There are currently no frontend unit tests.
-
-# Building the Docker Image
-
-From the project root folder:
-```
-docker build --tag recipe_estimator .  
-```
-And to run:
-```
-docker run --name recipe_estimator -dp 5520:5521 recipe_estimator
+```bash
+# Build and run with docker-compose
+make up
 ```
 
-# Processing Steps
+Access at: `http://localhost:5520/static/#0677294998025`
 
-## Obtain Nutrients for Ingredients
+## 🤝 Community & Support
 
-For each ingredient we need to obtain the expected nutrient breakdown. This currently comes from the CIQUAL database, but other databases could be used, e.g. based on a regional preference.
+- **💬 Slack Channel**: [#recipe-estimator](https://openfoodfacts.slack.com/archives/C08BDAWPJP7) ([Join here](https://slack.openfoodfacts.org))
+- **📖 Wiki**: [Recipe Tool Documentation](https://wiki.openfoodfacts.org/Recipe/Tool)  
+- **📋 Project Poster**: [Visual Overview](https://slack-files.com/T02KVRT1Q-F09EEEV7FU3-16a07789bb)
+- **🎓 Getting Started**: [Presentation](https://docs.google.com/presentation/d/1QM7ATc-7eTzc-Tq3xf9Mi-0eOn_ZZeHTOaAmI7t1zds/edit?slide=id.g2a73fcafc65_0_17#slide=id.g2a73fcafc65_0_17)
 
-If the ingredient on the product doesn't currently have a CIQUAL code then attempt to look this up is made using ingredients.json. To refresh the ingredients taxonomy you can run:
+## 🛠️ For Developers
 
-```
-make refresh_ingredients_taxonomy
-```
+### Available Commands
 
-Having found the ingredient in CIQUAL a nutrient map is added to each ingredient. Only the "main" nutrient is used (the one with a `_100g` suffix).
-
-If the `nutrient_map.csv` or any of the source CIQUAL XML files are updated then you need to run:
-
-```
-make build_ciqual_ingredients
-```
-Which will update the `ciqual_ingredients.json` file.
-
-## Determine nutrients for computation
-
-Only nutrients that occur on every ingredient can be used. Energy is also eliminated as this combines multiple nutrients.
-
-## Weighting
-
-A weighting can be applied to give specific nutrients more / less impact on the overall calculation. If a nutrient has no weighting then 1 is assumed.
-
-## Estimation
-
-The estimation attempts to find the proportion of each ingredient that minimises the weighted difference between the computed nurtients and those obtained from the product.
-
-## Return data
-
-An example return structure is shown below:
-
-```json
-ingredients: [
-  {
-    id: "en:tomato",
-    percent_estimate: 67.2,
-    evaporation: 4,
-    nutrients: {
-      calcium: {percent_min: 0.023, percent_max: 0.024},
-      carbohydrates: {percent_min: 3.45, percent_max: 3.45},
-      ...
-    }
-  },
-  ...
-],
-recipe_estimator: {
-  nutrients: {
-    calcium: {
-      product_total: 0.06,
-      weighting: 1000,
-    },
-    vitamin-b2: {
-      notes: "Not listed on product"
-    },
-    ...
-  },
-  ingredient_count: 3,
-  iterations: 35,
-  status: 0,
-  time: 0.2
-}
+```bash
+make install          # Install all dependencies
+make watch            # Run backend with auto-reload  
+make watch_frontend   # Run frontend with auto-reload
+make tests            # Run tests
+make build            # Build Docker image
+make up               # Run with docker-compose
 ```
 
-### Ingredients
+### Project Structure
 
-The original ingredients map will be returned with additional percent_estimate field and a nutrients map with the expected nutrient value ranges in g per 100 g/ml of that ingredient.
+- `frontend/` - React application  
+- `recipe_estimator/` - Python FastAPI backend
+- `docs/` - Additional documentation
+- `ciqual/` - CIQUAL nutritional database files
+- `scripts/` - Build and maintenance scripts
 
-A quantity_estimate field is also provided which shows the amount of the ingredient needed to make 100 g/ml of the product. Note this may be higher than the percent_estimate because of evaporation during the product preparation / processing. An evaporation field shows the estimated water loss during processing.
+## 🔧 Contributing
 
-### Recipe Estimator
+1. **Join the community**: Connect with us on [Slack](https://slack.openfoodfacts.org)
+2. **Read the docs**: Check the [Wiki](https://wiki.openfoodfacts.org/Recipe/Tool) and [project documents](docs/COMMUNITY.md)
+3. **Set up locally**: Follow the [Installation Guide](docs/INSTALLATION.md)
+4. **Start developing**: Use the [Development Guide](docs/DEVELOPMENT.md)
 
-A new "recipe_estimator" map will also be returned, providing the compted nutrients and some metrics
+We welcome contributions of all kinds - code, documentation, testing, and feedback!
 
-#### Nutrients
+---
 
-This will contain the calculated value based on the new estimate and will also provide the weighting used, the nutrient identifier for the database used (CIQUAL), the quoted proportion from the product and the difference from the computed value. Nutrients that were not quoted on the product will also be included.
-
-#### Metrics
-
-This will provide details of the computation performed, such as time taken and number of iterations.
-
-
-# TODO
-
- - Need to return a more formal error object
- - Use min and max for ingredient nutrient when stated as "< ..." in CIQUAL
- - Use min and max from CIQUAL for unmatched ingredients
- - Cope with min and max on product nutrients (e.g. if we had to get from a category)
-
-
-# Background Info
-
-To get nutrient types for nutrient_map.csv I used:
-
-```js
-db.products.aggregate(
-[
-  {
-    $project: {
-      keys: {
-        $map: {
-          input: {
-            $objectToArray: "$nutriments"
-          },
-          in: "$$this.k"
-        }
-      }
-    }
-  },
-  {
-    $unwind: "$keys"
-  },
-  {
-    $match: {
-      $and: [
-        {
-          keys: {
-            $regex: "_100g$"
-          }
-        },
-        {
-          keys: {
-            $ne: {
-              $regex: "_prepared_100g$"
-            }
-          }
-        }
-      ]
-    }
-  },
-  {
-    $project:
-      {
-        keys: {
-          $replaceOne: {
-            input: "$keys",
-            find: "_100g",
-            replacement: ""
-          }
-        }
-      }
-  },
-  {
-    $group: {
-      _id: "$keys",
-      count: {
-        $sum: 1
-      }
-    }
-  },
-  {
-    $sort:
-      {
-        count: -1
-      }
-  }
-]
-)
-```
+**Part of the [Open Food Facts](https://openfoodfacts.org) ecosystem** 🌍
 
