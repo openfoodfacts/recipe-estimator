@@ -8,6 +8,7 @@ from .nutrients import ciqual_ingredients, prepare_product
 from .product import get_product
 from .recipe_estimator import estimate_recipe
 from .recipe_estimator_scipy import estimate_recipe as estimate_recipe_scipy
+from .recipe_estimator_nnls import estimate_recipe as estimate_recipe_nnls
 from .fitness import get_objective_function_args, objective
 
 app = FastAPI()
@@ -48,6 +49,13 @@ async def recipe(request: Request):
     product = await request.json()
     prepare_product(product)
     estimate_recipe_scipy(product)
+    return product
+
+@app.post("/api/v3/estimate_recipe_nnls")
+async def recipe(request: Request):
+    product = await request.json()
+    prepare_product(product)
+    estimate_recipe_nnls(product)
     return product
 
 @app.post("/api/v3/get_penalties")
