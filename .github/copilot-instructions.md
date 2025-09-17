@@ -20,9 +20,9 @@ Always reference these instructions first and fallback to search or bash command
 
 ### Testing
 - Run Python tests: `pytest` -- takes 2 seconds. NEVER CANCEL. Set timeout to 60+ seconds.
-- Run tests with slow/network tests: `cd recipe_estimator && pytest --runslow` -- takes 2 seconds but network tests will fail in sandboxed environment.
+- Run tests with slow/network tests: `cd recipe_estimator && pytest --runslow` -- takes 6 seconds including network tests.
 - Alternative: `make tests`
-- **CRITICAL**: Two tests will fail due to network connectivity (`test_estimate_recipe` and `test_product_comes_from_metrics`) - this is expected in sandboxed environments.
+- All 34 tests should pass (network access to `world.openfoodfacts.net` is available).
 - Frontend has no test suite configured.
 
 ### Build Times and Timeouts
@@ -44,7 +44,7 @@ make watch_frontend            # Start frontend dev server (port 5522)
 # Testing
 make tests                     # Run Python test suite (2 seconds)
 pytest                         # Same as above
-cd recipe_estimator && pytest --runslow  # Include slow tests
+cd recipe_estimator && pytest --runslow  # Include slow/network tests (6 seconds)
 ```
 
 ## Validation
@@ -71,10 +71,10 @@ estimate_recipe(product)
 - Test frontend functionality by visiting http://localhost:5522/#PRODUCT_CODE (e.g., #0677294998025)
 - Verify static build works by accessing http://localhost:5521/static/#PRODUCT_CODE
 
-### Expected Test Failures
-- `test_estimate_recipe` and `test_product_comes_from_metrics` will fail due to network connectivity to `world.openfoodfacts.net`
-- This is expected and normal in sandboxed environments
-- All other 32 tests should pass
+### Expected Test Results
+- All 34 tests pass with network access enabled
+- Test suite completes in ~2 seconds for regular tests, ~6 seconds with slow tests included
+- Network tests (`test_estimate_recipe` and `test_product_comes_from_metrics`) now work due to firewall allowlist
 
 ## Common Tasks
 
@@ -128,10 +128,10 @@ estimate_recipe(product)
 
 ### Common Issues
 - **Docker build fails**: Use local development setup instead
-- **Network test failures**: Expected in sandboxed environments, ignore if other tests pass
 - **Frontend won't start**: Ensure `npm install` completed successfully
 - **API returns errors**: Check that Python dependencies are installed and backend is running
 - **Static files not found**: Run `cd frontend && npm run build` to generate static files
+- **Test failures**: All tests should pass; if they don't, check that dependencies are installed correctly
 
 ### Performance Notes
 - The recipe estimation algorithm is computationally intensive but typically completes in <1 second
