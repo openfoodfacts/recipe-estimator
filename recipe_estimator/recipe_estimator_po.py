@@ -5,7 +5,7 @@ import numpy
 from .fitness import get_objective_function_args, objective
 
 POWER = -1.0
-def estimate_percentages(ingredients, percent_remaining = 100, current_max = 100, current_min = 100):
+def estimate_percentages(ingredients, percent_remaining = 100.0, current_max = 100.0, current_min = 100.0):
     # This is an implementation of the current PO algorithm.
     # First the min and max ranges are set.
     # For any ingredient the max can't be such that it could be bigger than an early ingredient,
@@ -26,8 +26,8 @@ def estimate_percentages(ingredients, percent_remaining = 100, current_max = 100
         return
 
     for n, ingredient in enumerate(ingredients):
-        this_max = current_max / (n + 1)
-        this_min = 0
+        this_max = current_max / (n + 1.0)
+        this_min = 0.0
         if n == 0:
             this_min = current_min / num_ingredients
 
@@ -36,7 +36,7 @@ def estimate_percentages(ingredients, percent_remaining = 100, current_max = 100
 
         # Limit the max for the estimate to the percent remaining
         estimate_max = this_max if this_max < percent_remaining else percent_remaining
-        estimate = (estimate_max + this_min) / 2
+        estimate = (estimate_max + this_min) / 2.0
         if n == (num_ingredients - 1):
             estimate = percent_remaining
         
