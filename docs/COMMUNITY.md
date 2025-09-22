@@ -7,7 +7,7 @@ The Recipe Estimator is part of the Open Food Facts ecosystem, helping to estima
 ## 📋 Key Resources
 
 ### Project Poster
-- [Recipe Estimator Poster](https://slack-files.com/T02KVRT1Q-F09EEEV7FU3-16a07789bb) - Visual overview of the project
+- [Recipe Estimator Poster](https://github.com/openfoodfacts/recipe-estimator/blob/main/docs/2025-poster-recipe-estimator.png) - Visual overview of the project
 
 ### Documentation
 - [Wiki: Recipe Tool](https://wiki.openfoodfacts.org/Recipe/Tool) - Comprehensive project documentation
