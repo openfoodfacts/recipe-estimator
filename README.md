@@ -4,7 +4,7 @@
 
 The Recipe Estimator analyzes food products to estimate ingredient proportions based on nutritional information. It's part of the [Open Food Facts](https://openfoodfacts.org) ecosystem, helping to understand what's really in our food.
 
-<img src="https://github.com/openfoodfacts/recipe-estimator/blob/copilot/fix-113/docs/poster-recipe-estimator.png"/>
+<img src="https://github.com/openfoodfacts/recipe-estimator/blob/main/docs/2025-poster-recipe-estimator.png"/>
 
 
 ## 🚀 Try It Now
