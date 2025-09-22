@@ -9,6 +9,8 @@ from .product import get_product
 from .recipe_estimator import estimate_recipe
 from .recipe_estimator_scipy import estimate_recipe as estimate_recipe_scipy
 from .recipe_estimator_nnls import estimate_recipe as estimate_recipe_nnls
+from .recipe_estimator_simple import estimate_recipe as estimate_recipe_simple
+from .recipe_estimator_po import estimate_recipe as estimate_recipe_po
 from .fitness import get_objective_function_args, objective
 
 app = FastAPI()
@@ -56,6 +58,20 @@ async def recipe(request: Request):
     product = await request.json()
     prepare_product(product)
     estimate_recipe_nnls(product)
+    return product
+
+@app.post("/api/v3/estimate_recipe_simple")
+async def recipe(request: Request):
+    product = await request.json()
+    prepare_product(product)
+    estimate_recipe_simple(product)
+    return product
+
+@app.post("/api/v3/estimate_recipe_po")
+async def recipe(request: Request):
+    product = await request.json()
+    prepare_product(product)
+    estimate_recipe_po(product)
     return product
 
 @app.post("/api/v3/get_penalties")
