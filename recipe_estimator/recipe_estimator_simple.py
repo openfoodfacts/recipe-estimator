@@ -4,7 +4,7 @@ import numpy
 
 from .fitness import get_objective_function_args, objective
 
-POWER = -2.0
+POWERS = [-2, -1.73, -1.61, -1.33, -1.18]
 def estimate_percentages(ingredients, total = 100.0):
     # Each ingredient quantity = a * n ^ p
     # where p is the POWER constant, n is the ingredient number and a is the percentage of the first ingredient
@@ -12,11 +12,11 @@ def estimate_percentages(ingredients, total = 100.0):
     num_ingredients = len(ingredients)
     if num_ingredients < 1:
         return
-    
-    raw_sum = sum([(n + 1.0) ** POWER for n in range(num_ingredients)])
+    power = POWERS[num_ingredients - 1] if num_ingredients < len(POWERS) else POWERS[-1]
+    raw_sum = sum([(n + 1.0) ** power for n in range(num_ingredients)])
     a = total / raw_sum
     for n, ingredient in enumerate(ingredients):
-        estimate = round(a * (n + 1.0) ** POWER, 2)
+        estimate = round(a * (n + 1.0) ** power, 2)
         ingredient["percent_estimate"] = estimate
         ingredient["quantity_estimate"] = estimate
         if "ingredients" in ingredient:
