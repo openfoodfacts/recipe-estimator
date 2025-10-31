@@ -70,7 +70,15 @@ def setup_ingredients(ingredients, nutrients):
 def prepare_product(product):
     setup_ingredients(product['ingredients'], product.get('nutriments', {}))
 
-
+# Product Opener sometimes store numbers as strings when it outputs JSON
+def ensure_float(value):
+    if isinstance(value, str):
+        value = value.replace(',', '.')
+        try:
+            return float(value)
+        except ValueError:
+            return 0.0
+    return float(value)
 
 # Dump ingredients
 #with open(filename, "w", encoding="utf-8") as ingredients_file:
