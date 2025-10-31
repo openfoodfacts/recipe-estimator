@@ -238,7 +238,7 @@ def estimate_recipe(product):
     sugars_constraint = None
     sugars = nutriments.get('sugars_100g')
     if sugars is not None:
-        sugars_constraint = solver.Constraint(0, ensure_float(sugar))
+        sugars_constraint = solver.Constraint(0, ensure_float(sugars))
 
     fat_constraint = None
     fat = nutriments.get('fat_100g')
