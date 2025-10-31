@@ -48,6 +48,16 @@ const PERCENT = new Intl.NumberFormat(undefined, {maximumFractionDigits:1,minimu
 const VARIANCE = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2,signDisplay:"always"});
 const QUANTITY = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2});
 
+const algorithms = {
+  estimate_recipe_scipy: "Differential Evolution",
+  estimate_recipe: "GLOP Linear Solver",
+  estimate_recipe_nnls: "NNLS (Constrained)",
+  unconstrained_nnls: "NNLS (Unconstrained)",
+  estimate_recipe_simple: "Simple Inverse Power",
+  estimate_recipe_po: "Simplified Product Opener",
+}
+const DEFAULT_ALGORITHM = Object.keys(algorithms)[0];
+
 function format(num: number, formatter: Intl.NumberFormat){
   return num == null || isNaN(num) ? 'unknown' : formatter.format(num);
 }
@@ -57,7 +67,7 @@ export default function Recipe({product}: RecipeProps) {
   const [ingredients, setIngredients] = useState<any>();
   const [nutrients, setNutrients] = useState<any>();
   const [penalties, setPenalties] = useState<any>();
-  const [algorithm, setAlgorithm] = useState<string>('estimate_recipe_scipy');
+  const [algorithm, setAlgorithm] = useState<string>(DEFAULT_ALGORITHM);
 
   const getRecipe = useCallback((product: any) => {
     if (!product || !product.ingredients)
@@ -91,7 +101,8 @@ export default function Recipe({product}: RecipeProps) {
 
   useEffect(()=>{
     const params = new URLSearchParams(window.location.search);
-    setAlgorithm(params.get('algorithm') ?? 'estimate_recipe_scipy');
+    const useAlgorithm = params.get('algorithm') ?? DEFAULT_ALGORITHM;
+    setAlgorithm(useAlgorithm in algorithms ? useAlgorithm : DEFAULT_ALGORITHM);
     getRecipe(product);
   }, [product, getRecipe]);
 
@@ -105,8 +116,6 @@ export default function Recipe({product}: RecipeProps) {
     const newUrl = window.location.origin + window.location.pathname + `?algorithm=${useAlgorithm}#${product.code}`;
     window.history.pushState({path:newUrl},'',newUrl);
     setAlgorithm(useAlgorithm);
-
-    // getRecipe(product);
   }
 
   function ingredientsEdited() {
@@ -213,12 +222,9 @@ export default function Recipe({product}: RecipeProps) {
                   label="Algorithm"
                   onChange={(event) => recalculateRecipe(event.target.value)}
                 >
-                  <MenuItem value={'estimate_recipe'}>GLOP Linear Solver</MenuItem>
-                  <MenuItem value={'estimate_recipe_scipy'}>Differential Evolution</MenuItem>
-                  <MenuItem value={'estimate_recipe_nnls'}>NNLS (Constrained)</MenuItem>
-                  <MenuItem value={'unconstrained_nnls'}>NNLS (Unconstrained)</MenuItem>
-                  <MenuItem value={'estimate_recipe_simple'}>Simple Inverse Power</MenuItem>
-                  <MenuItem value={'estimate_recipe_po'}>Simplified Product Opener</MenuItem>
+                  {Object.entries(algorithms).map((entry) => (
+                    <MenuItem value={entry[0]}>{entry[1]}</MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </TableCell>
