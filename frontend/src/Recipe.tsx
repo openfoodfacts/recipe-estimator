@@ -1,4 +1,4 @@
-import { Table, TableHead, TableRow, TextField, TableBody, TableCell, Typography, Autocomplete, Button} from '@mui/material';
+import { Table, TableHead, TableRow, TextField, TableBody, TableCell, Typography, Autocomplete, Select, InputLabel, MenuItem, FormControl} from '@mui/material';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { API_PATH } from './api';
 
@@ -56,25 +56,24 @@ function format(num: number, formatter: Intl.NumberFormat){
 export default function Recipe({product}: RecipeProps) {
   const [ingredients, setIngredients] = useState<any>();
   const [nutrients, setNutrients] = useState<any>();
-  const [algorithm, setAlgorithm] = useState<boolean>();
   const [penalties, setPenalties] = useState<any>();
+  const [algorithm, setAlgorithm] = useState<string>('estimate_recipe_scipy');
 
-  const getRecipe = useCallback((product: any, scipy = true) => {
+  const getRecipe = useCallback((product: any) => {
     if (!product || !product.ingredients)
       return;
     async function fetchData() {
       setIngredients(null);
-      const results = await (await fetch(`${API_PATH}api/v3/estimate_recipe${scipy ? '_scipy' : ''}`, {method: 'POST', body: JSON.stringify(product)})).json();
+      const results = await (await fetch(`${API_PATH}api/v3/${algorithm}`, {method: 'POST', body: JSON.stringify(product)})).json();
       setIngredients(results.ingredients);
       setNutrients(Object.fromEntries(
         Object.entries(results.recipe_estimator.nutrients).filter(
            ([key, val])=>(val as any).product_total > 0
         )));
       setPenalties(results.recipe_estimator.penalties)
-      setAlgorithm(scipy)
     }
     fetchData();
-  }, []);
+  }, [algorithm]);
 
   const refreshPenalties = useCallback((product: any) => {
     async function fetchData() {
@@ -91,6 +90,8 @@ export default function Recipe({product}: RecipeProps) {
 
 
   useEffect(()=>{
+    const params = new URLSearchParams(window.location.search);
+    setAlgorithm(params.get('algorithm') ?? 'estimate_recipe_scipy');
     getRecipe(product);
   }, [product, getRecipe]);
 
@@ -98,12 +99,23 @@ export default function Recipe({product}: RecipeProps) {
     return getTotalForParent(nutrient_key, ingredients, bound);
   }
 
-  function recalculateRecipe(useScipy: boolean) {
+  function recalculateRecipe(useAlgorithm: string) {
     product.ingredients = ingredients;
-    getRecipe(product, useScipy);
+    
+    const newUrl = window.location.origin + window.location.pathname + `?algorithm=${useAlgorithm}#${product.code}`;
+    window.history.pushState({path:newUrl},'',newUrl);
+    setAlgorithm(useAlgorithm);
+
+    // getRecipe(product);
   }
 
   function ingredientsEdited() {
+    // Re-run algorithm with newly specified ingredients
+    product.ingredients = ingredients;
+    getRecipe(product);
+  }
+
+  function quantitiesEdited() {
     // Re-evaluate objective function
     product.ingredients = ingredients;
     refreshPenalties(product);
@@ -192,9 +204,23 @@ export default function Recipe({product}: RecipeProps) {
               <Typography>{product.ingredients_text}</Typography>
             </TableCell>
             <TableCell>
-              <Button variant={algorithm ? 'outlined' : 'contained'} onClick={()=>recalculateRecipe(false)}>GLOP</Button>
-              &nbsp;
-              <Button variant={algorithm ? 'contained' : 'outlined'} onClick={()=>recalculateRecipe(true)}>SciPy</Button>
+              <FormControl variant="standard">
+                <InputLabel id="algorithm-label">Algorithm:</InputLabel>
+                <br/>
+                <Select
+                  labelId="algorithm-label"
+                  value={algorithm}
+                  label="Algorithm"
+                  onChange={(event) => recalculateRecipe(event.target.value)}
+                >
+                  <MenuItem value={'estimate_recipe'}>GLOP Linear Solver</MenuItem>
+                  <MenuItem value={'estimate_recipe_scipy'}>Differential Evolution</MenuItem>
+                  <MenuItem value={'estimate_recipe_nnls'}>NNLS (Constrained)</MenuItem>
+                  <MenuItem value={'unconstrained_nnls'}>NNLS (Unconstrained)</MenuItem>
+                  <MenuItem value={'estimate_recipe_simple'}>Simple Inverse Power</MenuItem>
+                  <MenuItem value={'estimate_recipe_po'}>Simplified Product Opener</MenuItem>
+                </Select>
+              </FormControl>
             </TableCell>
             <TableCell>
               <Table size='small' sx={{'& .MuiTableCell-sizeSmall': {padding: '1px 4px'}}}>
@@ -304,7 +330,7 @@ export default function Recipe({product}: RecipeProps) {
                     }
                     </TableCell>
                     <TableCell>{!ingredient.ingredients
-                      ? <TextField variant="standard" type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);ingredientsEdited();}}/>
+                      ? <TextField variant="standard" type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);quantitiesEdited();}}/>
                       : <Typography>{format(parseFloat(ingredient.quantity_estimate), QUANTITY)}</Typography>
                     }
                     </TableCell>

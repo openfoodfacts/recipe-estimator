@@ -156,7 +156,7 @@ def get_objective_function_args(product):
                 sub_ingredient_count = 1
 
                 # Set lost water constraint
-                water = ingredient["nutrients"].get("water", {})
+                water = ingredient.get("nutrients", {}).get("water", {})
                 maximum_water_content = water.get("percent_nom", 0) * 0.01
                 # water_loss_multipliers.append(
                 #     water_constraint(leaf_ingredient_index, maximum_water_content)
