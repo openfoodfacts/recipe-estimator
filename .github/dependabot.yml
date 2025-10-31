@@ -9,11 +9,40 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "monthly"
-  - package-ecosystem: "github-actions"
+    allow:
+      - dependency-type: "all"
+    groups:
+      python:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "npm"
+    directory: "frontend"
+    schedule:
+      interval: "monthly"
+    allow:
+      - dependency-type: "all"
+    groups:
+      frontend:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "monthly"
-    open-pull-requests-limit: 300
-    commit-message:
-      prefix: "chore"
-      include: "scope"
+    allow:
+      - dependency-type: "all"
+    groups:
+      docker:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    schedule:
+      interval: "monthly"

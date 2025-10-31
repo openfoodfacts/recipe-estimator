@@ -236,8 +236,8 @@ export default function Recipe({product}: RecipeProps) {
                       <TableCell>
                         <Typography variant="caption">{penalty_key}</Typography>
                       </TableCell>
-                      <TableCell>
-                        <Typography variant="caption">{penalties[penalty_key]}</Typography>
+                      <TableCell align='right'>
+                        <Typography variant="caption">{Intl.NumberFormat(undefined,{maximumFractionDigits: 0}).format(penalties[penalty_key])}</Typography>
                       </TableCell>
                     </TableRow>
                   ))}
