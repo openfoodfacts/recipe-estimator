@@ -1,6 +1,5 @@
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
-ARG PYTHON_VERSION=3.10
 
 FROM node:current-alpine AS frontend-build
 WORKDIR /app
@@ -9,7 +8,7 @@ RUN npm install
 COPY frontend ./
 RUN npm run build
 
-FROM python:$PYTHON_VERSION-slim-buster
+FROM python:3.11-slim-buster
 ARG USER_UID
 ARG USER_GID
 ENV PIP_CACHE_DIR=/var/cache/pip \

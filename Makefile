@@ -1,6 +1,9 @@
 refresh_ingredients_taxonomy:
 	python scripts/refresh_ingredients_taxonomy.py
 
+build_ciqual_ingredients:
+	python -m scripts.build_ciqual_ingredients
+
 install:
 	cd ./frontend; npm install; npm run build
 	pip install -r requirements.txt
@@ -18,4 +21,4 @@ up: build
 	docker compose up --wait
 
 tests:
-	pytest
+	pytest ${args}

@@ -40,3 +40,16 @@
 .total td, .total p {
   font-weight: 500;
 }
+
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+thead :last-child th {
+    border-bottom: double !important;
+}
+.parent {
+  background-color: #eee;
+  font-style: italic;
+}

@@ -20,7 +20,7 @@ This is using Python3.
 
 Create a virtualenv.
 ```
-python -m venv venv 
+python3.11 -m venv venv 
 ```
 
 Enter virtualenv (Windows).
@@ -99,6 +99,13 @@ make refresh_ingredients_taxonomy
 ```
 
 Having found the ingredient in CIQUAL a nutrient map is added to each ingredient. Only the "main" nutrient is used (the one with a `_100g` suffix).
+
+If the `nutrient_map.csv` or any of the source CIQUAL XML files are updated then you need to run:
+
+```
+make build_ciqual_ingredients
+```
+Which will update the `ciqual_ingredients.json` file.
 
 ## Determine nutrients for computation
 
@@ -180,13 +187,14 @@ This will provide details of the computation performed, such as time taken and n
 To get nutrient types for nutrient_map.csv I used:
 
 ```js
-db.products.aggregate([
+db.products.aggregate(
+[
   {
     $project: {
       keys: {
         $map: {
           input: {
-            "$objectToArray": "$nutriments"
+            $objectToArray: "$nutriments"
           },
           in: "$$this.k"
         }
@@ -197,14 +205,50 @@ db.products.aggregate([
     $unwind: "$keys"
   },
   {
+    $match: {
+      $and: [
+        {
+          keys: {
+            $regex: "_100g$"
+          }
+        },
+        {
+          keys: {
+            $ne: {
+              $regex: "_prepared_100g$"
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    $project:
+      {
+        keys: {
+          $replaceOne: {
+            input: "$keys",
+            find: "_100g",
+            replacement: ""
+          }
+        }
+      }
+  },
+  {
     $group: {
       _id: "$keys",
       count: {
-        "$sum": 1
+        $sum: 1
       }
     }
+  },
+  {
+    $sort:
+      {
+        count: -1
+      }
   }
-])
+]
+)
 ```
 
-Need to skip any nutrients where Ciqual value is '-' as this means not known, not zero
