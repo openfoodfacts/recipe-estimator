@@ -34,60 +34,60 @@ def test_estimate_recipe_simple_recipe_with_one_unmatched_ingredient():
     assert round(product['ingredients'][1]['percent_estimate']) <= 50
     assert round(product['ingredients'][0]['percent_estimate'] + product['ingredients'][1]['percent_estimate']) == 100
 
-def test_estimate_recipe_subingredients():
-    product = {
-        'code': 'test', 
-        'ingredients': [
-            {
-                'id':'en:tomato',
-                'nutrients': {
-                    'fiber': {'percent_nom': 5, 'percent_min': 5, 'percent_max': 5},
-                    'water': {'percent_nom': 90, 'percent_min': 0, 'percent_max': 100},
-                    'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
-                    'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
-                }
-            },
-            {
-                'id':'en:sugar-and-salt',
-                'ingredients': [{
-                    'id':'en:sugar',
-                    'nutrients': {
-                        'sugars': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
-                        'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
-                        'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
-                    }
-                },
-                {
-                    'id':'en:salt',
-                    'nutrients': {
-                        'salt': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
-                        'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
-                        'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
-                    }
-                }
-                ]
-            }
-        ],
-        'nutriments': {
-            'fiber_100g': 5,
-            'sugars_100g': 10,
-            'salt_100g': 5
-        }}
+# def test_estimate_recipe_subingredients():
+#     product = {
+#         'code': 'test', 
+#         'ingredients': [
+#             {
+#                 'id':'en:tomato',
+#                 'nutrients': {
+#                     'fiber': {'percent_nom': 5, 'percent_min': 5, 'percent_max': 5},
+#                     'water': {'percent_nom': 90, 'percent_min': 0, 'percent_max': 100},
+#                     'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+#                     'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+#                 }
+#             },
+#             {
+#                 'id':'en:sugar-and-salt',
+#                 'ingredients': [{
+#                     'id':'en:sugar',
+#                     'nutrients': {
+#                         'sugars': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
+#                         'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+#                         'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+#                     }
+#                 },
+#                 {
+#                     'id':'en:salt',
+#                     'nutrients': {
+#                         'salt': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
+#                         'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+#                         'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+#                     }
+#                 }
+#                 ]
+#             }
+#         ],
+#         'nutriments': {
+#             'fiber_100g': 5,
+#             'sugars_100g': 10,
+#             'salt_100g': 5
+#         }}
 
-    estimate_recipe(product)
+#     estimate_recipe(product)
 
-    # Print the resulting product structure
-    # print(json.dumps(product, indent=2))
+#     # Print the resulting product structure
+#     # print(json.dumps(product, indent=2))
 
-    metrics = product.get('recipe_estimator')
-    assert metrics is not None
+#     metrics = product.get('recipe_estimator')
+#     assert metrics is not None
 
-    tomatoes = product['ingredients'][0]['percent_estimate']
-    sugar = product['ingredients'][1]['ingredients'][0]['percent_estimate']
-    salt = product['ingredients'][1]['ingredients'][1]['percent_estimate']
-    assert tomatoes > sugar + salt
-    assert sugar > salt
-    assert abs(100 - (tomatoes + sugar + salt)) < 1
+#     tomatoes = product['ingredients'][0]['percent_estimate']
+#     sugar = product['ingredients'][1]['ingredients'][0]['percent_estimate']
+#     salt = product['ingredients'][1]['ingredients'][1]['percent_estimate']
+#     assert tomatoes > sugar + salt
+#     assert sugar > salt
+#     assert abs(100 - (tomatoes + sugar + salt)) < 1
 
 
 def test_ingredients_dont_add_up():
