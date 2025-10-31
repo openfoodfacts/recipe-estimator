@@ -9,11 +9,18 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "monthly"
+    allow:
+      - dependency-type: "all"
+    groups:
+      pip-production:
+        patterns:
+          - "*"
+
   - package-ecosystem: "github-actions"
     directory: "/"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
     schedule:
       interval: "monthly"
-    open-pull-requests-limit: 300
-    commit-message:
-      prefix: "chore"
-      include: "scope"
