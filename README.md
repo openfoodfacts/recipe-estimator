@@ -20,7 +20,7 @@ This is using Python3.
 
 Create a virtualenv.
 ```
-python -m venv venv 
+python3.11 -m venv venv 
 ```
 
 Enter virtualenv (Windows).
