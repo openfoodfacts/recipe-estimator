@@ -1,0 +1,54 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple"
+    }
+  },
+  "changelog-sections": [
+    {
+      "type": "feat",
+      "section": "Features",
+      "hidden": false
+    },
+    {
+      "type": "fix",
+      "section": "Bug Fixes",
+      "hidden": false
+    },
+    {
+      "type": "l10n",
+      "section": "Translations",
+      "hidden": false
+    },
+    {
+      "type": "docs",
+      "section": "Technical",
+      "hidden": false
+    },
+    {
+      "type": "test",
+      "section": "Technical",
+      "hidden": false
+    },
+    {
+      "type": "refactor",
+      "section": "Technical",
+      "hidden": false
+    },
+    {
+      "type": "ci",
+      "section": "Technical",
+      "hidden": false
+    },
+    {
+      "type": "build",
+      "section": "Technical",
+      "hidden": false
+    },
+    {
+      "type": "chore",
+      "section": "Technical",
+      "hidden": false
+    }
+  ]
+}
