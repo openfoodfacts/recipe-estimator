@@ -28,7 +28,7 @@ function App() {
 
   return (
     <>
-      <Recipe product={product} />
+      <Recipe product={product}/>
     </>
   );
 }
