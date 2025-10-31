@@ -5,7 +5,6 @@ services:
       args:
         USER_UID: ${USER_UID:-1000}
         USER_GID: ${USER_GID:-1000}
-        PYTHON_VERSION: ${PYTHON_VERSION:-3.10}
     image: recipe-estimator:dev
     volumes:
       - ./recipe_estimator:/app/recipe_estimator
