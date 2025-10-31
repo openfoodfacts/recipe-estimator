@@ -12,7 +12,29 @@ updates:
     allow:
       - dependency-type: "all"
     groups:
-      pip-production:
+      python:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "npm"
+    directory: "frontend"
+    schedule:
+      interval: "monthly"
+    allow:
+      - dependency-type: "all"
+    groups:
+      frontend:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    allow:
+      - dependency-type: "all"
+    groups:
+      docker:
         patterns:
           - "*"
 
