@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.3.0](https://github.com/openfoodfacts/recipe-estimator/compare/v0.2.0...v0.3.0) (2025-11-03)
+
+
+### Features
+
+* Add nnls version ([#112](https://github.com/openfoodfacts/recipe-estimator/issues/112)) ([d5b3bee](https://github.com/openfoodfacts/recipe-estimator/commit/d5b3beebec83289f88e94ce6ca29c8017d427e46))
+
+
+### Bug Fixes
+
+* Attempting to get dependabot to work for npm ([6f22256](https://github.com/openfoodfacts/recipe-estimator/commit/6f222566566041803552d2d2f9510bd8a76e37f8))
+* input checks + put max constraints on salt / fat / sugar ingredients only if corresponding nutrient is provided ([#96](https://github.com/openfoodfacts/recipe-estimator/issues/96)) ([cb8d03c](https://github.com/openfoodfacts/recipe-estimator/commit/cb8d03c5ca07eada3bfcbe9773aa318bb27368f7))
+* Simplify penalty format ([#123](https://github.com/openfoodfacts/recipe-estimator/issues/123)) ([f6e789d](https://github.com/openfoodfacts/recipe-estimator/commit/f6e789d91d42fe860fd9a23442bb81a10058b8e2))
+
+
+### Technical
+
+* Configure Release Please ([#127](https://github.com/openfoodfacts/recipe-estimator/issues/127)) ([39c3db9](https://github.com/openfoodfacts/recipe-estimator/commit/39c3db9fd2056e4090bd63f968f3e5772319cdee))
+* **deps:** bump the github-actions group with 3 updates ([#124](https://github.com/openfoodfacts/recipe-estimator/issues/124)) ([7370442](https://github.com/openfoodfacts/recipe-estimator/commit/7370442a218390950441e4f5074512087237f4ce))
+* **deps:** bump the npm_and_yarn group across 1 directory with 22 updates ([#126](https://github.com/openfoodfacts/recipe-estimator/issues/126)) ([e286ad0](https://github.com/openfoodfacts/recipe-estimator/commit/e286ad0207061500f0ea633fbc1038d3e095befd))
+* **deps:** bump the python group with 2 updates ([#128](https://github.com/openfoodfacts/recipe-estimator/issues/128)) ([102fe35](https://github.com/openfoodfacts/recipe-estimator/commit/102fe35de051eb16ff547d0436793e5531b77dac))
+* **deps:** bump the python group with 26 updates ([#125](https://github.com/openfoodfacts/recipe-estimator/issues/125)) ([c3c1299](https://github.com/openfoodfacts/recipe-estimator/commit/c3c129940accafb71442b47ac7f6677ce90df201))
+
 ## [0.2.0](https://github.com/openfoodfacts/recipe-estimator/compare/v0.1.0...v0.2.0) (2025-09-03)
 
 
