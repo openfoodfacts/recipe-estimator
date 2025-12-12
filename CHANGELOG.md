@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/openfoodfacts/recipe-estimator/compare/v0.3.0...v0.3.1) (2025-12-12)
+
+
+### Technical
+
+* **deps:** bump the frontend group in /frontend with 16 updates ([#129](https://github.com/openfoodfacts/recipe-estimator/issues/129)) ([7959e52](https://github.com/openfoodfacts/recipe-estimator/commit/7959e527069b832fbb4bdbdccbb3fd7ce683304a))
+* **deps:** bump urllib3 from 2.5.0 to 2.6.0 ([#137](https://github.com/openfoodfacts/recipe-estimator/issues/137)) ([ea414d7](https://github.com/openfoodfacts/recipe-estimator/commit/ea414d757f9488d8a4b6b2a895d9b20ed403161c))
+
 ## [0.3.0](https://github.com/openfoodfacts/recipe-estimator/compare/v0.2.0...v0.3.0) (2025-11-03)
 
 
