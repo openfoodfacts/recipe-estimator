@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.1](https://github.com/openfoodfacts/recipe-estimator/compare/v0.3.0...v0.3.1) (2025-12-15)
+
+
+### Technical
+
+* Create comprehensive GitHub Copilot instructions for recipe-estimator repository ([#116](https://github.com/openfoodfacts/recipe-estimator/issues/116)) ([7d209cd](https://github.com/openfoodfacts/recipe-estimator/commit/7d209cd2aaf40a8e220bb2f94b2f096097b8a932))
+* **deps:** bump the frontend group in /frontend with 16 updates ([#129](https://github.com/openfoodfacts/recipe-estimator/issues/129)) ([7959e52](https://github.com/openfoodfacts/recipe-estimator/commit/7959e527069b832fbb4bdbdccbb3fd7ce683304a))
+* **deps:** bump urllib3 from 2.5.0 to 2.6.0 ([#137](https://github.com/openfoodfacts/recipe-estimator/issues/137)) ([ea414d7](https://github.com/openfoodfacts/recipe-estimator/commit/ea414d757f9488d8a4b6b2a895d9b20ed403161c))
+* Improve onboarding documentation with fragmented structure and community resources ([#114](https://github.com/openfoodfacts/recipe-estimator/issues/114)) ([aff6f4b](https://github.com/openfoodfacts/recipe-estimator/commit/aff6f4bf2da29213250ab4c9c3a06c05a81c8122))
+
 ## [0.3.0](https://github.com/openfoodfacts/recipe-estimator/compare/v0.2.0...v0.3.0) (2025-11-03)
 
 
