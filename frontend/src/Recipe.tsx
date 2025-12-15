@@ -1,4 +1,4 @@
-import { Table, TableHead, TableRow, TextField, TableBody, TableCell, Typography, Autocomplete, Button} from '@mui/material';
+import { Table, TableHead, TableRow, TextField, TableBody, TableCell, Typography, Autocomplete, Select, InputLabel, MenuItem, FormControl} from '@mui/material';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { API_PATH } from './api';
 
@@ -48,6 +48,16 @@ const PERCENT = new Intl.NumberFormat(undefined, {maximumFractionDigits:1,minimu
 const VARIANCE = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2,signDisplay:"always"});
 const QUANTITY = new Intl.NumberFormat(undefined, {maximumFractionDigits:2,minimumFractionDigits:2});
 
+const algorithms = {
+  estimate_recipe_scipy: "Differential Evolution",
+  estimate_recipe: "GLOP Linear Solver",
+  estimate_recipe_nnls: "NNLS (Constrained)",
+  unconstrained_nnls: "NNLS (Unconstrained)",
+  estimate_recipe_simple: "Simple Inverse Power",
+  estimate_recipe_po: "Simplified Product Opener",
+}
+const DEFAULT_ALGORITHM = Object.keys(algorithms)[0];
+
 function format(num: number, formatter: Intl.NumberFormat){
   return num == null || isNaN(num) ? 'unknown' : formatter.format(num);
 }
@@ -56,25 +66,24 @@ function format(num: number, formatter: Intl.NumberFormat){
 export default function Recipe({product}: RecipeProps) {
   const [ingredients, setIngredients] = useState<any>();
   const [nutrients, setNutrients] = useState<any>();
-  const [algorithm, setAlgorithm] = useState<boolean>();
   const [penalties, setPenalties] = useState<any>();
+  const [algorithm, setAlgorithm] = useState<string>(DEFAULT_ALGORITHM);
 
-  const getRecipe = useCallback((product: any, scipy = true) => {
+  const getRecipe = useCallback((product: any) => {
     if (!product || !product.ingredients)
       return;
     async function fetchData() {
       setIngredients(null);
-      const results = await (await fetch(`${API_PATH}api/v3/estimate_recipe${scipy ? '_scipy' : ''}`, {method: 'POST', body: JSON.stringify(product)})).json();
+      const results = await (await fetch(`${API_PATH}api/v3/${algorithm}`, {method: 'POST', body: JSON.stringify(product)})).json();
       setIngredients(results.ingredients);
       setNutrients(Object.fromEntries(
         Object.entries(results.recipe_estimator.nutrients).filter(
            ([key, val])=>(val as any).product_total > 0
         )));
       setPenalties(results.recipe_estimator.penalties)
-      setAlgorithm(scipy)
     }
     fetchData();
-  }, []);
+  }, [algorithm]);
 
   const refreshPenalties = useCallback((product: any) => {
     async function fetchData() {
@@ -91,6 +100,9 @@ export default function Recipe({product}: RecipeProps) {
 
 
   useEffect(()=>{
+    const params = new URLSearchParams(window.location.search);
+    const useAlgorithm = params.get('algorithm') ?? DEFAULT_ALGORITHM;
+    setAlgorithm(useAlgorithm in algorithms ? useAlgorithm : DEFAULT_ALGORITHM);
     getRecipe(product);
   }, [product, getRecipe]);
 
@@ -98,12 +110,21 @@ export default function Recipe({product}: RecipeProps) {
     return getTotalForParent(nutrient_key, ingredients, bound);
   }
 
-  function recalculateRecipe(useScipy: boolean) {
+  function recalculateRecipe(useAlgorithm: string) {
     product.ingredients = ingredients;
-    getRecipe(product, useScipy);
+    
+    const newUrl = window.location.origin + window.location.pathname + `?algorithm=${useAlgorithm}#${product.code}`;
+    window.history.pushState({path:newUrl},'',newUrl);
+    setAlgorithm(useAlgorithm);
   }
 
   function ingredientsEdited() {
+    // Re-run algorithm with newly specified ingredients
+    product.ingredients = ingredients;
+    getRecipe(product);
+  }
+
+  function quantitiesEdited() {
     // Re-evaluate objective function
     product.ingredients = ingredients;
     refreshPenalties(product);
@@ -192,9 +213,20 @@ export default function Recipe({product}: RecipeProps) {
               <Typography>{product.ingredients_text}</Typography>
             </TableCell>
             <TableCell>
-              <Button variant={algorithm ? 'outlined' : 'contained'} onClick={()=>recalculateRecipe(false)}>GLOP</Button>
-              &nbsp;
-              <Button variant={algorithm ? 'contained' : 'outlined'} onClick={()=>recalculateRecipe(true)}>SciPy</Button>
+              <FormControl variant="standard">
+                <InputLabel id="algorithm-label">Algorithm:</InputLabel>
+                <br/>
+                <Select
+                  labelId="algorithm-label"
+                  value={algorithm}
+                  label="Algorithm"
+                  onChange={(event) => recalculateRecipe(event.target.value)}
+                >
+                  {Object.entries(algorithms).map((entry) => (
+                    <MenuItem value={entry[0]}>{entry[1]}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </TableCell>
             <TableCell>
               <Table size='small' sx={{'& .MuiTableCell-sizeSmall': {padding: '1px 4px'}}}>
@@ -204,8 +236,8 @@ export default function Recipe({product}: RecipeProps) {
                       <TableCell>
                         <Typography variant="caption">{penalty_key}</Typography>
                       </TableCell>
-                      <TableCell>
-                        <Typography variant="caption">{penalties[penalty_key]}</Typography>
+                      <TableCell align='right'>
+                        <Typography variant="caption">{Intl.NumberFormat(undefined,{maximumFractionDigits: 0}).format(penalties[penalty_key])}</Typography>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -304,7 +336,7 @@ export default function Recipe({product}: RecipeProps) {
                     }
                     </TableCell>
                     <TableCell>{!ingredient.ingredients
-                      ? <TextField variant="standard" type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);ingredientsEdited();}}/>
+                      ? <TextField variant="standard" type="number" size='small' value={parseFloat(ingredient.quantity_estimate) || ''} onChange={(e) => {ingredient.quantity_estimate = parseFloat(e.target.value);quantitiesEdited();}}/>
                       : <Typography>{format(parseFloat(ingredient.quantity_estimate), QUANTITY)}</Typography>
                     }
                     </TableCell>
