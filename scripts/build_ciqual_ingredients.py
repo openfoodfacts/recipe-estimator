@@ -3,26 +3,28 @@ import os
 import xml.etree.ElementTree as ET
 from recipe_estimator.nutrient_map import ciqual_to_off
 
+version = "2025_11_03"
+
 def parse_value(ciqual_nutrient):
     if not ciqual_nutrient or ciqual_nutrient == '-':
         return 0
     return float(ciqual_nutrient.replace(',','.').replace('<','').replace('traces','0'))
 
 const_codes = {}
-const_table = ET.parse(os.path.join(os.path.dirname(__file__), "../ciqual/const_2020_07_07.xml")).getroot()
+const_table = ET.parse(os.path.join(os.path.dirname(__file__), f"../ciqual/const_{version}.xml")).getroot()
 for const in const_table:
     const_codes[const.find('const_code').text.strip()] = const.find('const_nom_eng').text.strip()
 
 # Load Ciqual data
 alim_codes = {}
-alim_table = ET.parse(os.path.join(os.path.dirname(__file__), "../ciqual/alim_2020_07_07.xml")).getroot()
+alim_table = ET.parse(os.path.join(os.path.dirname(__file__), f"../ciqual/alim_{version}.xml")).getroot()
 for alim in alim_table:
     alim_codes[alim.find('alim_code').text.strip()] = alim.find('alim_nom_eng').text.strip()
 
 ciqual_ingredients = {}
 
 # Compo file is not valid XML. Need to fix all of the "less than" entries
-with open(os.path.join(os.path.dirname(__file__), "../ciqual/compo_2020_07_07.xml"), encoding="utf8") as compo_file:
+with open(os.path.join(os.path.dirname(__file__), f"../ciqual/compo_{version}.xml"), encoding="utf8") as compo_file:
     compo_table = ET.fromstring(compo_file.read().replace(' < ', ' &lt; '))
 
 # Code below creates the ciqual_stats.csv file

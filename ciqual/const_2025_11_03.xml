@@ -1,0 +1,447 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TABLE>
+   <CONST>
+      <const_code> 327 </const_code>
+      <const_nom_fr> Energie, Règlement UE N° 1169/2011 (kJ/100 g) </const_nom_fr>
+      <const_nom_eng> Energy, Regulation EU No 1169/2011 (kJ/100g) </const_nom_eng>
+      <code_INFOODS> ENERC </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 328 </const_code>
+      <const_nom_fr> Energie, Règlement UE N° 1169/2011 (kcal/100 g) </const_nom_fr>
+      <const_nom_eng> Energy, Regulation EU No 1169/2011 (kcal/100g) </const_nom_eng>
+      <code_INFOODS> ENERC </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 332 </const_code>
+      <const_nom_fr> Energie, N x facteur Jones, avec fibres (kJ/100 g) </const_nom_fr>
+      <const_nom_eng> Energy, N x Jones&apos; factor, with fibres (kJ/100g) </const_nom_eng>
+      <code_INFOODS> ENERC </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 333 </const_code>
+      <const_nom_fr> Energie, N x facteur Jones, avec fibres (kcal/100 g) </const_nom_fr>
+      <const_nom_eng> Energy, N x Jones&apos; factor, with fibres (kcal/100g) </const_nom_eng>
+      <code_INFOODS> ENERC </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 400 </const_code>
+      <const_nom_fr> Eau (g/100 g) </const_nom_fr>
+      <const_nom_eng> Water (g/100g) </const_nom_eng>
+      <code_INFOODS> WATER </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10000 </const_code>
+      <const_nom_fr> Cendres (g/100 g) </const_nom_fr>
+      <const_nom_eng> Ash (g/100g) </const_nom_eng>
+      <code_INFOODS> ASH </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10004 </const_code>
+      <const_nom_fr> Sel chlorure de sodium (g/100 g) </const_nom_fr>
+      <const_nom_eng> Salt (g/100g) </const_nom_eng>
+      <code_INFOODS missing=" " />
+   </CONST>
+   <CONST>
+      <const_code> 10110 </const_code>
+      <const_nom_fr> Sodium (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Sodium (mg/100g) </const_nom_eng>
+      <code_INFOODS> NA </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10120 </const_code>
+      <const_nom_fr> Magnésium (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Magnesium (mg/100g) </const_nom_eng>
+      <code_INFOODS> MG </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10150 </const_code>
+      <const_nom_fr> Phosphore (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Phosphorus (mg/100g) </const_nom_eng>
+      <code_INFOODS> P </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10170 </const_code>
+      <const_nom_fr> Chlorure (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Chloride (mg/100g) </const_nom_eng>
+      <code_INFOODS> CLD </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10190 </const_code>
+      <const_nom_fr> Potassium (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Potassium (mg/100g) </const_nom_eng>
+      <code_INFOODS> K </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10200 </const_code>
+      <const_nom_fr> Calcium (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Calcium (mg/100g) </const_nom_eng>
+      <code_INFOODS> CA </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10251 </const_code>
+      <const_nom_fr> Manganèse (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Manganese (mg/100g) </const_nom_eng>
+      <code_INFOODS> MN </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10260 </const_code>
+      <const_nom_fr> Fer (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Iron (mg/100g) </const_nom_eng>
+      <code_INFOODS> FE </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10290 </const_code>
+      <const_nom_fr> Cuivre (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Copper (mg/100g) </const_nom_eng>
+      <code_INFOODS> CU </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10300 </const_code>
+      <const_nom_fr> Zinc (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Zinc (mg/100g) </const_nom_eng>
+      <code_INFOODS> ZN </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10340 </const_code>
+      <const_nom_fr> Sélénium (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Selenium (µg/100g) </const_nom_eng>
+      <code_INFOODS> SE </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 10530 </const_code>
+      <const_nom_fr> Iode (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Iodine (µg/100g) </const_nom_eng>
+      <code_INFOODS> ID </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 25000 </const_code>
+      <const_nom_fr> Protéines, N x facteur de Jones (g/100 g) </const_nom_fr>
+      <const_nom_eng> Protein (g/100g) </const_nom_eng>
+      <code_INFOODS> PROCNT </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 25003 </const_code>
+      <const_nom_fr> Protéines, N x 6.25 (g/100 g) </const_nom_fr>
+      <const_nom_eng> Protein, crude, N x 6.25 (g/100g) </const_nom_eng>
+      <code_INFOODS> PROCNT </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 31000 </const_code>
+      <const_nom_fr> Glucides (g/100 g) </const_nom_fr>
+      <const_nom_eng> Carbohydrate (g/100g) </const_nom_eng>
+      <code_INFOODS> CHOAVL </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 32000 </const_code>
+      <const_nom_fr> Sucres (g/100 g) </const_nom_fr>
+      <const_nom_eng> Sugars (g/100g) </const_nom_eng>
+      <code_INFOODS> SUGAR </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 32210 </const_code>
+      <const_nom_fr> Fructose (g/100 g) </const_nom_fr>
+      <const_nom_eng> Fructose (g/100g) </const_nom_eng>
+      <code_INFOODS> FRUS </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 32220 </const_code>
+      <const_nom_fr> Galactose (g/100 g) </const_nom_fr>
+      <const_nom_eng> Galactose (g/100g) </const_nom_eng>
+      <code_INFOODS> GALS </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 32250 </const_code>
+      <const_nom_fr> Glucose (g/100 g) </const_nom_fr>
+      <const_nom_eng> Glucose (g/100g) </const_nom_eng>
+      <code_INFOODS> GLUS </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 32410 </const_code>
+      <const_nom_fr> Lactose (g/100 g) </const_nom_fr>
+      <const_nom_eng> Lactose (g/100g) </const_nom_eng>
+      <code_INFOODS> LACS </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 32430 </const_code>
+      <const_nom_fr> Maltose (g/100 g) </const_nom_fr>
+      <const_nom_eng> Maltose (g/100g) </const_nom_eng>
+      <code_INFOODS> MALS </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 32480 </const_code>
+      <const_nom_fr> Saccharose (g/100 g) </const_nom_fr>
+      <const_nom_eng> Sucrose (g/100g) </const_nom_eng>
+      <code_INFOODS> SUCS </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 33110 </const_code>
+      <const_nom_fr> Amidon (g/100 g) </const_nom_fr>
+      <const_nom_eng> Starch (g/100g) </const_nom_eng>
+      <code_INFOODS> STARCH </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 34000 </const_code>
+      <const_nom_fr> Polyols totaux (g/100 g) </const_nom_fr>
+      <const_nom_eng> Polyols (g/100g) </const_nom_eng>
+      <code_INFOODS> POLYL </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 34100 </const_code>
+      <const_nom_fr> Fibres alimentaires (g/100 g) </const_nom_fr>
+      <const_nom_eng> Fibres (g/100g) </const_nom_eng>
+      <code_INFOODS> FIB- </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 40000 </const_code>
+      <const_nom_fr> Lipides (g/100 g) </const_nom_fr>
+      <const_nom_eng> Fat (g/100g) </const_nom_eng>
+      <code_INFOODS> FAT </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 40302 </const_code>
+      <const_nom_fr> AG saturés (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA saturated (g/100g) </const_nom_eng>
+      <code_INFOODS> FASAT </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 40303 </const_code>
+      <const_nom_fr> AG monoinsaturés (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA mono (g/100g) </const_nom_eng>
+      <code_INFOODS> FAMS </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 40304 </const_code>
+      <const_nom_fr> AG polyinsaturés (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA poly (g/100g) </const_nom_eng>
+      <code_INFOODS> FAPU </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 40400 </const_code>
+      <const_nom_fr> AG 4:0, butyrique (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 4:0 (g/100g) </const_nom_eng>
+      <code_INFOODS> F4D0 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 40600 </const_code>
+      <const_nom_fr> AG 6:0, caproïque (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 6:0 (g/100g) </const_nom_eng>
+      <code_INFOODS> F6D0 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 40800 </const_code>
+      <const_nom_fr> AG 8:0, caprylique (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 8:0 (g/100g) </const_nom_eng>
+      <code_INFOODS> F8D0 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 41000 </const_code>
+      <const_nom_fr> AG 10:0, caprique (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 10:0 (g/100g) </const_nom_eng>
+      <code_INFOODS> F10D0 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 41200 </const_code>
+      <const_nom_fr> AG 12:0, laurique (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 12:0 (g/100g) </const_nom_eng>
+      <code_INFOODS> F12D0 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 41400 </const_code>
+      <const_nom_fr> AG 14:0, myristique (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 14:0 (g/100g) </const_nom_eng>
+      <code_INFOODS> F14D0 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 41600 </const_code>
+      <const_nom_fr> AG 16:0, palmitique (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 16:0 (g/100g) </const_nom_eng>
+      <code_INFOODS> F16D0 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 41800 </const_code>
+      <const_nom_fr> AG 18:0, stéarique (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 18:0 (g/100g) </const_nom_eng>
+      <code_INFOODS> F18D0 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 41819 </const_code>
+      <const_nom_fr> AG 18:1 9c (n-9), oléique (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 18:1 n-9 cis (g/100g) </const_nom_eng>
+      <code_INFOODS> F18D1CN9 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 41826 </const_code>
+      <const_nom_fr> AG 18:2 9c,12c (n-6), linoléique (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 18:2 9c,12c (n-6) (g/100g) </const_nom_eng>
+      <code_INFOODS> F18D2CN6 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 41833 </const_code>
+      <const_nom_fr> AG 18:3 c9,c12,c15 (n-3), alpha-linolénique (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 18:3 c9,c12,c15 (n-3) (g/100g) </const_nom_eng>
+      <code_INFOODS> F18D3N3 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 42046 </const_code>
+      <const_nom_fr> AG 20:4 5c,8c,11c,14c (n-6), arachidonique (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 20:4 5c,8c,11c,14c (n-6) (g/100g) </const_nom_eng>
+      <code_INFOODS> F20D4N6 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 42053 </const_code>
+      <const_nom_fr> AG 20:5 5c,8c,11c,14c,17c (n-3) EPA (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 20:5 5c,8c,11c,14c,17c (n-3) EPA (g/100g) </const_nom_eng>
+      <code_INFOODS> F20D5N3 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 42263 </const_code>
+      <const_nom_fr> AG 22:6 4c,7c,10c,13c,16c,19c (n-3) DHA (g/100 g) </const_nom_fr>
+      <const_nom_eng> FA 22:6 4c,7c,10c,13c,16c,19c (n-3) DHA (g/100g) </const_nom_eng>
+      <code_INFOODS> F22D6N3 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 51104 </const_code>
+      <const_nom_fr> Activité vitaminique A, équivalents rétinol (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin A activity, retinol equivalent (µg/100mg) </const_nom_eng>
+      <code_INFOODS> RAE </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 51200 </const_code>
+      <const_nom_fr> Rétinol (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Retinol (µg/100g) </const_nom_eng>
+      <code_INFOODS> RETOL </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 51330 </const_code>
+      <const_nom_fr> Beta-Carotène (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Beta-carotene (µg/100g) </const_nom_eng>
+      <code_INFOODS> CARTB </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 52100 </const_code>
+      <const_nom_fr> Vitamine D (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin D (µg/100g) </const_nom_eng>
+      <code_INFOODS> VITD- </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 52200 </const_code>
+      <const_nom_fr> Vitamine D2 (ergocalciférol) (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin D2 (ergocalciferol) (µg/100g) </const_nom_eng>
+      <code_INFOODS> ERGCAL </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 52300 </const_code>
+      <const_nom_fr> Vitamine D3 (cholécalciférol) (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin D3 (cholecalciferol) (µg/100g) </const_nom_eng>
+      <code_INFOODS> CHOCAL </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 53100 </const_code>
+      <const_nom_fr> Vitamine E (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin E (mg/100g) </const_nom_eng>
+      <code_INFOODS> VITE- </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 54101 </const_code>
+      <const_nom_fr> Vitamine K1 (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin K1 (µg/100g) </const_nom_eng>
+      <code_INFOODS> VITK1 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 54104 </const_code>
+      <const_nom_fr> Vitamine K2 (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin K2 (µg/100g) </const_nom_eng>
+      <code_INFOODS> VITK2 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 55100 </const_code>
+      <const_nom_fr> Vitamine C (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin C (mg/100g) </const_nom_eng>
+      <code_INFOODS> VITC </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 56100 </const_code>
+      <const_nom_fr> Vitamine B1 ou Thiamine (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin B1 or Thiamin (mg/100g) </const_nom_eng>
+      <code_INFOODS> THIA </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 56200 </const_code>
+      <const_nom_fr> Vitamine B2 ou Riboflavine (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin B2 or Riboflavin (mg/100g) </const_nom_eng>
+      <code_INFOODS> RIBF </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 56310 </const_code>
+      <const_nom_fr> Vitamine B3 ou PP ou Niacine (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin B3 or Niacin (mg/100g) </const_nom_eng>
+      <code_INFOODS> NIA </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 56400 </const_code>
+      <const_nom_fr> Vitamine B5 ou Acide pantothénique (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin B5 or Pantothenic acid (mg/100g) </const_nom_eng>
+      <code_INFOODS> PANTAC </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 56500 </const_code>
+      <const_nom_fr> Vitamine B6 (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin B6 (mg/100g) </const_nom_eng>
+      <code_INFOODS> VITB6- </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 56600 </const_code>
+      <const_nom_fr> Vitamine B12 (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin B12 (µg/100g) </const_nom_eng>
+      <code_INFOODS> VITB12 </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 56700 </const_code>
+      <const_nom_fr> Vitamine B9 ou Folates totaux (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin B9 or total folates (µg/100g) </const_nom_eng>
+      <code_INFOODS> FOL </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 56702 </const_code>
+      <const_nom_fr> Vitamine B9 ou Folates totaux, équivalents folates alimentaires, DFE (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Vitamin B9 or total folates, dietary folate equivalents, DFE (µg/100g) </const_nom_eng>
+      <code_INFOODS> FOLDFE </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 56704 </const_code>
+      <const_nom_fr> Folates intrinsèques (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Intrinsic folate (µg/100 g) </const_nom_eng>
+      <code_INFOODS> FOLFD </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 56708 </const_code>
+      <const_nom_fr> Acide folique (enrichissement) (µg/100 g) </const_nom_fr>
+      <const_nom_eng> Folic acid (enrichment) (µg/100g) </const_nom_eng>
+      <code_INFOODS> FOLAC </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 60000 </const_code>
+      <const_nom_fr> Alcool (éthanol) (g/100 g) </const_nom_fr>
+      <const_nom_eng> Alcohol (g/100g) </const_nom_eng>
+      <code_INFOODS> ALC </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 65000 </const_code>
+      <const_nom_fr> Acides organiques (g/100 g) </const_nom_fr>
+      <const_nom_eng> Organic acids (g/100g) </const_nom_eng>
+      <code_INFOODS> OA </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 71010 </const_code>
+      <const_nom_fr> Alpha-tocophérol (vitamine E) (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Alpha-tocopherol (vitamine E)(mg/100g) </const_nom_eng>
+      <code_INFOODS> TOCPHA </code_INFOODS>
+   </CONST>
+   <CONST>
+      <const_code> 75100 </const_code>
+      <const_nom_fr> Cholestérol (mg/100 g) </const_nom_fr>
+      <const_nom_eng> Cholesterol (mg/100g) </const_nom_eng>
+      <code_INFOODS> CHOL- </code_INFOODS>
+   </CONST>
+</TABLE>
