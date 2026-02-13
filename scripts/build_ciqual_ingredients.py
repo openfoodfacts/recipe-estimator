@@ -95,6 +95,8 @@ for compo in compo_table:
             'percent_max': max_value,
             'confidence' : confidence.strip() if confidence is not None and teneur != '-' else '-'
         }
+        if "<" in teneur:
+            ciqual_ingredient['nutrients'][nutrient_key]["modifier"] = "<"
 
 # Post-process sugars as some items, like fructose, don't quote sugars but so quote the individual parts
 for ciqual_ingredient in ciqual_ingredients.values():
