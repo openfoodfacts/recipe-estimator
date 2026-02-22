@@ -87,18 +87,19 @@ for compo in compo_table:
             'alim_nom_eng': alim_nom_eng,
             'text': alim_nom_eng,
             'nutrients': {},
+            'source': version,
         })
-        ciqual_ingredient = ciqual_ingredients.get(alim_code, {})
         ciqual_ingredient['nutrients'][nutrient_key] = {
             'percent_nom': nom_value,
             'percent_min': min_value,
             'percent_max': max_value,
-            'confidence' : confidence.strip() if confidence is not None and teneur != '-' else '-'
+            'confidence' : confidence.strip() if confidence is not None and teneur != '-' else '-',
+            'source': version,
         }
         if "<" in teneur:
             ciqual_ingredient['nutrients'][nutrient_key]["modifier"] = "<"
 
-# Post-process sugars as some items, like fructose, don't quote sugars but so quote the individual parts
+# Post-process sugars as some items, like fructose, don't quote sugars but do quote the individual parts
 for ciqual_ingredient in ciqual_ingredients.values():
     nutrients = ciqual_ingredient['nutrients']
     sugars = nutrients.get('sugars')
