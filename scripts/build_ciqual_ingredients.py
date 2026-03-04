@@ -16,7 +16,7 @@ for version in ["2025_11_03", "2020_07_07"]:
     const_codes = {}
     const_table = ET.parse(os.path.join(os.path.dirname(__file__), f"../ciqual/const_{version}.xml")).getroot()
     for const in const_table:
-        const_codes[const.find('const_code').text.strip()] = const.find('const_nom_eng').text.strip()
+        const_codes[const.find('const_code').text.strip()] = const.find('const_nom_eng').text.strip().lower()
 
     # Load Ciqual data
     alim_codes = {}
