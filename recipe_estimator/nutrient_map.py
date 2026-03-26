@@ -19,4 +19,4 @@ with open(filename, newline="", encoding="utf8") as csvfile:
                 factor = 1000000.0
             row['factor'] = factor
             off_to_ciqual[row["off_id"]] = row
-            ciqual_to_off[row["ciqual_id"]] = row
+            ciqual_to_off[row["ciqual_id"].lower()] = row
