@@ -1,5 +1,6 @@
 import os
-import urllib.request, json 
+import urllib.request
+import json
 
 with open(os.path.join(os.path.dirname(__file__), "../recipe_estimator/assets/ciqual_ingredients.json"), "r", encoding="utf-8") as ciqual_file:
     ciqual = json.load(ciqual_file)
