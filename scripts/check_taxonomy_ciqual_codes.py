@@ -11,30 +11,30 @@ with urllib.request.urlopen("https://static.openfoodfacts.org/data/taxonomies/ca
     categories = json.load(url)
 
 def check_taxonomy(taxonomy):
-  missing_codes = []
-  name_differences = []
-  missing_proxy_codes = []
-  for id, item in taxonomy.items():
-    if 'ciqual_food_code' in item:
-      item_name = item.get("name", {}).get("en")
-      ciqual_code = item['ciqual_food_code'].get('en')
-      ciqual_name_en = item.get('ciqual_food_name',{}).get('en')
-      ciqual_ingredient = ciqual.get(ciqual_code)
-      if not ciqual_ingredient:
-        missing_codes.append(f"{id} ({item_name}): Can't find CIQUAL code {ciqual_code} ({ciqual_name_en})")
-      else:
-        alim_nom_eng = ciqual_ingredient.get("alim_nom_eng")
-        if ciqual_name_en != alim_nom_eng:
-          name_differences.append(f"{id} ({item_name}): Names don't match for CIQUAL code {ciqual_code} ({ciqual_name_en} / {alim_nom_eng})")
+    missing_codes = []
+    name_differences = []
+    missing_proxy_codes = []
+    for id, item in taxonomy.items():
+        if 'ciqual_food_code' in item:
+            item_name = item.get("name", {}).get("en")
+            ciqual_code = item['ciqual_food_code'].get('en')
+            ciqual_name_en = item.get('ciqual_food_name', {}).get('en')
+            ciqual_ingredient = ciqual.get(ciqual_code)
+            if not ciqual_ingredient:
+                missing_codes.append(f"{id} ({item_name}): Can't find CIQUAL code {ciqual_code} ({ciqual_name_en})")
+            else:
+                alim_nom_eng = ciqual_ingredient.get("alim_nom_eng")
+                if ciqual_name_en != alim_nom_eng:
+                    name_differences.append(f"{id} ({item_name}): Names don't match for CIQUAL code {ciqual_code} ({ciqual_name_en} / {alim_nom_eng})")
 
-    if 'ciqual_proxy_food_code' in item:
-      item_name = item.get("name", {}).get("en")
-      ciqual_code = item['ciqual_proxy_food_code'].get('en')
-      ciqual_name_en = item.get('ciqual_proxy_food_name',{}).get('en')
-      ciqual_ingredient = ciqual.get(ciqual_code)
-      if not ciqual_ingredient:
-        missing_proxy_codes.append(f"{id} ({item_name}): Can't find proxy CIQUAL code {ciqual_code} ({ciqual_name_en})")
-  return missing_codes, missing_proxy_codes, name_differences
+        if 'ciqual_proxy_food_code' in item:
+            item_name = item.get("name", {}).get("en")
+            ciqual_code = item['ciqual_proxy_food_code'].get('en')
+            ciqual_name_en = item.get('ciqual_proxy_food_name', {}).get('en')
+            ciqual_ingredient = ciqual.get(ciqual_code)
+            if not ciqual_ingredient:
+                missing_proxy_codes.append(f"{id} ({item_name}): Can't find proxy CIQUAL code {ciqual_code} ({ciqual_name_en})")
+    return missing_codes, missing_proxy_codes, name_differences
 
 ingredient_missing_codes, ingredient_missing_proxy_codes, ingredient_name_differences = check_taxonomy(ingredients)
 category_missing_codes, category_missing_proxy_codes, category_name_differences = check_taxonomy(categories)
