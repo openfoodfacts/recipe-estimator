@@ -37,3 +37,47 @@ def test_estimate_recipe_simple_recipe():
 
     assert abs(58.3 - product['ingredients'][0]['percent_estimate']) < 2
     assert abs(41.7 - product['ingredients'][1]['percent_estimate']) < 2
+
+
+def test_estimate_recipe_subingredient_limits():
+    product = {
+        'code': 'subingredients',
+        'ingredients': [
+            {
+                'id':'en:dummy-ingredients',
+                'ingredients': [
+                    {
+                        'id':'en:one',
+                        'nutrients': {
+                            'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                        }
+                    },
+                    {
+                        'id':'en:two',
+                        'nutrients': {
+                            'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                        }
+                    }
+                ]
+            },
+            {
+                'id':'en:salt',
+                'nutrients': {
+                    'salt': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
+                }
+            },
+        ],
+        'nutriments': {
+            'salt_100g': 100
+        }}
+
+    # For the above there is no way to reach the salt limit as the only ingredient with salt is in second place
+    # so can be at most 50%
+    estimate_recipe(product)
+
+    metrics = product.get('recipe_estimator')
+    assert metrics is not None
+
+    salt = product['ingredients'][1]
+    # Percent estimate is as high a possible
+    assert abs(50 - salt.get('percent_estimate')) < 2

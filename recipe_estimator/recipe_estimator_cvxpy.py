@@ -6,18 +6,38 @@ from .fitness import get_objective_function_args, objective as objective_functio
 
 from .prepare_nutrients import prepare_nutrients
 
+def add_ingredient_order_constraints(ingredients, constraints, leaf_ingredients, ingredient_variables):
+    previous_ingredients = None
+    total_ingredients = []
+    for ingredient in ingredients:
+        if ('ingredients' in ingredient and len(ingredient['ingredients']) > 0):
+            # Child ingredients
+            my_ingredients = add_ingredient_order_constraints(ingredient['ingredients'], constraints, leaf_ingredients, ingredient_variables)
+        else:
+            my_ingredients = [ingredient_variables[len(leaf_ingredients)]]
+            leaf_ingredients.append(ingredient)
+            
+        if previous_ingredients and my_ingredients:
+            constraints.append(sum(previous_ingredients) >= sum(my_ingredients))
+
+        total_ingredients.extend(my_ingredients)
+        previous_ingredients = my_ingredients
+    
+    return total_ingredients
+
 def estimate_recipe(product):
     current = time.perf_counter()
     leaf_ingredient_count = prepare_nutrients(product, True)
     ingredients = product["ingredients"]
     recipe_estimator = product["recipe_estimator"]
     nutrients = recipe_estimator["nutrients"]    
-    [_, leaf_ingredients, args] = get_objective_function_args(product)
 
     ingredients_nutrients = []
     product_nutrients = []
-    x = cp.Variable(leaf_ingredient_count)
-    constraints = [cp.sum(x) == 100, x >= 0]
+    x = cp.Variable(leaf_ingredient_count,nonneg=True)
+    constraints = [cp.sum(x) == 100]
+    leaf_ingredients = []
+    add_ingredient_order_constraints(ingredients, constraints, leaf_ingredients, x)
 
     for nutrient_key in nutrients:
         nutrient = nutrients[nutrient_key]
@@ -30,12 +50,13 @@ def estimate_recipe(product):
         
         product_nutrients.append(nutrient['product_total'])
         ingredient_nutrients = []
+        
         for i, ingredient in enumerate(leaf_ingredients):
             ingredient_nutrient_percent =  ingredient['nutrients'].get(nutrient_key, {}).get('percent_nom', 0)
             ingredient_nutrients.append(ingredient_nutrient_percent * 0.01)
-            if i > 0:
-                constraints.append(x[i - 1] >= x[i])
+
         ingredients_nutrients.append(ingredient_nutrients)
+
 
     A = np.array(ingredients_nutrients)
     b = np.array(product_nutrients)
@@ -52,6 +73,7 @@ def estimate_recipe(product):
 
     # Calculate objective function so we can compare with SciPy
     quantities = np.array([float(ingredient['quantity_estimate']) for ingredient in leaf_ingredients])
+    [_, _, args] = get_objective_function_args(product)
     objective_function(quantities, *args)
     recipe_estimator['penalties'] = args[0]
 
