@@ -55,6 +55,7 @@ const algorithms = {
   unconstrained_nnls: "NNLS (Unconstrained)",
   estimate_recipe_simple: "Simple Inverse Power",
   estimate_recipe_po: "Simplified Product Opener",
+  estimate_recipe_cvxpy: "CVXPY",
 }
 const DEFAULT_ALGORITHM = Object.keys(algorithms)[0];
 

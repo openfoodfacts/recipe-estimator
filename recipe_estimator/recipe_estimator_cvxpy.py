@@ -12,9 +12,9 @@ def add_ingredient_order_constraints(ingredients, constraints, leaf_ingredients,
     for ingredient in ingredients:
         if ('ingredients' in ingredient and len(ingredient['ingredients']) > 0):
             # Child ingredients
-            my_ingredients = add_ingredient_order_constraints(ingredient['ingredients'], constraints, leaf_ingredients, ingredient_variables)
+            my_ingredients = add_ingredient_order_constraints(ingredient['ingredients'], constraints, leaf_ingredients, ingredient_percentages)
         else:
-            my_ingredients = [ingredient_variables[len(leaf_ingredients)]]
+            my_ingredients = [ingredient_percentages[len(leaf_ingredients)]]
             leaf_ingredients.append(ingredient)
             
         if previous_ingredients and my_ingredients:
@@ -34,10 +34,12 @@ def estimate_recipe(product):
 
     ingredients_nutrients = []
     product_nutrients = []
-    x = cp.Variable(leaf_ingredient_count,nonneg=True)
-    constraints = [cp.sum(x) == 100]
     leaf_ingredients = []
-    add_ingredient_order_constraints(ingredients, constraints, leaf_ingredients, x)
+
+    ingredient_percentages = cp.Variable(leaf_ingredient_count, nonneg=True)
+    constraints = []
+    add_ingredient_order_constraints(ingredients, constraints, leaf_ingredients, ingredient_percentages)
+    #constraints.append(cp.sum(ingredient_percentages) == 100)
 
     for nutrient_key in nutrients:
         nutrient = nutrients[nutrient_key]
@@ -45,26 +47,26 @@ def estimate_recipe(product):
         weighting = nutrient.get('weighting')
         # Skip nutrients that don't have a weighting
         if weighting is None or weighting == 0:
-            print("Skipping nutrient without weight:", nutrient_key)
             continue
         
-        product_nutrients.append(nutrient['product_total'])
+        product_nutrients.append(nutrient['product_total'] * weighting)
         ingredient_nutrients = []
         
         for i, ingredient in enumerate(leaf_ingredients):
             ingredient_nutrient_percent =  ingredient['nutrients'].get(nutrient_key, {}).get('percent_nom', 0)
-            ingredient_nutrients.append(ingredient_nutrient_percent * 0.01)
+            ingredient_nutrients.append(ingredient_nutrient_percent * 0.01 * weighting)
 
         ingredients_nutrients.append(ingredient_nutrients)
 
 
     A = np.array(ingredients_nutrients)
     b = np.array(product_nutrients)
-    objective = cp.Minimize(cp.norm(A @ x - b, 2))
+    objective = cp.Minimize(cp.sum_squares(A @ ingredient_percentages - b))
     prob = cp.Problem(objective, constraints)
     prob.solve()
+    print(prob.status)
 
-    solution_x = x.value
+    solution_x = ingredient_percentages.value
     product_total_quantity = sum(solution_x)
 
     for i, ingredient in enumerate(leaf_ingredients):
