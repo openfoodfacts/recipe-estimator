@@ -34,6 +34,8 @@ def add_ingredient_order_constraints(
         else:
             my_ingredients = [ingredient_percentages[len(leaf_ingredients)]]
             leaf_ingredients.append(ingredient)
+            # Tried defaulting to a nominal value for water for unknown ingredients
+            # but didn't seem to help
             water_percentages.append(
                 ingredient["nutrients"].get("water", {}).get("percent_nom", 0) * 0.01
             )
@@ -48,7 +50,7 @@ def add_ingredient_order_constraints(
 
 
 def estimate_percentages(
-    ingredient_percentages, objectives, ingredients, total=100.0, index=0
+    ingredient_percentages, objectives, ingredients, total=100.0, index=0, percent_unknown = 0
 ):
     # Each ingredient quantity = a * n ^ p
     # where p is the POWER constant, n is the ingredient number and a is the percentage of the first ingredient
@@ -63,23 +65,25 @@ def estimate_percentages(
         estimate = round(a * (n + 1.0) ** POWER, 2)
 
         if "ingredients" in ingredient and len(ingredient["ingredients"]) > 0:
-            index = estimate_percentages(
+            index, percent_unknown = estimate_percentages(
                 ingredient_percentages,
                 objectives,
                 ingredient["ingredients"],
                 estimate,
                 index,
+                percent_unknown
             )
         else:
             # If ingredient has no nutrient information then add an objective to keep close to the estimate
             if len(ingredient["nutrients"]) == 0:
+                percent_unknown += estimate
                 objectives.append(
                     UNKNOWN_INGREDIENT_WEIGHTING
                     * cp.square(ingredient_percentages[index] - estimate)
                 )
             index += 1
 
-    return index
+    return index, percent_unknown
 
 
 def set_percentages(solution_x, ingredients, product_total_quantity, index=0):
@@ -105,6 +109,14 @@ def set_percentages(solution_x, ingredients, product_total_quantity, index=0):
     return index, total_percent, total_quantity
 
 
+def get_nutrient_weighting(percent_unknown):
+    # This curve is designed to give a weighting of 1 where all ingredients are known
+    # 0.5 when 20% are unknown and
+    # 0.01 when 50% are unknown
+    # Down to zero when none are known
+    return 1.053 / (1 + np.exp(0.152 * (percent_unknown - 19.33)))
+    
+    
 def estimate_recipe(product):
     current = time.perf_counter()
     leaf_ingredient_count = prepare_nutrients(product, True)
@@ -155,14 +167,17 @@ def estimate_recipe(product):
 
     objectives = []
 
+    # Add objective to keep unknown ingredients close to the inverse power series
+    _, percent_unknown = estimate_percentages(ingredient_percentages, objectives, ingredients)
+
     # Main objective to match ingredient nutrients to product nutrients
     if product_nutrients:
         A = np.array(ingredients_nutrients)
         b = np.array(product_nutrients)
-        objectives.append(cp.sum_squares(A @ ingredient_percentages - b))
+        # Reduce weighting if lots of ingredients are unknown
+        nutrient_weighting = get_nutrient_weighting(percent_unknown)
+        objectives.append(nutrient_weighting * cp.sum_squares(A @ ingredient_percentages - b))
 
-    # Add objective to keep unknown ingredients close to the inverse power series
-    estimate_percentages(ingredient_percentages, objectives, ingredients)
 
     # Get the ingredients to add up to close to 100g, which effectively adds a cost for evaporation.
     # Could potentially adjust the weighting here depending on the food category
