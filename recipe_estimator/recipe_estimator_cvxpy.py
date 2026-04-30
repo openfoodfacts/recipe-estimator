@@ -131,6 +131,7 @@ def estimate_recipe(product):
 
     ingredient_percentages = cp.Variable(leaf_ingredient_count, nonneg=True)
     constraints = []
+    nutrient_weightings = []
     add_ingredient_order_constraints(
         ingredients,
         constraints,
@@ -148,20 +149,20 @@ def estimate_recipe(product):
     for nutrient_key in nutrients:
         nutrient = nutrients[nutrient_key]
 
-        # We square root the weighting as it gets squared again later when the variances are calculated
-        weighting = math.sqrt(nutrient.get("weighting", 0))
+        weighting = nutrient.get("weighting", 0)
         # Skip nutrients that don't have a weighting
         if weighting == 0:
             continue
 
-        product_nutrients.append(nutrient["product_total"] * weighting)
+        product_nutrients.append(nutrient["product_total"])
+        nutrient_weightings.append(weighting)
         ingredient_nutrients = []
 
         for i, ingredient in enumerate(leaf_ingredients):
             ingredient_nutrient_percent = (
                 ingredient["nutrients"].get(nutrient_key, {}).get("percent_nom", 0)
             )
-            ingredient_nutrients.append(ingredient_nutrient_percent * 0.01 * weighting)
+            ingredient_nutrients.append(ingredient_nutrient_percent * 0.01)
 
         ingredients_nutrients.append(ingredient_nutrients)
 
@@ -174,9 +175,11 @@ def estimate_recipe(product):
     if product_nutrients:
         A = np.array(ingredients_nutrients)
         b = np.array(product_nutrients)
+        c = np.array(nutrient_weightings)
+        nutrient_variance = cp.sum(c @ cp.square(A @ ingredient_percentages - b))
         # Reduce weighting if lots of ingredients are unknown
-        nutrient_weighting = get_nutrient_weighting(percent_unknown)
-        objectives.append(nutrient_weighting * cp.sum_squares(A @ ingredient_percentages - b))
+        nutrient_adjustment = 1 #get_nutrient_weighting(percent_unknown)
+        objectives.append(nutrient_adjustment * nutrient_variance)
 
 
     # Get the ingredients to add up to close to 100g, which effectively adds a cost for evaporation.
@@ -188,6 +191,9 @@ def estimate_recipe(product):
     prob.solve()
 
     solution_x = ingredient_percentages.value
+    if product_nutrients:
+        recipe_estimator["nutrient_variance"] = nutrient_variance.value.item()
+
     product_total_quantity = sum(solution_x)
 
     set_percentages(solution_x, ingredients, product_total_quantity)
