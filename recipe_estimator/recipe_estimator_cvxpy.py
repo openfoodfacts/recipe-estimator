@@ -154,18 +154,21 @@ def estimate_recipe(product):
         if weighting == 0:
             continue
 
-        product_nutrients.append(nutrient["product_total"])
+        product_total = nutrient["product_total"]
+        product_nutrients.append(product_total)
         nutrient_weightings.append(weighting)
         ingredient_nutrients = []
 
         for i, ingredient in enumerate(leaf_ingredients):
-            ingredient_nutrient_percent = (
-                ingredient["nutrients"].get(nutrient_key, {}).get("percent_nom", 0)
-            )
+            ingredient_nutrient = ingredient["nutrients"].get(nutrient_key, {})
+            ingredient_nutrient_percent = ingredient_nutrient.get("percent_nom", 0)
             ingredient_nutrients.append(ingredient_nutrient_percent * 0.01)
 
         ingredients_nutrients.append(ingredient_nutrients)
-
+        
+        # Tried adding a constraint that the minimum nutrient value for all ingredients can't exceed what is on the packaging
+        # but it didn't improve the results
+    
     objectives = []
 
     # Add objective to keep unknown ingredients close to the inverse power series
@@ -173,10 +176,8 @@ def estimate_recipe(product):
 
     # Main objective to match ingredient nutrients to product nutrients
     if product_nutrients:
-        A = np.array(ingredients_nutrients)
-        b = np.array(product_nutrients)
-        c = np.array(nutrient_weightings)
-        nutrient_variance = cp.sum(c @ cp.square(A @ ingredient_percentages - b))
+        ingredients_nutrients = np.array(ingredients_nutrients)
+        nutrient_variance = cp.sum(nutrient_weightings @ cp.square(ingredients_nutrients @ ingredient_percentages - product_nutrients))
         # Reduce weighting if lots of ingredients are unknown
         nutrient_adjustment = 1 #get_nutrient_weighting(percent_unknown)
         objectives.append(nutrient_adjustment * nutrient_variance)
