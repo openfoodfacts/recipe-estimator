@@ -28,6 +28,10 @@ def fix_ingredients(ingredients):
 
 
 def get_product(id):
+    id = str(id)
+    if not id.isdigit():
+        return {}
+
     # First see if the product is in a test set
     matches = list(
         Path("../recipe-estimator-metrics/test-sets/input").rglob(id + ".json")
