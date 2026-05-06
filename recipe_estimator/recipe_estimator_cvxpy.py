@@ -50,7 +50,7 @@ def add_ingredient_order_constraints(
 
 
 def estimate_percentages(
-    ingredient_percentages, objectives, ingredients, total=100.0, index=0, percent_unknown = 0
+    ingredient_percentages, nutrient_objectives, simple_objectives, ingredients, total=100.0, index=0, percent_unknown = 0
 ):
     # Each ingredient quantity = a * n ^ p
     # where p is the POWER constant, n is the ingredient number and a is the percentage of the first ingredient
@@ -67,7 +67,8 @@ def estimate_percentages(
         if "ingredients" in ingredient and len(ingredient["ingredients"]) > 0:
             index, percent_unknown = estimate_percentages(
                 ingredient_percentages,
-                objectives,
+                nutrient_objectives,
+                simple_objectives,
                 ingredient["ingredients"],
                 estimate,
                 index,
@@ -77,10 +78,12 @@ def estimate_percentages(
             # If ingredient has no nutrient information then add an objective to keep close to the estimate
             if len(ingredient["nutrients"]) == 0:
                 percent_unknown += estimate
-                objectives.append(
+                nutrient_objectives.append(
                     UNKNOWN_INGREDIENT_WEIGHTING
                     * cp.square(ingredient_percentages[index] - estimate)
                 )
+            # Simple objectives are used if we find that going by nutrients doesn't work
+            simple_objectives.append(cp.square(ingredient_percentages[index] - estimate))
             index += 1
 
     return index, percent_unknown
@@ -109,14 +112,6 @@ def set_percentages(solution_x, ingredients, product_total_quantity, index=0):
     return index, total_percent, total_quantity
 
 
-def get_nutrient_weighting(percent_unknown):
-    # This curve is designed to give a weighting of 1 where all ingredients are known
-    # 0.5 when 20% are unknown and
-    # 0.01 when 50% are unknown
-    # Down to zero when none are known
-    return 1.053 / (1 + np.exp(0.152 * (percent_unknown - 19.33)))
-    
-    
 def estimate_recipe(product):
     current = time.perf_counter()
     leaf_ingredient_count = prepare_nutrients(product, True)
@@ -169,32 +164,46 @@ def estimate_recipe(product):
         # Tried adding a constraint that the minimum nutrient value for all ingredients can't exceed what is on the packaging
         # but it didn't improve the results
     
-    objectives = []
+    # Need an np.array in the matrix multiplication below
+    ingredients_nutrients = np.array(ingredients_nutrients)
+    nutrient_objectives = []
+    simple_objectives = []
 
     # Add objective to keep unknown ingredients close to the inverse power series
-    _, percent_unknown = estimate_percentages(ingredient_percentages, objectives, ingredients)
+    # simple_objectives does this for all ingredients
+    _, percent_unknown = estimate_percentages(ingredient_percentages, nutrient_objectives, simple_objectives, ingredients)
 
     # Main objective to match ingredient nutrients to product nutrients
     if product_nutrients:
-        ingredients_nutrients = np.array(ingredients_nutrients)
         nutrient_variance = cp.sum(nutrient_weightings @ cp.square(ingredients_nutrients @ ingredient_percentages - product_nutrients))
-        # Reduce weighting if lots of ingredients are unknown
-        nutrient_adjustment = 1 #get_nutrient_weighting(percent_unknown)
-        objectives.append(nutrient_adjustment * nutrient_variance)
+        nutrient_objectives.append(nutrient_variance)
 
 
+    # Don't bother with the nutrient approach if the first ingredient is unknown or too many others are unknown
+    objectives = nutrient_objectives if percent_unknown < 10 and len(leaf_ingredients[0]["nutrients"]) else simple_objectives
+    
     # Get the ingredients to add up to close to 100g, which effectively adds a cost for evaporation.
     # Could potentially adjust the weighting here depending on the food category
-    objectives.append(EVAPORATION_COST * cp.square(sum(ingredient_percentages) - 100))
+    evaporation_cost = EVAPORATION_COST * cp.square(sum(ingredient_percentages) - 100)
+    objectives.append(evaporation_cost)
 
     objective = cp.Minimize(sum(objectives))
     prob = cp.Problem(objective, constraints)
     prob.solve()
 
-    solution_x = ingredient_percentages.value
     if product_nutrients:
-        recipe_estimator["nutrient_variance"] = nutrient_variance.value.item()
+        nutrient_variance_value = nutrient_variance.value.item()
+        recipe_estimator["nutrient_variance"] = nutrient_variance_value
 
+        # If nutrient variance is too much then try again with the simple approach
+        # if nutrient_variance_value > 1000 and objectives == nutrient_objectives:
+        #     objectives = simple_objectives
+        #     objective = cp.Minimize(sum(objectives))
+        #     prob = cp.Problem(objective, constraints)
+        #     prob.solve()
+        #     recipe_estimator["nutrient_variance_simple"] = nutrient_variance.value.item()
+
+    solution_x = ingredient_percentages.value
     product_total_quantity = sum(solution_x)
 
     set_percentages(solution_x, ingredients, product_total_quantity)

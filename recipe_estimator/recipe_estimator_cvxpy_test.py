@@ -3,12 +3,6 @@ from pytest import approx
 from recipe_estimator.recipe_estimator_cvxpy import estimate_recipe, get_nutrient_weighting
 
 
-def test_nutrient_weighting():
-    assert get_nutrient_weighting(0) == approx(1, 0.1)
-    assert get_nutrient_weighting(20) == approx(0.5, 0.1)
-    assert get_nutrient_weighting(50) == approx(0.01, 0.1)
-    assert get_nutrient_weighting(100) == approx(0, abs=0.00001)
-
 def test_estimate_recipe_simple_recipe():
     # 15A + 3B = 10
     # A + B = 1
