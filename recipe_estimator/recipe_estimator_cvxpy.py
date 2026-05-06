@@ -196,12 +196,12 @@ def estimate_recipe(product):
         recipe_estimator["nutrient_variance"] = nutrient_variance_value
 
         # If nutrient variance is too much then try again with the simple approach
-        # if nutrient_variance_value > 1000 and objectives == nutrient_objectives:
-        #     objectives = simple_objectives
-        #     objective = cp.Minimize(sum(objectives))
-        #     prob = cp.Problem(objective, constraints)
-        #     prob.solve()
-        #     recipe_estimator["nutrient_variance_simple"] = nutrient_variance.value.item()
+        if nutrient_variance_value > 2500 and objectives == nutrient_objectives:
+            objectives = simple_objectives
+            objective = cp.Minimize(sum(objectives))
+            prob = cp.Problem(objective, constraints)
+            prob.solve()
+            recipe_estimator["nutrient_variance_simple"] = nutrient_variance.value.item()
 
     solution_x = ingredient_percentages.value
     product_total_quantity = sum(solution_x)
