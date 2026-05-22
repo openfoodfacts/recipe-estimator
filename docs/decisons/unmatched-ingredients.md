@@ -19,8 +19,8 @@ Some [tests](https://wiki.openfoodfacts.org/Recipe/Simple_Tool) on existing prod
 
 ## Decision Outcome
 
-Chosen option: "{title of option 1}", because
-{justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force {force} | … | comes out best (see below)}.
+Chosen option: "Include unknown ingredients in the optimization, with an objective to keep as close to the inverse power series as possible", because
+it is simple to implement and there is no evidence that it will produce less accurate results.
 
 ## Pros and Cons of the Options
 
@@ -32,4 +32,4 @@ Chosen option: "{title of option 1}", because
 ### Include unknown ingredients in the optimization, with an objective to keep as close to the inverse power series as possible
 
 * Good: Simple to implement
-* Bad: Relative quantityt of unknown ingredients not affected by known ingredients, except for ordering constraints
+* Bad: Relative quantity of unknown ingredients not affected by known ingredients, except for ordering constraints

@@ -1,6 +1,6 @@
 from pytest import approx
 
-from recipe_estimator.recipe_estimator_cvxpy import estimate_recipe, get_nutrient_weighting
+from recipe_estimator.recipe_estimator_cvxpy import estimate_recipe
 
 
 def test_estimate_recipe_simple_recipe():
@@ -51,35 +51,35 @@ def test_estimate_recipe_subingredient_limits():
                     {
                         'id':'en:one',
                         'nutrients': {
-                            'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                            'proteins': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                         }
                     },
                     {
                         'id':'en:two',
                         'nutrients': {
-                            'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                            'proteins': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                         }
                     }
                 ]
             },
             {
-                'id':'en:salt',
+                'id':'en:proteins',
                 'nutrients': {
-                    'salt': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
+                    'proteins': {'percent_nom': 1, 'percent_min': 100, 'percent_max': 100},
                 }
             },
         ],
         'nutriments': {
-            'salt_100g': 100
+            'proteins_100g': 1
         }}
 
-    # For the above there is no way to reach the salt limit as the only ingredient with salt is in second place
-    # so can be at most 50%
+    # For the above there is no way to reach the proteins limit as the only ingredient with proteins is in second place
+    # so can be at most 50%. Note use low values so that the nutrient variance is not too high which would cause it to switch to the simple approach
     estimate_recipe(product)
 
     metrics = product.get('recipe_estimator')
     assert metrics is not None
 
-    salt = product['ingredients'][1]
+    proteins = product['ingredients'][1]
     # Percent estimate is as high a possible
-    assert abs(50 - salt.get('percent_estimate')) < 2
+    assert abs(50 - proteins.get('percent_estimate')) < 2

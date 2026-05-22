@@ -175,12 +175,21 @@ def estimate_recipe(product):
 
     # Main objective to match ingredient nutrients to product nutrients
     if product_nutrients:
-        nutrient_variance = cp.sum(nutrient_weightings @ cp.square(ingredients_nutrients @ ingredient_percentages - product_nutrients))
+        residual = ingredients_nutrients @ ingredient_percentages - product_nutrients
+        nutrient_variance = cp.sum(nutrient_weightings @ cp.square(residual))
         nutrient_objectives.append(nutrient_variance)
 
+        # Tried adding a penalty if not all ingredients are known to penalize results where
+        # the ingredient nutrients are greater than the product nutrients
+        # But it didn't offer any signbificant improvement
+        # if percent_unknown > 0:
+        #     bias_penalty = 0.3 * percent_unknown * cp.sum(cp.multiply(nutrient_weightings, cp.pos(residual)))
+        #     nutrient_objectives.append(bias_penalty)
+
+    try_nutrients = percent_unknown < 10 and len(leaf_ingredients[0]["nutrients"])
 
     # Don't bother with the nutrient approach if the first ingredient is unknown or too many others are unknown
-    objectives = nutrient_objectives if percent_unknown < 10 and len(leaf_ingredients[0]["nutrients"]) else simple_objectives
+    objectives = nutrient_objectives if try_nutrients else simple_objectives
     
     # Get the ingredients to add up to close to 100g, which effectively adds a cost for evaporation.
     # Could potentially adjust the weighting here depending on the food category
@@ -190,13 +199,13 @@ def estimate_recipe(product):
     objective = cp.Minimize(sum(objectives))
     prob = cp.Problem(objective, constraints)
     prob.solve()
-
+    
     if product_nutrients:
         nutrient_variance_value = nutrient_variance.value.item()
         recipe_estimator["nutrient_variance"] = nutrient_variance_value
 
         # If nutrient variance is too much then try again with the simple approach
-        if nutrient_variance_value > 2500 and objectives == nutrient_objectives:
+        if try_nutrients and nutrient_variance_value > 2500:
             objectives = simple_objectives
             objective = cp.Minimize(sum(objectives))
             prob = cp.Problem(objective, constraints)
@@ -204,7 +213,10 @@ def estimate_recipe(product):
             recipe_estimator["nutrient_variance_simple"] = nutrient_variance.value.item()
 
     solution_x = ingredient_percentages.value
-    product_total_quantity = sum(solution_x)
+    
+    # In the UK/EU the percentage is the weight of raw product needed to produce 100g divided by the final weight (100g)
+    # In the US it is the weight of raw ingredient divided by the total weight of all raw ingredients
+    product_total_quantity = sum(solution_x) if recipe_estimator.get('might_be_us') else 100
 
     set_percentages(solution_x, ingredients, product_total_quantity)
 
@@ -218,5 +230,13 @@ def estimate_recipe(product):
     recipe_estimator["status"] = 0
     recipe_estimator["status_message"] = prob.status
     recipe_estimator["time"] = round(time.perf_counter() - current, 2)
+
+    # for n, ingredient in enumerate(leaf_ingredients):
+    #     prob2 = cp.Problem(cp.Minimize(ingredient_percentages[n]), constraints)
+    #     prob2.solve()
+        
+    #     prob3 = cp.Problem(cp.Maximize(ingredient_percentages[n]), constraints)
+    #     prob3.solve()
+
 
     return
