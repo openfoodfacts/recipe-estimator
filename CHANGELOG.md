@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/openfoodfacts/recipe-estimator/compare/v0.3.1...v0.4.0) (2026-05-26)
+
+
+### Features
+
+* Add CVXPY based solver ([#165](https://github.com/openfoodfacts/recipe-estimator/issues/165)) ([06ec00e](https://github.com/openfoodfacts/recipe-estimator/commit/06ec00eb7d51561084cc5ee523974c6b176a30cc))
+
 ## [0.3.1](https://github.com/openfoodfacts/recipe-estimator/compare/v0.3.0...v0.3.1) (2026-05-04)
 
 
