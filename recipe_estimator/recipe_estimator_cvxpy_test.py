@@ -1,4 +1,3 @@
-from pytest import approx
 
 from recipe_estimator.recipe_estimator_cvxpy import estimate_recipe
 

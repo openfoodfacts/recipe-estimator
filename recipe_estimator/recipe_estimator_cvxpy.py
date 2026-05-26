@@ -1,4 +1,3 @@
-import math
 import time
 import cvxpy as cp
 import numpy as np
@@ -115,7 +114,7 @@ def estimate_percentages(
     # We work out a by adding up all the results of the series with a = 1 and then factor a so that the total adds up to 100% (total)
     num_ingredients = len(ingredients)
     if num_ingredients < 1:
-        return
+        return 0, 100
 
     raw_sum = sum([(n + 1.0) ** POWER for n in range(num_ingredients)])
     a = total / raw_sum
@@ -253,10 +252,7 @@ def estimate_recipe(product):
 
         # Tried adding a penalty if not all ingredients are known to penalize results where
         # the ingredient nutrients are greater than the product nutrients
-        # But it didn't offer any signbificant improvement
-        # if percent_unknown > 0:
-        #     bias_penalty = 0.3 * percent_unknown * cp.sum(cp.multiply(nutrient_weightings, cp.pos(residual)))
-        #     nutrient_objectives.append(bias_penalty)
+        # But it didn't offer any significant improvement
 
     try_nutrients = percent_unknown < 10 and len(leaf_ingredients[0]["nutrients"])
 
@@ -306,12 +302,7 @@ def estimate_recipe(product):
     recipe_estimator["status_message"] = prob.status
     recipe_estimator["time"] = round(time.perf_counter() - current, 2)
 
-    # for n, ingredient in enumerate(leaf_ingredients):
-    #     prob2 = cp.Problem(cp.Minimize(ingredient_quantities[n]), constraints)
-    #     prob2.solve()
-        
-    #     prob3 = cp.Problem(cp.Maximize(ingredient_quantities[n]), constraints)
-    #     prob3.solve()
-
+    # Tried re-running the solver multiple times to get the minimum and maximum of each ingredient
+    # But it had a significant performance penalty
 
     return
