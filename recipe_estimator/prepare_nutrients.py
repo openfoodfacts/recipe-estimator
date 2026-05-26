@@ -31,8 +31,9 @@ def count_ingredients(ingredients, nutrients):
 
 def assign_weightings(product, scipy):
     # Determine which nutrients will be used in the analysis by assigning a weighting
+    might_be_us = False
+    
     product_nutrients = product.get('nutriments', {})
-    count = product['recipe_estimator']['ingredient_count']
     computed_nutrients = product['recipe_estimator']['nutrients']
 
     for nutrient_key in computed_nutrients:
@@ -76,7 +77,9 @@ def assign_weightings(product, scipy):
             if remaining_carbs > 0:
                 carbohydrates['weighting'] = 0
                 carbohydrates['notes'] = 'Might be total carbs'
+                might_be_us = True
 
+    return might_be_us
 
 def prepare_nutrients(product, scipy = False):
     nutrients = {}
@@ -84,5 +87,5 @@ def prepare_nutrients(product, scipy = False):
     recipe_estimator = product.setdefault('recipe_estimator', {})
     recipe_estimator['nutrients'] = nutrients
     recipe_estimator['ingredient_count'] = count
-    assign_weightings(product, scipy)
+    recipe_estimator['might_be_us'] = assign_weightings(product, scipy)
     return count

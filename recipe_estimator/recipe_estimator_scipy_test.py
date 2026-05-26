@@ -212,7 +212,7 @@ def test_estimate_recipe_subingredients():
                     'fiber': {'percent_nom': 5, 'percent_min': 5, 'percent_max': 5},
                     'water': {'percent_nom': 90, 'percent_min': 0, 'percent_max': 100},
                     'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
-                    'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                    'sodium': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                 }
             },
             {
@@ -222,13 +222,13 @@ def test_estimate_recipe_subingredients():
                     'nutrients': {
                         'sugars': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
                         'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
-                        'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                        'sodium': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                     }
                 },
                 {
                     'id':'en:salt',
                     'nutrients': {
-                        'salt': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
+                        'sodium': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
                         'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                         'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                     }
@@ -239,7 +239,7 @@ def test_estimate_recipe_subingredients():
         'nutriments': {
             'fiber_100g': 5,
             'sugars_100g': 10,
-            'salt_100g': 5
+            'sodium_100g': 5
         }}
 
     # For the above there must by 5g of Salt and 10g of Sugar.
@@ -268,9 +268,9 @@ def test_estimate_recipe_subingredients():
     assert abs(9 - sugar.get('percent_estimate')) < 1
     assert abs(10 - sugar.get('quantity_estimate')) < 1
 
-    salt = product['ingredients'][1]['ingredients'][1]
-    assert abs(4 - salt.get('percent_estimate')) < 1
-    assert abs(5 - salt.get('quantity_estimate')) < 11
+    sodium = product['ingredients'][1]['ingredients'][1]
+    assert abs(4 - sodium.get('percent_estimate')) < 1
+    assert abs(5 - sodium.get('quantity_estimate')) < 11
 
 
 def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
@@ -338,13 +338,13 @@ def test_estimate_recipe_subingredient_limits():
                     {
                         'id':'en:one',
                         'nutrients': {
-                            'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                            'sodium': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                         }
                     },
                     {
                         'id':'en:two',
                         'nutrients': {
-                            'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                            'sodium': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                         }
                     }
                 ]
@@ -352,12 +352,12 @@ def test_estimate_recipe_subingredient_limits():
             {
                 'id':'en:salt',
                 'nutrients': {
-                    'salt': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
+                    'sodium': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
                 }
             },
         ],
         'nutriments': {
-            'salt_100g': 100
+            'sodium_100g': 100
         }}
 
     # For the above there is no way to reach the salt limit as the only ingredient with salt is in second place

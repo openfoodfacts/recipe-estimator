@@ -55,6 +55,7 @@ const algorithms = {
   unconstrained_nnls: "NNLS (Unconstrained)",
   estimate_recipe_simple: "Simple Inverse Power",
   estimate_recipe_po: "Simplified Product Opener",
+  estimate_recipe_cvxpy: "CVXPY",
 }
 const DEFAULT_ALGORITHM = Object.keys(algorithms)[0];
 
@@ -133,7 +134,9 @@ export default function Recipe({product}: RecipeProps) {
   function getTotalForParent(nutrient_key: string, parent: any[], bound: string) {
     let total = 0;
     for(const ingredient of parent) {
-      if (!ingredient.ingredients) {
+      // For ingredient quantities and nutrients we only look at leaf ingredients
+      // For total percent we just look at parent ingredients
+      if (nutrient_key === '_percent' || !ingredient.ingredients) {
         if (nutrient_key === '_total')
           total += 1.0 * ingredient.quantity_estimate;
         else if (nutrient_key === '_percent')

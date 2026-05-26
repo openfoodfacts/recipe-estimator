@@ -82,7 +82,7 @@ def test_estimate_recipe_subingredients():
                     'fiber': {'percent_nom': 5, 'percent_min': 5, 'percent_max': 5},
                     'water': {'percent_nom': 90, 'percent_min': 0, 'percent_max': 100},
                     'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
-                    'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                    'sodium': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                 }
             },
             {
@@ -92,13 +92,13 @@ def test_estimate_recipe_subingredients():
                     'nutrients': {
                         'sugars': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
                         'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
-                        'salt': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                        'sodium': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                     }
                 },
                 {
                     'id':'en:salt',
                     'nutrients': {
-                        'salt': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
+                        'sodium': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
                         'fiber': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                         'sugars': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
                     }
@@ -109,10 +109,10 @@ def test_estimate_recipe_subingredients():
         'nutriments': {
             'fiber_100g': 5,
             'sugars_100g': 10,
-            'salt_100g': 5
+            'sodium_100g': 5
         }}
 
-    # For the above there must by 5g of Salt and 10g of Sugar.
+    # For the above there must by 5g of sodium and 10g of Sugar.
     # In order to make 5g of fibre we need 100g of tomatoes, so there will be 15g of lost water
     # Percentages will be quantities * (100 / 115) = 4.3, 8.7 and 87
     estimate_recipe(product)
