@@ -16,10 +16,11 @@ This document discusses approaches to dealing with this.
 * Use variables for water loss on each ingredient and for the recipe as a whole
 * Have one variable for water loss
 * Use maximum water loss as a constraint and optimize to minimize water loss
+* Only add a variable for per-ingredient water loss if the ingredient has a stated percentage
 
 ## Decision Outcome
 
-Chosen option: "Use maximum water loss as a constraint and optimize to minimize water loss", because it keeps the number of variables small and seems to give good results.
+Chosen option: "Only add a variable for per-ingredient water loss if the ingredient has a stated percentage", because it only introduces additional variables where there is supporting data but allows the optimization to fully respect quoted ingredient percentages.
 
 ## Pros and Cons of the Options
 
@@ -54,3 +55,14 @@ The optimization objective is to minimize the water loss, so favour solutions wh
 * Good: Doesn't add any more variables
 * Good: Easy to understand
 * Good: Water loss can easily be inferred from the difference between the sum of the ingredients and 100g
+
+### Only add a variable for per-ingredient water loss if the ingredient has a stated percentage
+
+This is similar to the first option but a water loss variable per individual ingredient would only be added if the variable has a quoted percentage.
+
+This water loss would be taken into account in ingredient ordering rules. e.g. if tomatoes had a calculated raw weight of 20g to make 100g of product with 5g lost water then we would assume 15g tomatoes for ingredient ordering.
+
+* Good: Gives more information about ingredients with stated percentages and how they have been processed
+* Good: Only introduces more variables into the optimization when there is enough data to calculate them
+* Good: Gives better results for products that don't have a final cooking stage
+* Bad: Harder to understand

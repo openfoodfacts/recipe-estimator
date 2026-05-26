@@ -12,45 +12,103 @@ EVAPORATION_COST = 0.01
 UNKNOWN_INGREDIENT_WEIGHTING = 0.002
 
 
-def add_ingredient_order_constraints(
+def get_ingredient_range(ingredient_percentage):
+    if int(ingredient_percentage) == ingredient_percentage:
+        # If percentage is an integer then assume standard rounding has been used
+        return ingredient_percentage - 0.5, ingredient_percentage + 0.5
+    else:
+        # If decimals have been used then assume they have rounded to the nearest 0.5%
+        return ingredient_percentage - 0.25, ingredient_percentage + 0.25
+
+
+def add_ingredient_constraints(
     ingredients,
     constraints,
     leaf_ingredients,
-    ingredient_percentages,
-    water_percentages,
+    ingredient_quantities,
+    water_proportions,
+    ingredient_vars,
 ):
-    previous_ingredients = None
-    total_ingredients = []
+    previous_ingredient_mixing_bowl_weight = None
+    total_mixing_bowl_weight = []
     for ingredient in ingredients:
+        # TODO: Remove hidden eventually
+        ingredient_percent = ingredient.get("percent", ingredient.get("percent_hidden"))
+        my_index = len(leaf_ingredients)
+        ingredient_var = {
+            "ingredient": ingredient,
+            "percent": ingredient_percent,
+            "leaf_ingredient_index": my_index,
+        }
+        ingredient_vars.append(ingredient_var)
         if "ingredients" in ingredient and len(ingredient["ingredients"]) > 0:
             # Child ingredients
-            my_ingredients = add_ingredient_order_constraints(
+            ingredient_var["ingredients"] = []
+            my_mixing_bowl_weight = add_ingredient_constraints(
                 ingredient["ingredients"],
                 constraints,
                 leaf_ingredients,
-                ingredient_percentages,
-                water_percentages,
+                ingredient_quantities,
+                water_proportions,
+                ingredient_var["ingredients"],
             )
+            # Keep a note of how many child ingredients make up the total for this parent ingredient
+            last_child_index = len(leaf_ingredients)
+            ingredient_var["last_child_index"] = last_child_index
+
+            # For compound ingredients, if there is a known percentage then assume there is water loss before the entire compound ingredient is added to the mixing bowl
+            if ingredient_percent is not None:
+                # If we have a percentage for the ingredient then we add a pre-mixing bowl water loss variable
+                # TODO: Cope with re-hydrated ingredients, like concentrates, where the water loss would be negative
+                pre_mixing_bowl_water_loss = cp.Variable(nonneg=True)
+                # For UK/EU quantity of raw ingredient less pre-mixing bowl water should correspond to the percentage on the packaging
+                percent_min, percent_max = get_ingredient_range(ingredient_percent)
+                constraints.extend([
+                    (cp.sum(my_mixing_bowl_weight) - pre_mixing_bowl_water_loss) >= percent_min,
+                    (cp.sum(my_mixing_bowl_weight) - pre_mixing_bowl_water_loss) <= percent_max
+                ])
+                my_mixing_bowl_weight.append(-pre_mixing_bowl_water_loss)
+                ingredient_var["pre_mixing_bowl_water_loss"] = pre_mixing_bowl_water_loss
+
+                if last_child_index > my_index:
+                    # If child ingredients were found then we add a constraint that the pre-mixing bowl water loss of the parent
+                    # can't be greater than the total quantity of those leaf ingredients multiplied by their water proportion
+                    constraints.append(
+                        pre_mixing_bowl_water_loss <= cp.sum(cp.multiply(ingredient_quantities[my_index:last_child_index], water_proportions[my_index:last_child_index]))
+                    )
         else:
-            my_ingredients = [ingredient_percentages[len(leaf_ingredients)]]
+            my_quantity = ingredient_quantities[my_index]
+            my_mixing_bowl_weight = [my_quantity]
             leaf_ingredients.append(ingredient)
             # Tried defaulting to a nominal value for water for unknown ingredients
             # but didn't seem to help
-            water_percentages.append(
-                ingredient["nutrients"].get("water", {}).get("percent_nom", 0) * 0.01
-            )
+            water_proportion = ingredient["nutrients"].get("water", {}).get("percent_nom", 0) * 0.01
+            water_proportions.append(water_proportion)
 
-        if previous_ingredients and my_ingredients:
-            constraints.append(sum(previous_ingredients) >= sum(my_ingredients))
+            if ingredient_percent is not None:
+                # If we have a percentage for the ingredient then we add a pre-mixing bowl water loss variable
+                pre_mixing_bowl_water_loss = cp.Variable(nonneg=True)
+                ingredient_var["pre_mixing_bowl_water_loss"] = pre_mixing_bowl_water_loss
+                # For UK/EU quantity of raw ingredient less pre-mixing bowl water should correspond to the percentage on the packaging
+                percent_min, percent_max = get_ingredient_range(ingredient_percent)
+                constraints.extend([
+                    pre_mixing_bowl_water_loss <= my_quantity * water_proportion,
+                    (my_quantity - pre_mixing_bowl_water_loss) >= percent_min,
+                    (my_quantity - pre_mixing_bowl_water_loss) <= percent_max
+                ])
+                my_mixing_bowl_weight.append(-pre_mixing_bowl_water_loss)
 
-        total_ingredients.extend(my_ingredients)
-        previous_ingredients = my_ingredients
+        if previous_ingredient_mixing_bowl_weight and my_mixing_bowl_weight:
+            constraints.append(sum(previous_ingredient_mixing_bowl_weight) >= sum(my_mixing_bowl_weight))
 
-    return total_ingredients
+        total_mixing_bowl_weight.extend(my_mixing_bowl_weight)
+        previous_ingredient_mixing_bowl_weight = my_mixing_bowl_weight
+
+    return total_mixing_bowl_weight
 
 
 def estimate_percentages(
-    ingredient_percentages, nutrient_objectives, simple_objectives, ingredients, total=100.0, index=0, percent_unknown = 0
+    ingredient_quantities, nutrient_objectives, simple_objectives, ingredients, simple_estimates, total=100.0, index=0, percent_unknown = 0
 ):
     # Each ingredient quantity = a * n ^ p
     # where p is the POWER constant, n is the ingredient number and a is the percentage of the first ingredient
@@ -66,10 +124,11 @@ def estimate_percentages(
 
         if "ingredients" in ingredient and len(ingredient["ingredients"]) > 0:
             index, percent_unknown = estimate_percentages(
-                ingredient_percentages,
+                ingredient_quantities,
                 nutrient_objectives,
                 simple_objectives,
                 ingredient["ingredients"],
+                simple_estimates,
                 estimate,
                 index,
                 percent_unknown
@@ -80,36 +139,46 @@ def estimate_percentages(
                 percent_unknown += estimate
                 nutrient_objectives.append(
                     UNKNOWN_INGREDIENT_WEIGHTING
-                    * cp.square(ingredient_percentages[index] - estimate)
+                    * cp.square(ingredient_quantities[index] - estimate)
                 )
             # Simple objectives are used if we find that going by nutrients doesn't work
-            simple_objectives.append(cp.square(ingredient_percentages[index] - estimate))
+            simple_objectives.append(cp.square(ingredient_quantities[index] - estimate))
+            simple_estimates.append(estimate)
             index += 1
 
     return index, percent_unknown
 
 
-def set_percentages(solution_x, ingredients, product_total_quantity, index=0):
-    total_percent = 0
-    total_quantity = 0
-    for ingredient in ingredients:
-        if "ingredients" in ingredient and len(ingredient["ingredients"]) > 0:
-            index, percent_estimate, quantity_estimate = set_percentages(
-                solution_x, ingredient["ingredients"], product_total_quantity, index
+def set_percentages(solution_x, ingredient_vars, product_total_quantity):
+    total_mixing_bowl_quantity = 0
+    total_original_quantity = 0
+    for ingredient_var in ingredient_vars:
+        ingredient = ingredient_var["ingredient"]
+        pre_mixing_bowl_water_loss = ingredient_var.get("pre_mixing_bowl_water_loss")
+        pre_mixing_bowl_water_loss_value = (
+            pre_mixing_bowl_water_loss.value
+            if pre_mixing_bowl_water_loss is not None
+            and pre_mixing_bowl_water_loss.value is not None
+            else 0
+        )
+        if "ingredients" in ingredient_var:
+            index, mixing_bowl_quantity_estimate, original_quantity_estimate = set_percentages(
+                solution_x, ingredient_var["ingredients"], product_total_quantity
             )
+            # Subtract the parent ingredient's pre-mixing bowl water loss from the mixing bowl quantity estimate of the child ingredients to get the mixing bowl estimate for the parent ingredient
+            mixing_bowl_quantity_estimate = mixing_bowl_quantity_estimate - pre_mixing_bowl_water_loss_value
         else:
-            quantity_estimate = round(solution_x[index], 2)
-            percent_estimate = round(
-                100 * solution_x[index] / product_total_quantity, 2
-            )
-            index += 1
+            index = ingredient_var["leaf_ingredient_index"]
+            raw_ingredient_quantity = solution_x[index]
+            original_quantity_estimate = raw_ingredient_quantity
+            mixing_bowl_quantity_estimate = original_quantity_estimate - pre_mixing_bowl_water_loss_value
 
-        ingredient["percent_estimate"] = percent_estimate
-        ingredient["quantity_estimate"] = quantity_estimate
-        total_percent += percent_estimate
-        total_quantity += quantity_estimate
+        ingredient["percent_estimate"] = round(100 * mixing_bowl_quantity_estimate / product_total_quantity, 2)
+        ingredient["quantity_estimate"] = round(original_quantity_estimate, 2)
+        total_mixing_bowl_quantity += mixing_bowl_quantity_estimate
+        total_original_quantity += original_quantity_estimate
 
-    return index, total_percent, total_quantity
+    return index, total_mixing_bowl_quantity, total_original_quantity
 
 
 def estimate_recipe(product):
@@ -122,22 +191,24 @@ def estimate_recipe(product):
     ingredients_nutrients = []
     product_nutrients = []
     leaf_ingredients = []
-    water_percentages = []
+    water_proportions = []
 
-    ingredient_percentages = cp.Variable(leaf_ingredient_count, nonneg=True)
+    ingredient_quantities = cp.Variable(leaf_ingredient_count, nonneg=True)
     constraints = []
     nutrient_weightings = []
-    add_ingredient_order_constraints(
+    ingredient_vars = []
+    add_ingredient_constraints(
         ingredients,
         constraints,
         leaf_ingredients,
-        ingredient_percentages,
-        water_percentages,
+        ingredient_quantities,
+        water_proportions,
+        ingredient_vars,
     )
 
     # Hard constraint: sum of ingredients less maximum water loss can't be greater than 100g
     constraints.append(
-        cp.sum(ingredient_percentages) - (ingredient_percentages @ water_percentages)
+        cp.sum(ingredient_quantities) - (ingredient_quantities @ water_proportions)
         <= 100
     )
 
@@ -168,14 +239,15 @@ def estimate_recipe(product):
     ingredients_nutrients = np.array(ingredients_nutrients)
     nutrient_objectives = []
     simple_objectives = []
+    simple_estimates = []
 
     # Add objective to keep unknown ingredients close to the inverse power series
     # simple_objectives does this for all ingredients
-    _, percent_unknown = estimate_percentages(ingredient_percentages, nutrient_objectives, simple_objectives, ingredients)
+    _, percent_unknown = estimate_percentages(ingredient_quantities, nutrient_objectives, simple_objectives, ingredients, simple_estimates)
 
     # Main objective to match ingredient nutrients to product nutrients
     if product_nutrients:
-        residual = ingredients_nutrients @ ingredient_percentages - product_nutrients
+        residual = ingredients_nutrients @ ingredient_quantities - product_nutrients
         nutrient_variance = cp.sum(nutrient_weightings @ cp.square(residual))
         nutrient_objectives.append(nutrient_variance)
 
@@ -193,32 +265,34 @@ def estimate_recipe(product):
     
     # Get the ingredients to add up to close to 100g, which effectively adds a cost for evaporation.
     # Could potentially adjust the weighting here depending on the food category
-    evaporation_cost = EVAPORATION_COST * cp.square(sum(ingredient_percentages) - 100)
+    evaporation_cost = EVAPORATION_COST * cp.square(sum(ingredient_quantities) - 100)
     objectives.append(evaporation_cost)
 
     objective = cp.Minimize(sum(objectives))
     prob = cp.Problem(objective, constraints)
     prob.solve()
-    
+
     if product_nutrients:
-        nutrient_variance_value = nutrient_variance.value.item()
-        recipe_estimator["nutrient_variance"] = nutrient_variance_value
+        if prob.status == cp.OPTIMAL:
+            nutrient_variance_value = nutrient_variance.value.item()
+            recipe_estimator["nutrient_variance"] = nutrient_variance_value
 
         # If nutrient variance is too much then try again with the simple approach
-        if try_nutrients and nutrient_variance_value > 2500:
+        if try_nutrients and (prob.status != cp.OPTIMAL or nutrient_variance_value > 2500):
             objectives = simple_objectives
             objective = cp.Minimize(sum(objectives))
             prob = cp.Problem(objective, constraints)
             prob.solve()
-            recipe_estimator["nutrient_variance_simple"] = nutrient_variance.value.item()
+            if prob.status == cp.OPTIMAL:
+                recipe_estimator["nutrient_variance_simple"] = nutrient_variance.value.item()
 
-    solution_x = ingredient_percentages.value
-    
+    solution_x = ingredient_quantities.value if prob.status == cp.OPTIMAL else simple_estimates
+        
     # In the UK/EU the percentage is the weight of raw product needed to produce 100g divided by the final weight (100g)
     # In the US it is the weight of raw ingredient divided by the total weight of all raw ingredients
     product_total_quantity = sum(solution_x) if recipe_estimator.get('might_be_us') else 100
 
-    set_percentages(solution_x, ingredients, product_total_quantity)
+    set_percentages(solution_x, ingredient_vars, product_total_quantity)
 
     # Calculate objective function so we can compare with SciPy
     quantities = np.array(
@@ -227,15 +301,16 @@ def estimate_recipe(product):
     [_, _, args] = get_objective_function_args(product)
     objective_function(quantities, *args)
     recipe_estimator["penalties"] = args[0]
-    recipe_estimator["status"] = 0
+
+    recipe_estimator["status"] = 0 # TODO: Should probably have different status codes for different failure modes, e.g. not optimal vs unbounded vs infeasible
     recipe_estimator["status_message"] = prob.status
     recipe_estimator["time"] = round(time.perf_counter() - current, 2)
 
     # for n, ingredient in enumerate(leaf_ingredients):
-    #     prob2 = cp.Problem(cp.Minimize(ingredient_percentages[n]), constraints)
+    #     prob2 = cp.Problem(cp.Minimize(ingredient_quantities[n]), constraints)
     #     prob2.solve()
         
-    #     prob3 = cp.Problem(cp.Maximize(ingredient_percentages[n]), constraints)
+    #     prob3 = cp.Problem(cp.Maximize(ingredient_quantities[n]), constraints)
     #     prob3.solve()
 
 
