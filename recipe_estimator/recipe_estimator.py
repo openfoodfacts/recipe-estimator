@@ -37,6 +37,9 @@ def add_ingredients_to_solver(ingredients, solver, total_ingredients):
             maximum_water_content = water.get('percent_nom', 0)
             print("maximum_water_content", ingredient['id'], maximum_water_content)
 
+            # remove water loss completely
+            # maximum_water_content = 0
+
             water_loss_ratio_constraint = solver.Constraint(0, solver.infinity(),  '')
             water_loss_ratio_constraint.SetCoefficient(ingredient_numvar['numvar'], 0.01 * maximum_water_content)
             water_loss_ratio_constraint.SetCoefficient(ingredient_numvar['lost_water'], -1.0)
@@ -201,6 +204,24 @@ def add_objective_to_minimize_maximum_distance_between_ingredients(solver, objec
 
     objective.SetCoefficient(max_ingredients_distance, weighting)
 
+# add an objective to minimize the water loss
+def add_objective_to_minimize_water_loss(solver, objective, weighting, ingredient_numvars):
+    total_lost_water = solver.NumVar(0, solver.infinity(), "total_lost_water")
+
+    def add_lost_water_to_constraint(constraint, numvars):
+        for numvar in numvars:
+            if 'child_numvars' in numvar:
+                add_lost_water_to_constraint(constraint, numvar['child_numvars'])
+            else:
+                constraint.SetCoefficient(numvar['lost_water'], -1)
+
+    constraint = solver.Constraint(0, 0)
+    constraint.SetCoefficient(total_lost_water, 1)
+    add_lost_water_to_constraint(constraint, ingredient_numvars)
+
+    objective.SetCoefficient(total_lost_water, weighting)
+
+
 # estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
 # The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
 def estimate_recipe(product):
@@ -292,7 +313,15 @@ def estimate_recipe(product):
         print("nutrient_key:", nutrient_key, "nutrient_total:", nutrient_total, "weighting:", weighting)
         objective.SetCoefficient(nutrient_distance, weighting)
 
+
     add_objective_to_minimize_maximum_distance_between_ingredients(solver, objective, 0.005, ingredient_numvars)
+
+    # add an objective to minimize water loss (a lot), unless the categories include en:fats
+    categories = product.get('categories_tags', [])
+    if not any(cat in categories for cat in ['en:fats']):
+        add_objective_to_minimize_water_loss(solver, objective, 1, ingredient_numvars)
+    else:
+        add_objective_to_minimize_water_loss(solver, objective, 0.1, ingredient_numvars)
 
     objective.SetMinimization()
 
