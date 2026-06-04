@@ -129,6 +129,13 @@ async def recipe(request: Request):
     if error_response:
         return error_response
     prepare_product(product)
+    estimate_recipe_cvxpy(product)
+    return product
+
+@app.post("/api/v3/estimate_recipe_glop")
+async def recipe(request: Request):
+    product = await request.json()
+    prepare_product(product)
     estimate_recipe(product)
     return _product_response(product, options)
 
