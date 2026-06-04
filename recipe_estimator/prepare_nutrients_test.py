@@ -79,3 +79,34 @@ def test_prepare_nutrients_copes_with_no_product_nutrients():
     assert nutrient.get('weighting') == 0
 
 
+def test_prepare_nutrients_with_new_nutrition_schema():
+    product = {
+        'code': 1234567890123,
+        'ingredients': [{
+            'id': 'en:salt',
+            'nutrients': {
+                'sodium': {'percent_nom': 40},
+                'carbohydrates': {'percent_nom': 0},
+            }
+        }],
+        'nutrition': {
+            'aggregated_set': {
+                'nutrients': {
+                    'sodium': {'value': 0},
+                    'carbohydrates': {'value': 5},
+                }
+            }
+        }
+    }
+
+    prepare_nutrients(product)
+
+    metrics = product.get('recipe_estimator')
+    assert metrics is not None
+    nutrients = metrics.get('nutrients')
+    assert nutrients is not None
+    sodium = nutrients.get('sodium')
+    assert sodium is not None
+    nutrient = nutrients.get('carbohydrates')
+    assert nutrient is not None
+
