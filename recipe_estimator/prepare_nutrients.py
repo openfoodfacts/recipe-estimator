@@ -32,14 +32,18 @@ def count_ingredients(ingredients, nutrients):
 def assign_weightings(product, scipy):
     # Determine which nutrients will be used in the analysis by assigning a weighting
     might_be_us = False
-    
-    product_nutrients = product.get('nutriments', {})
+
     computed_nutrients = product['recipe_estimator']['nutrients']
 
     for nutrient_key in computed_nutrients:
         computed_nutrient = computed_nutrients[nutrient_key]
         # Get nutrient value per 100g of product
-        product_nutrient = product_nutrients.get(nutrient_key + '_100g', None)
+        # In the new nutrition schema, nutrients are stored in nutrition.aggregated_set.nutrients.[nutrient id].value
+        # In the old schema, they are stored in nutriments.[nutrient id]_100g
+        # We use the new schema if available, otherwise we fall back to the old schema
+        product_nutrient = product.get('nutrition', {}).get('aggregated_set', {}).get('nutrients', {}).get(nutrient_key, {}).get('value', None)
+        if product_nutrient is None:
+            product_nutrient = product.get('nutriments', {}).get(nutrient_key + '_100g', None)
         if product_nutrient is None:
             computed_nutrient['notes'] = 'Not listed on product'
             continue

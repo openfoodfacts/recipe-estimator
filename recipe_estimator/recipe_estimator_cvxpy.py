@@ -32,7 +32,7 @@ def add_ingredient_constraints(
     total_mixing_bowl_weight = []
     for ingredient in ingredients:
         # TODO: Remove hidden eventually
-        ingredient_percent = ingredient.get("percent", ingredient.get("percent_hidden"))
+        ingredient_percent = ingredient.get("percent")
         my_index = len(leaf_ingredients)
         ingredient_var = {
             "ingredient": ingredient,

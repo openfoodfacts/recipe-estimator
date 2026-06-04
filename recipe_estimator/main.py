@@ -41,7 +41,15 @@ async def product(id):
     product = get_product(id)
     return product
 
+# /estimate_recipe uses the default recipe estimation method (currently cvxpy)
 @app.post("/api/v3/estimate_recipe")
+async def recipe(request: Request):
+    product = await request.json()
+    prepare_product(product)
+    estimate_recipe_cvxpy(product)
+    return product
+
+@app.post("/api/v3/estimate_recipe_glop")
 async def recipe(request: Request):
     product = await request.json()
     prepare_product(product)
