@@ -49,10 +49,13 @@ def setup_ingredients(ingredients, nutrients):
             # Always get the ciqual code from the taxonomy unless the nutrients are already setup
             if 'nutrients' not in ingredient:
                 ciqual_code, ciqual_proxy_code = get_ciqual_code(ingredient['id'])
-                ingredient['ciqual_food_code'] = ciqual_code
-                ingredient['ciqual_proxy_food_code'] = ciqual_proxy_code
-                
                 ciqual_code = ciqual_code or ciqual_proxy_code
+
+                # Add the ciqual code or proxy code if we have one
+                if ciqual_code:
+                    ingredient['ciqual_food_code'] = ciqual_code
+                elif ciqual_proxy_code:
+                    ingredient['ciqual_proxy_food_code'] = ciqual_proxy_code
 
                 # Convert CIQUAL nutrient codes back to OFF
                 ingredient_nutrients = {}
@@ -69,6 +72,18 @@ def setup_ingredients(ingredients, nutrients):
 
 def prepare_product(product):
     setup_ingredients(product['ingredients'], product.get('nutriments', {}))
+
+
+def remove_temporary_ingredients_fields(ingredients):
+    for ingredient in ingredients:
+        ingredient.pop('alim_nom_eng', None)
+        ingredient.pop('ciqual_food_code_used', None)
+        ingredient.pop('nutrients', None)
+        ingredient.pop('index', None)
+        ingredient.pop('initial_estimate', None)
+
+        if 'ingredients' in ingredient and len(ingredient['ingredients']) > 0:
+            remove_temporary_ingredients_fields(ingredient['ingredients'])
 
 # Product Opener sometimes store numbers as strings when it outputs JSON
 def ensure_float(value):

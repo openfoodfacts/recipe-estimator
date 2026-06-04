@@ -75,13 +75,14 @@ export default function Recipe({product}: RecipeProps) {
       return;
     async function fetchData() {
       setIngredients(null);
-      const results = await (await fetch(`${API_PATH}api/v3/${algorithm}`, {method: 'POST', body: JSON.stringify(product)})).json();
-      setIngredients(results.ingredients);
+      const results = await (await fetch(`${API_PATH}api/v3/${algorithm}`, {method: 'POST', body: JSON.stringify({product})})).json();
+      const resultingProduct = results.product;
+      setIngredients(resultingProduct.ingredients);
       setNutrients(Object.fromEntries(
-        Object.entries(results.recipe_estimator.nutrients).filter(
+        Object.entries(resultingProduct.recipe_estimator.nutrients).filter(
            ([key, val])=>(val as any).product_total > 0
         )));
-      setPenalties(results.recipe_estimator.penalties)
+      setPenalties(resultingProduct.recipe_estimator.penalties)
     }
     fetchData();
   }, [algorithm]);
