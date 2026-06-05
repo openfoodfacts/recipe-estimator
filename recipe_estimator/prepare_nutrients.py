@@ -70,7 +70,7 @@ def assign_weightings(product, scipy):
     carbohydrates = computed_nutrients.get('carbohydrates')
     if carbohydrates and carbohydrates['weighting'] > 0 and 'countries_tags' in product:
         gross_countries = len(set(['en:united-states', 'en:canada', 'en:south-africa','en:bahrain','en:kuwait', 'en:iraq', 'en:iran', 'en:oman', 'en:qatar', 'en:saudi-arabia', 'en:united-arab-emirates']) & set(product['countries_tags']))
-        if gross_countries / len(product['countries_tags']) > 0.5:
+        if gross_countries / (len(product['countries_tags']) | 1) > 0.5: # Avoid division by zero if countries_tags is empty
             # If we subtract the sugar and fiber from the carbs and get a negative result then it can't be gross carbs
             fiber = computed_nutrients.get('fiber')
             sugars = computed_nutrients.get('sugars')
