@@ -213,7 +213,7 @@ def estimate_recipe_glop(product):
     # Instantiate a Glop solver
     solver = pywraplp.Solver.CreateSolver('GLOP')
     if not solver:
-        return
+        return None
     
     # Total of leaf level ingredients must add up to at least 100
     total_ingredients = solver.Constraint(100 - precision, 100 + precision, '')
