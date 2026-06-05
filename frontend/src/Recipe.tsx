@@ -75,7 +75,7 @@ export default function Recipe({product}: RecipeProps) {
       return;
     async function fetchData() {
       setIngredients(null);
-      const results = await (await fetch(`${API_PATH}api/v3/${algorithm}`, {method: 'POST', body: JSON.stringify({product})})).json();
+      const results = await (await fetch(`${API_PATH}api/v3/${algorithm}`, {method: 'POST', body: JSON.stringify({product: product, options: {debug: true}})})).json();
       const resultingProduct = results.product;
       setIngredients(resultingProduct.ingredients);
       setNutrients(Object.fromEntries(
