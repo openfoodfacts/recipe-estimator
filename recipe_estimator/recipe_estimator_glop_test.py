@@ -1,5 +1,5 @@
 import json
-from .recipe_estimator import estimate_recipe
+from .recipe_estimator_glop import estimate_recipe_glop
 
 def test_estimate_recipe_accounts_for_lost_water():
     product = {
@@ -15,7 +15,7 @@ def test_estimate_recipe_accounts_for_lost_water():
             'fiber_100g': 5,
         }}
 
-    estimate_recipe(product)
+    estimate_recipe_glop(product)
 
     metrics = product.get('recipe_estimator')
     assert metrics is not None
@@ -51,7 +51,7 @@ def test_estimate_recipe_lost_water_is_constrained():
         }}
 
 
-    estimate_recipe(product)
+    estimate_recipe_glop(product)
 
     metrics = product.get('recipe_estimator')
     assert metrics is not None
@@ -94,7 +94,7 @@ def test_estimate_recipe_simple_recipe():
             'fiber_100g': 10,
         }}
 
-    estimate_recipe(product)
+    estimate_recipe_glop(product)
 
     metrics = product.get('recipe_estimator')
     assert metrics is not None
@@ -126,7 +126,7 @@ def test_estimate_recipe_simple_recipe_with_one_unmatched_ingredient():
             'fiber_100g': 10,
         }}
 
-    estimate_recipe(product)
+    estimate_recipe_glop(product)
 
     metrics = product.get('recipe_estimator')
     assert metrics is not None
@@ -159,7 +159,7 @@ def test_estimate_recipe_simple_recipe_with_no_matched_ingredients():
             'fiber_100g': 10,
         }}
 
-    estimate_recipe(product)
+    estimate_recipe_glop(product)
 
     metrics = product.get('recipe_estimator')
     assert metrics is not None
@@ -189,7 +189,7 @@ def test_estimate_recipe_simple_recipe_with_no_nutriments():
             }
         ]}
 
-    estimate_recipe(product)
+    estimate_recipe_glop(product)
 
     metrics = product.get('recipe_estimator')
     assert metrics is not None
@@ -241,7 +241,7 @@ def test_estimate_recipe_subingredients():
     # For the above there must by 5g of Salt and 10g of Sugar.
     # In order to make 5g of carbohydrate we need 100g of tomatoes, so there will be 15g of lost water
     # Percentages will be quantities * (100 / 115) = 4.3, 8.7 and 87
-    estimate_recipe(product)
+    estimate_recipe_glop(product)
 
     # Print the resulting product structure
     print(product)
@@ -306,7 +306,7 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients():
     # the first ingredient to be 50 / (1 - 0.5 ^ 4) = 53.3
     # Each subsequent one half that, so 26.7, 13.3, 6.7
 
-    estimate_recipe(product)
+    estimate_recipe_glop(product)
 
     # Pretty print with indents the resulting product structure
     print(json.dumps(product, indent=4))
@@ -362,7 +362,7 @@ def test_estimate_recipe_minimize_maximum_distance_between_ingredients_with_subi
     # For the sub-ingredients of ingredient one the first should be
     # (0.5 * 66.7) / (1 - 0.5 ^ 2) = 44.4%
     # So the second would be 22.2%
-    estimate_recipe(product)
+    estimate_recipe_glop(product)
 
     metrics = product.get('recipe_estimator')
     assert metrics is not None

@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 from .nutrients import ciqual_ingredients, prepare_product, remove_temporary_ingredients_fields
 from .product import get_product
-from .recipe_estimator import estimate_recipe
+from .recipe_estimator_glop import estimate_recipe_glop
 from .recipe_estimator_scipy import estimate_recipe as estimate_recipe_scipy
 from .recipe_estimator_nnls import estimate_recipe as estimate_recipe_nnls
 from .recipe_estimator_unconstrained_nnls import estimate_recipe as estimate_recipe_unconstrained_nnls
@@ -113,89 +113,51 @@ def _product_response(product, options=None):
         remove_temporary_ingredients_fields(product.get("ingredients", []))
     return {"product": product}
 
+# generic function to use in estimate_recipe_* endpoints that only differ by the estimation method used
+# read the product and options from the request, prepare the product, call the estimation function and return the response
+async def estimate_recipe_generic(request: Request, estimation_function):
+    product, options, error_response = await _read_product(request)
+    if error_response:
+        return error_response
+    prepare_product(product)
+    estimation_function(product)
+    if not bool(options.get("debug")):
+        remove_temporary_ingredients_fields(product.get("ingredients", []))
+    return _product_response(product, options)
+
+
 # /estimate_recipe uses the default recipe estimation method (currently cvxpy)
 @app.post("/api/v3/estimate_recipe")
 async def recipe(request: Request):
-    product, options, error_response = await _read_product(request)
-    if error_response:
-        return error_response
-    prepare_product(product)
-    estimate_recipe_cvxpy(product)
-    return _product_response(product, options)
+    return await estimate_recipe_generic(request, estimate_recipe_cvxpy)
     
 @app.post("/api/v3/estimate_recipe_glop")
 async def recipe(request: Request):
-    product, options, error_response = await _read_product(request)
-    if error_response:
-        return error_response
-    prepare_product(product)
-    estimate_recipe_cvxpy(product)
-    return product
-
-@app.post("/api/v3/estimate_recipe_glop")
-async def recipe(request: Request):
-    product = await request.json()
-    prepare_product(product)
-    estimate_recipe(product)
-    return _product_response(product, options)
+    return await estimate_recipe_generic(request, estimate_recipe_glop)
 
 @app.post("/api/v3/estimate_recipe_scipy")
 async def recipe(request: Request):
-    product, options, error_response = await _read_product(request)
-    if error_response:
-        return error_response
-    prepare_product(product)
-    estimate_recipe_scipy(product)
-    return _product_response(product, options)
+    return await estimate_recipe_generic(request, estimate_recipe_scipy)
 
 @app.post("/api/v3/estimate_recipe_nnls")
 async def recipe(request: Request):
-    product, options, error_response = await _read_product(request)
-    if error_response:
-        return error_response
-    prepare_product(product)
-    estimate_recipe_nnls(product)
-    return _product_response(product, options)
+    return await estimate_recipe_generic(request, estimate_recipe_nnls)
 
-@app.post("/api/v3/unconstrained_nnls")
+@app.post("/api/v3/estimate_recipe_unconstrained_nnls")
 async def recipe(request: Request):
-    payload = await request.json()
-    product = payload.get("product") if isinstance(payload, dict) and "product" in payload else payload
-    options = payload.get("options", {}) if isinstance(payload, dict) else {}
-    if not isinstance(options, dict):
-        options = {}
-    prepare_product(product)
-    estimate_recipe_unconstrained_nnls(product)
-    if not bool(options.get("debug")):
-        remove_temporary_ingredients_fields(product.get("ingredients", []))
-    return product
+    return await estimate_recipe_generic(request, estimate_recipe_unconstrained_nnls)
 
 @app.post("/api/v3/estimate_recipe_simple")
 async def recipe(request: Request):
-    product, options, error_response = await _read_product(request)
-    if error_response:
-        return error_response
-    prepare_product(product)
-    estimate_recipe_simple(product)
-    return _product_response(product, options)
+    return await estimate_recipe_generic(request, estimate_recipe_simple)
 
 @app.post("/api/v3/estimate_recipe_po")
 async def recipe(request: Request):
-    product, options, error_response = await _read_product(request)
-    if error_response:
-        return error_response
-    prepare_product(product)
-    estimate_recipe_po(product)
-    return _product_response(product, options)
+    return await estimate_recipe_generic(request, estimate_recipe_po)
 
 @app.post("/api/v3/estimate_recipe_cvxpy")
 async def recipe(request: Request):
-    product, options, error_response = await _read_product(request)
-    if error_response:
-        return error_response
-    prepare_product(product)
-    estimate_recipe_cvxpy(product)
-    return _product_response(product, options)
+    return await estimate_recipe_generic(request, estimate_recipe_cvxpy)
 
 @app.post("/api/v3/get_penalties")
 async def recipe(request: Request):

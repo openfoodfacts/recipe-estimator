@@ -201,9 +201,9 @@ def add_objective_to_minimize_maximum_distance_between_ingredients(solver, objec
 
     objective.SetCoefficient(max_ingredients_distance, weighting)
 
-# estimate_recipe() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
+# estimate_recipe_glop() uses a linear solver to estimate the quantities of all leaf ingredients (ingredients that don't have child ingredient)
 # The solver is used to minimise the difference between the sum of the nutrients in the leaf ingredients and the total nutrients in the product
-def estimate_recipe(product):
+def estimate_recipe_glop(product):
     current = time.perf_counter()
     prepare_nutrients(product)
     ingredients = product['ingredients']
