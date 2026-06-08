@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.4.0](https://github.com/openfoodfacts/recipe-estimator/compare/v0.3.1...v0.4.0) (2026-06-05)
+
+
+### Features
+
+* Add CVXPY based solver ([#165](https://github.com/openfoodfacts/recipe-estimator/issues/165)) ([06ec00e](https://github.com/openfoodfacts/recipe-estimator/commit/06ec00eb7d51561084cc5ee523974c6b176a30cc))
+
+
+### Bug Fixes
+
+* new nutrition support, cvxpy as default, remove use of percent_hidden ([#167](https://github.com/openfoodfacts/recipe-estimator/issues/167)) ([3faa86e](https://github.com/openfoodfacts/recipe-estimator/commit/3faa86eac3c72da554a0a6d0c8cf6f35cacbf169))
+* Put product data in product field, return API v3 errors ([#168](https://github.com/openfoodfacts/recipe-estimator/issues/168)) ([1b8011a](https://github.com/openfoodfacts/recipe-estimator/commit/1b8011a082f09a291bcd02fc6b5e54f9a428eb4f))
+* use new API v3 format in frontend ([#169](https://github.com/openfoodfacts/recipe-estimator/issues/169)) ([d61e879](https://github.com/openfoodfacts/recipe-estimator/commit/d61e879dc29f736493abfb6cdd96cf4973d57457))
+
 ## [0.3.1](https://github.com/openfoodfacts/recipe-estimator/compare/v0.3.0...v0.3.1) (2026-05-04)
 
 
