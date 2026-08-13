@@ -180,7 +180,7 @@ def set_percentages(solution_x, ingredient_vars, product_total_quantity):
     return index, total_mixing_bowl_quantity, total_original_quantity
 
 
-def estimate_recipe(product):
+def estimate_recipe(product, use_simple_estimates=False):
     current = time.perf_counter()
     leaf_ingredient_count = prepare_nutrients(product, True)
     ingredients = product["ingredients"]
@@ -254,7 +254,7 @@ def estimate_recipe(product):
         # the ingredient nutrients are greater than the product nutrients
         # But it didn't offer any significant improvement
 
-    try_nutrients = percent_unknown < 10 and len(leaf_ingredients[0]["nutrients"])
+    try_nutrients = False if use_simple_estimates else (percent_unknown < 10 and len(leaf_ingredients[0]["nutrients"]))
 
     # Don't bother with the nutrient approach if the first ingredient is unknown or too many others are unknown
     objectives = nutrient_objectives if try_nutrients else simple_objectives

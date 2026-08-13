@@ -69,13 +69,14 @@ export default function Recipe({product}: RecipeProps) {
   const [nutrients, setNutrients] = useState<any>();
   const [penalties, setPenalties] = useState<any>();
   const [algorithm, setAlgorithm] = useState<string>(DEFAULT_ALGORITHM);
+  const [useSimpleEstimates, setUseSimpleEstimates] = useState(false);
 
   const getRecipe = useCallback((product: any) => {
     if (!product || !product.ingredients)
       return;
     async function fetchData() {
       setIngredients(null);
-      const results = await (await fetch(`${API_PATH}api/v3/${algorithm}`, {method: 'POST', body: JSON.stringify({product: product, options: {debug: true}})})).json();
+      const results = await (await fetch(`${API_PATH}api/v3/${algorithm}`, {method: 'POST', body: JSON.stringify({product: product, options: {debug: true, use_simple_estimates: useSimpleEstimates}})})).json();
       const resultingProduct = results.product;
       setIngredients(resultingProduct.ingredients);
       setNutrients(Object.fromEntries(
@@ -217,21 +218,38 @@ export default function Recipe({product}: RecipeProps) {
               <Typography>{product.ingredients_text}</Typography>
             </TableCell>
             <TableCell>
-              <FormControl variant="standard">
-                <InputLabel id="algorithm-label">Algorithm:</InputLabel>
-                <br/>
-                <Select
-                  labelId="algorithm-label"
-                  value={algorithm}
-                  label="Algorithm"
-                  onChange={(event) => recalculateRecipe(event.target.value)}
-                >
-                  {Object.entries(algorithms).map((entry) => (
-                    <MenuItem value={entry[0]}>{entry[1]}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </TableCell>
+               <FormControl variant="standard">
+                 <InputLabel id="algorithm-label">Algorithm:</InputLabel>
+                 <br/>
+                 <Select
+                   labelId="algorithm-label"
+                   value={algorithm}
+                   label="Algorithm"
+                   onChange={(event) => recalculateRecipe(event.target.value)}
+                 >
+                   {Object.entries(algorithms).map((entry) => (
+                     <MenuItem value={entry[0]}>{entry[1]}</MenuItem>
+                   ))}
+                 </Select>
+               </FormControl>
+             </TableCell>
+             {algorithm === 'estimate_recipe_cvxpy' && (
+               <TableCell>
+                 <FormControl variant="standard">
+                   <InputLabel id="use-simple-estimates-label">Use simple estimates:</InputLabel>
+                   <br/>
+                   <Select
+                     labelId="use-simple-estimates-label"
+                     value={useSimpleEstimates ? "true" : "false"}
+                     label="Use simple estimates"
+                     onChange={(event) => setUseSimpleEstimates(event.target.value === "true")}
+                   >
+                     <MenuItem value="false">No</MenuItem>
+                     <MenuItem value="true">Yes</MenuItem>
+                   </Select>
+                 </FormControl>
+               </TableCell>
+             )}
             <TableCell>
               <Table size='small' sx={{'& .MuiTableCell-sizeSmall': {padding: '1px 4px'}}}>
                 <TableBody>
