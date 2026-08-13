@@ -1,0 +1,1226 @@
+[
+    {
+        "_id": "8410199009968",
+        "product_name": "Lay's Classiche",
+        "categories_tags": [
+            "en:salty-snacks",
+            "en:crisps",
+            "en:potato-crisps"
+        ],
+        "ingredients": [
+            {
+                "id": "en:potato",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 17,
+                        "percent_min": 15,
+                        "percent_max": 19
+                    },
+                    "fat": {
+                        "percent_nom": 0.1,
+                        "percent_min": 0,
+                        "percent_max": 1
+                    },
+                    "proteins": {
+                        "percent_nom": 2,
+                        "percent_min": 1.5,
+                        "percent_max": 2.5
+                    },
+                    "water": {
+                        "percent_nom": 77,
+                        "percent_min": 75,
+                        "percent_max": 80
+                    }
+                }
+            },
+            {
+                "id": "en:sunflower-oil",
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:salt",
+                "nutrients": {
+                    "salt": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            }
+        ],
+        "nutriments": {
+            "carbohydrates_100g": 51,
+            "fat_100g": 32,
+            "proteins_100g": 6.6,
+            "salt_100g": 1.2,
+            "fiber_100g": 4.5
+        }
+    },
+    {
+        "_id": "5053990156009",
+        "product_name": "Original Pringles",
+        "categories_tags": [
+            "en:salty-snacks",
+            "en:crisps"
+        ],
+        "ingredients": [
+            {
+                "id": "en:dehydrated-potatoes",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 76,
+                        "percent_min": 74,
+                        "percent_max": 78
+                    },
+                    "proteins": {
+                        "percent_nom": 8,
+                        "percent_min": 7,
+                        "percent_max": 9
+                    },
+                    "fat": {
+                        "percent_nom": 0.5,
+                        "percent_min": 0.2,
+                        "percent_max": 1
+                    }
+                }
+            },
+            {
+                "id": "en:sunflower-oil",
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:wheat-flour",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 76,
+                        "percent_min": 74,
+                        "percent_max": 78
+                    },
+                    "proteins": {
+                        "percent_nom": 10,
+                        "percent_min": 9,
+                        "percent_max": 11
+                    }
+                }
+            },
+            {
+                "id": "en:corn-flour",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 87,
+                        "percent_min": 85,
+                        "percent_max": 89
+                    },
+                    "proteins": {
+                        "percent_nom": 7,
+                        "percent_min": 6,
+                        "percent_max": 8
+                    }
+                }
+            },
+            {
+                "id": "en:rice-flour",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 79,
+                        "percent_min": 77,
+                        "percent_max": 81
+                    },
+                    "proteins": {
+                        "percent_nom": 6,
+                        "percent_min": 5,
+                        "percent_max": 7
+                    }
+                }
+            },
+            {
+                "id": "en:salt",
+                "nutrients": {
+                    "salt": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            }
+        ],
+        "nutriments": {
+            "carbohydrates_100g": 54,
+            "fat_100g": 31,
+            "proteins_100g": 6.2,
+            "salt_100g": 1.0,
+            "fiber_100g": 4.1
+        }
+    },
+    {
+        "_id": "0000200003080",
+        "product_name": "Walkers Salt & Vinegar",
+        "categories_tags": [
+            "en:salty-snacks",
+            "en:crisps"
+        ],
+        "ingredients": [
+            {
+                "id": "en:potato",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 17,
+                        "percent_min": 15,
+                        "percent_max": 19
+                    },
+                    "fat": {
+                        "percent_nom": 0.1,
+                        "percent_min": 0,
+                        "percent_max": 1
+                    },
+                    "proteins": {
+                        "percent_nom": 2,
+                        "percent_min": 1.5,
+                        "percent_max": 2.5
+                    },
+                    "water": {
+                        "percent_nom": 77,
+                        "percent_min": 75,
+                        "percent_max": 80
+                    }
+                }
+            },
+            {
+                "id": "en:vegetable-oil",
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:salt",
+                "nutrients": {
+                    "salt": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:vinegar-seasoning",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 5,
+                        "percent_min": 3,
+                        "percent_max": 10
+                    },
+                    "salt": {
+                        "percent_nom": 10,
+                        "percent_min": 5,
+                        "percent_max": 20
+                    }
+                }
+            }
+        ],
+        "nutriments": {
+            "carbohydrates_100g": 54,
+            "fat_100g": 30,
+            "proteins_100g": 6.3,
+            "salt_100g": 0.67,
+            "fiber_100g": 6.2
+        }
+    },
+    {
+        "_id": "5000328741314",
+        "product_name": "Doritos Tangy Cheese",
+        "categories_tags": [
+            "en:salty-snacks",
+            "en:corn-chips"
+        ],
+        "ingredients": [
+            {
+                "id": "en:corn",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 73,
+                        "percent_min": 71,
+                        "percent_max": 75
+                    },
+                    "fat": {
+                        "percent_nom": 3.9,
+                        "percent_min": 3,
+                        "percent_max": 5
+                    },
+                    "proteins": {
+                        "percent_nom": 9,
+                        "percent_min": 8,
+                        "percent_max": 10
+                    },
+                    "water": {
+                        "percent_nom": 13,
+                        "percent_min": 11,
+                        "percent_max": 15
+                    }
+                }
+            },
+            {
+                "id": "en:vegetable-oil",
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:tangy-cheese-flavour",
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 25,
+                        "percent_min": 20,
+                        "percent_max": 35
+                    },
+                    "proteins": {
+                        "percent_nom": 35,
+                        "percent_min": 30,
+                        "percent_max": 45
+                    },
+                    "carbohydrates": {
+                        "percent_nom": 15,
+                        "percent_min": 10,
+                        "percent_max": 25
+                    }
+                }
+            },
+            {
+                "id": "en:salt",
+                "nutrients": {
+                    "salt": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            }
+        ],
+        "nutriments": {
+            "carbohydrates_100g": 57.5,
+            "fat_100g": 25.9,
+            "proteins_100g": 6.5,
+            "salt_100g": 0.36,
+            "fiber_100g": 5.6
+        }
+    },
+    {
+        "_id": "3497917000907",
+        "product_name": "Brets Jura Cheese",
+        "categories_tags": [
+            "en:salty-snacks",
+            "en:crisps"
+        ],
+        "ingredients": [
+            {
+                "id": "en:potato",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 17,
+                        "percent_min": 15,
+                        "percent_max": 19
+                    },
+                    "fat": {
+                        "percent_nom": 0.1,
+                        "percent_min": 0,
+                        "percent_max": 1
+                    },
+                    "proteins": {
+                        "percent_nom": 2,
+                        "percent_min": 1.5,
+                        "percent_max": 2.5
+                    },
+                    "water": {
+                        "percent_nom": 77,
+                        "percent_min": 75,
+                        "percent_max": 80
+                    }
+                }
+            },
+            {
+                "id": "en:sunflower-oil",
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:cheese-powder",
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 28,
+                        "percent_min": 25,
+                        "percent_max": 35
+                    },
+                    "proteins": {
+                        "percent_nom": 26,
+                        "percent_min": 20,
+                        "percent_max": 32
+                    },
+                    "carbohydrates": {
+                        "percent_nom": 3,
+                        "percent_min": 1,
+                        "percent_max": 5
+                    },
+                    "salt": {
+                        "percent_nom": 6,
+                        "percent_min": 4,
+                        "percent_max": 8
+                    }
+                }
+            },
+            {
+                "id": "en:salt",
+                "nutrients": {
+                    "salt": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            }
+        ],
+        "nutriments": {
+            "carbohydrates_100g": 52,
+            "fat_100g": 31,
+            "proteins_100g": 6.3,
+            "salt_100g": 1.7,
+            "fiber_100g": 4.8
+        }
+    },
+    {
+        "_id": "8041790505827",
+        "product_name": "Pai - patatine",
+        "categories_tags": [
+            "en:plant-based-foods-and-beverages",
+            "en:plant-based-foods",
+            "en:snacks",
+            "en:cereals-and-potatoes",
+            "en:salty-snacks",
+            "en:appetizers",
+            "en:chips-and-fries",
+            "en:potatoes-and-their-products",
+            "en:crisps",
+            "en:salty-snacks-made-from-potato",
+            "en:potato-crisps"
+        ],
+        "ingredients": [
+            {
+                "id": "en:potato",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 17,
+                        "percent_min": 15,
+                        "percent_max": 19
+                    },
+                    "fat": {
+                        "percent_nom": 0.1,
+                        "percent_min": 0,
+                        "percent_max": 1
+                    },
+                    "proteins": {
+                        "percent_nom": 2,
+                        "percent_min": 1.5,
+                        "percent_max": 2.5
+                    },
+                    "water": {
+                        "percent_nom": 77,
+                        "percent_min": 75,
+                        "percent_max": 80
+                    }
+                }
+            },
+            {
+                "id": "en:vegetable-oil",
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:salt",
+                "nutrients": {
+                    "salt": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            }
+        ],
+        "nutriments": {
+            "carbohydrates_100g": 54,
+            "fat_100g": 28,
+            "proteins_100g": 6.9,
+            "salt_100g": 1.1,
+            "fiber_100g": 5.3,
+            "sugars_100g": 0.6,
+            "saturated-fat_100g": 9.8,
+            "sodium_100g": 0.44,
+            "energy-kcal_100g": 506,
+            "energy-kj_100g": 2114
+        }
+    },
+    {
+        "_id": "8410199009975",
+        "product_name": "Campagnola",
+        "categories_tags": [
+            "en:plant-based-foods-and-beverages",
+            "en:plant-based-foods",
+            "en:snacks",
+            "en:cereals-and-potatoes",
+            "en:salty-snacks",
+            "en:appetizers",
+            "en:chips-and-fries",
+            "en:potatoes-and-their-products",
+            "en:crisps",
+            "en:salty-snacks-made-from-potato",
+            "en:potato-crisps",
+            "en:flavoured-potato-crisps",
+            "en:barbecue-crisps",
+            "en:potato-crisps-in-sunflower-oil"
+        ],
+        "ingredients": [
+            {
+                "id": "en:potato",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 17,
+                        "percent_min": 15,
+                        "percent_max": 19
+                    },
+                    "fat": {
+                        "percent_nom": 0.1,
+                        "percent_min": 0,
+                        "percent_max": 1
+                    },
+                    "proteins": {
+                        "percent_nom": 2,
+                        "percent_min": 1.5,
+                        "percent_max": 2.5
+                    },
+                    "water": {
+                        "percent_nom": 77,
+                        "percent_min": 75,
+                        "percent_max": 80
+                    }
+                }
+            },
+            {
+                "id": "en:corn-oil",
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:aromatic-preparation-to-the-taste-of-vegetables",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 50,
+                        "percent_min": 40,
+                        "percent_max": 60
+                    },
+                    "proteins": {
+                        "percent_nom": 10,
+                        "percent_min": 5,
+                        "percent_max": 15
+                    },
+                    "fat": {
+                        "percent_nom": 5,
+                        "percent_min": 0,
+                        "percent_max": 10
+                    },
+                    "sugars": {
+                        "percent_nom": 20,
+                        "percent_min": 15,
+                        "percent_max": 25
+                    },
+                    "salt": {
+                        "percent_nom": 20,
+                        "percent_min": 15,
+                        "percent_max": 25
+                    }
+                }
+            },
+            {
+                "id": "en:spice",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 50,
+                        "percent_min": 40,
+                        "percent_max": 60
+                    },
+                    "proteins": {
+                        "percent_nom": 10,
+                        "percent_min": 5,
+                        "percent_max": 15
+                    },
+                    "fiber": {
+                        "percent_nom": 25,
+                        "percent_min": 20,
+                        "percent_max": 30
+                    }
+                }
+            },
+            {
+                "id": "en:salt",
+                "nutrients": {
+                    "salt": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            }
+        ],
+        "nutriments": {
+            "carbohydrates_100g": 54,
+            "fat_100g": 28,
+            "proteins_100g": 6,
+            "salt_100g": 1.3,
+            "fiber_100g": 3.9,
+            "sugars_100g": 2.9,
+            "saturated-fat_100g": 2.4,
+            "sodium_100g": 0.52,
+            "energy-kcal_100g": 497,
+            "energy-kj_100g": 2076
+        }
+    },
+    {
+        "_id": "8002183013534",
+        "product_name": "Grigliata al gusto paprica",
+        "categories_tags": [
+            "en:plant-based-foods-and-beverages",
+            "en:plant-based-foods",
+            "en:snacks",
+            "en:cereals-and-potatoes",
+            "en:salty-snacks",
+            "en:appetizers",
+            "en:chips-and-fries",
+            "en:potatoes-and-their-products",
+            "en:crisps",
+            "en:salty-snacks-made-from-potato",
+            "en:potato-crisps",
+            "en:flavoured-potato-crisps",
+            "en:paprika-crisps"
+        ],
+        "ingredients": [
+            {
+                "id": "en:potato",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 17,
+                        "percent_min": 15,
+                        "percent_max": 19
+                    },
+                    "fat": {
+                        "percent_nom": 0.1,
+                        "percent_min": 0,
+                        "percent_max": 1
+                    },
+                    "proteins": {
+                        "percent_nom": 2,
+                        "percent_min": 1.5,
+                        "percent_max": 2.5
+                    },
+                    "water": {
+                        "percent_nom": 77,
+                        "percent_min": 75,
+                        "percent_max": 80
+                    }
+                }
+            },
+            {
+                "id": "en:sunflower-oil",
+                "percent": 35,
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:natural-flavouring",
+                "nutrients": {}
+            },
+            {
+                "id": "en:salt",
+                "nutrients": {
+                    "salt": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            }
+        ],
+        "nutriments": {
+            "carbohydrates_100g": 51,
+            "fat_100g": 35,
+            "proteins_100g": 6.2,
+            "salt_100g": 1.5,
+            "fiber_100g": 3.7,
+            "sugars_100g": 0.6,
+            "saturated-fat_100g": 4,
+            "sodium_100g": 0.6,
+            "energy-kcal_100g": 551,
+            "energy-kj_100g": 2297
+        }
+    },
+    {
+        "_id": "8015854170368",
+        "product_name": "Tubini gustosi e friabili",
+        "categories_tags": [
+            "en:plant-based-foods-and-beverages",
+            "en:plant-based-foods",
+            "en:snacks",
+            "en:cereals-and-potatoes",
+            "en:salty-snacks",
+            "en:appetizers",
+            "en:biscuits-and-crackers",
+            "en:potatoes-and-their-products",
+            "en:salty-snacks-made-from-potato",
+            "en:crackers-appetizers",
+            "en:puffed-salty-snacks",
+            "en:puffed-salty-snacks-made-from-potato"
+        ],
+        "ingredients": [
+            {
+                "id": "en:potato-starch",
+                "percent": 31,
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 90,
+                        "percent_min": 85,
+                        "percent_max": 95
+                    },
+                    "proteins": {
+                        "percent_nom": 0.5,
+                        "percent_min": 0.2,
+                        "percent_max": 1
+                    }
+                }
+            },
+            {
+                "id": "en:sunflower-oil",
+                "percent": 30,
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:potato",
+                "percent": 27,
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 76,
+                        "percent_min": 74,
+                        "percent_max": 78
+                    },
+                    "proteins": {
+                        "percent_nom": 8,
+                        "percent_min": 7,
+                        "percent_max": 9
+                    },
+                    "fat": {
+                        "percent_nom": 0.5,
+                        "percent_min": 0.2,
+                        "percent_max": 1
+                    },
+                    "water": {
+                        "percent_nom": 8,
+                        "percent_min": 5,
+                        "percent_max": 10
+                    }
+                }
+            },
+            {
+                "id": "en:rice-flour",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 79,
+                        "percent_min": 77,
+                        "percent_max": 81
+                    },
+                    "proteins": {
+                        "percent_nom": 6,
+                        "percent_min": 5,
+                        "percent_max": 7
+                    }
+                }
+            },
+            {
+                "id": "en:salt",
+                "nutrients": {
+                    "salt": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:vegetable-extract",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 40,
+                        "percent_min": 30,
+                        "percent_max": 50
+                    },
+                    "proteins": {
+                        "percent_nom": 10,
+                        "percent_min": 5,
+                        "percent_max": 15
+                    }
+                }
+            },
+            {
+                "id": "en:garlic",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 30,
+                        "percent_min": 25,
+                        "percent_max": 35
+                    },
+                    "proteins": {
+                        "percent_nom": 6,
+                        "percent_min": 5,
+                        "percent_max": 8
+                    },
+                    "water": {
+                        "percent_nom": 60,
+                        "percent_min": 55,
+                        "percent_max": 65
+                    }
+                }
+            },
+            {
+                "id": "en:onion",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 10,
+                        "percent_min": 8,
+                        "percent_max": 12
+                    },
+                    "proteins": {
+                        "percent_nom": 1.5,
+                        "percent_min": 1,
+                        "percent_max": 2
+                    },
+                    "water": {
+                        "percent_nom": 89,
+                        "percent_min": 85,
+                        "percent_max": 92
+                    }
+                }
+            },
+            {
+                "id": "en:flavouring",
+                "nutrients": {}
+            },
+            {
+                "id": "en:dextrose",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            }
+        ],
+        "nutriments": {
+            "carbohydrates_100g": 55,
+            "fat_100g": 35,
+            "proteins_100g": 3.4,
+            "salt_100g": 2.2,
+            "fiber_100g": 1.2,
+            "sugars_100g": 0,
+            "saturated-fat_100g": 3.1,
+            "trans-fat_100g": 0,
+            "sodium_100g": 0.88,
+            "energy-kcal_100g": 551,
+            "energy-kj_100g": 2297.4
+        }
+    },
+    {
+        "_id": "5053990162734",
+        "product_name": "Pringles paprika 175 gr",
+        "categories_tags": [
+            "en:plant-based-foods-and-beverages",
+            "en:plant-based-foods",
+            "en:snacks",
+            "en:cereals-and-potatoes",
+            "en:condiments",
+            "en:salty-snacks",
+            "en:appetizers",
+            "en:chips-and-fries",
+            "en:potatoes-and-their-products",
+            "en:crisps",
+            "en:salty-snacks-made-from-potato",
+            "en:stacked-extruded-potato-crisps"
+        ],
+        "ingredients": [
+            {
+                "id": "en:dehydrated-potatoes",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 76,
+                        "percent_min": 74,
+                        "percent_max": 78
+                    },
+                    "proteins": {
+                        "percent_nom": 8,
+                        "percent_min": 7,
+                        "percent_max": 9
+                    },
+                    "fat": {
+                        "percent_nom": 0.5,
+                        "percent_min": 0.2,
+                        "percent_max": 1
+                    }
+                }
+            },
+            {
+                "id": "en:vegetable-oil",
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:wheat-flour",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 76,
+                        "percent_min": 74,
+                        "percent_max": 78
+                    },
+                    "proteins": {
+                        "percent_nom": 10,
+                        "percent_min": 9,
+                        "percent_max": 11
+                    }
+                }
+            },
+            {
+                "id": "en:corn-flour",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 87,
+                        "percent_min": 85,
+                        "percent_max": 89
+                    },
+                    "proteins": {
+                        "percent_nom": 7,
+                        "percent_min": 6,
+                        "percent_max": 8
+                    }
+                }
+            },
+            {
+                "id": "en:rice-flour",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 79,
+                        "percent_min": 77,
+                        "percent_max": 81
+                    },
+                    "proteins": {
+                        "percent_nom": 6,
+                        "percent_min": 5,
+                        "percent_max": 7
+                    }
+                }
+            },
+            {
+                "id": "en:paprika",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 50,
+                        "percent_min": 45,
+                        "percent_max": 55
+                    },
+                    "proteins": {
+                        "percent_nom": 14,
+                        "percent_min": 12,
+                        "percent_max": 16
+                    },
+                    "fiber": {
+                        "percent_nom": 30,
+                        "percent_min": 25,
+                        "percent_max": 35
+                    }
+                }
+            },
+            {
+                "id": "en:sugar",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:paprika-powder",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 50,
+                        "percent_min": 45,
+                        "percent_max": 55
+                    },
+                    "proteins": {
+                        "percent_nom": 14,
+                        "percent_min": 12,
+                        "percent_max": 16
+                    },
+                    "fiber": {
+                        "percent_nom": 30,
+                        "percent_min": 25,
+                        "percent_max": 35
+                    }
+                }
+            },
+            {
+                "id": "en:e621",
+                "nutrients": {}
+            },
+            {
+                "id": "it:guanilato disodico",
+                "nutrients": {}
+            },
+            {
+                "id": "en:e631",
+                "nutrients": {}
+            },
+            {
+                "id": "en:dextrose",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:yeast-powder",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 40,
+                        "percent_min": 35,
+                        "percent_max": 45
+                    },
+                    "proteins": {
+                        "percent_nom": 40,
+                        "percent_min": 35,
+                        "percent_max": 45
+                    }
+                }
+            },
+            {
+                "id": "en:salt",
+                "nutrients": {
+                    "salt": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:broth",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 10,
+                        "percent_min": 5,
+                        "percent_max": 15
+                    },
+                    "proteins": {
+                        "percent_nom": 10,
+                        "percent_min": 5,
+                        "percent_max": 15
+                    },
+                    "salt": {
+                        "percent_nom": 50,
+                        "percent_min": 40,
+                        "percent_max": 60
+                    }
+                }
+            },
+            {
+                "id": "en:flavouring",
+                "nutrients": {}
+            },
+            {
+                "id": "en:garlic-powder",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 70,
+                        "percent_min": 65,
+                        "percent_max": 75
+                    },
+                    "proteins": {
+                        "percent_nom": 20,
+                        "percent_min": 15,
+                        "percent_max": 25
+                    }
+                }
+            },
+            {
+                "id": "en:e160c",
+                "nutrients": {}
+            },
+            {
+                "id": "it:acidificante polvere di siero dolce",
+                "nutrients": {}
+            },
+            {
+                "id": "en:maltodextrin",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 100,
+                        "percent_min": 95,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:e471",
+                "nutrients": {}
+            },
+            {
+                "id": "it:norbissina di annatto",
+                "nutrients": {}
+            }
+        ],
+        "nutriments": {
+            "carbohydrates_100g": 56,
+            "fat_100g": 29,
+            "proteins_100g": 6.4,
+            "salt_100g": 1.4,
+            "fiber_100g": 3.8,
+            "sugars_100g": 3.9,
+            "saturated-fat_100g": 6.3,
+            "sodium_100g": 0.56,
+            "energy-kcal_100g": 500,
+            "energy-kj_100g": 2164.2
+        }
+    },
+    {
+        "_id": "8033256002452",
+        "product_name": "Le grigliate",
+        "categories_tags": [
+            "en:plant-based-foods-and-beverages",
+            "en:plant-based-foods",
+            "en:snacks",
+            "en:cereals-and-potatoes",
+            "en:salty-snacks",
+            "en:appetizers",
+            "en:chips-and-fries",
+            "en:potatoes-and-their-products",
+            "en:crisps",
+            "en:salty-snacks-made-from-potato",
+            "en:potato-crisps",
+            "it:Snack salati"
+        ],
+        "ingredients": [
+            {
+                "id": "en:potato",
+                "nutrients": {
+                    "carbohydrates": {
+                        "percent_nom": 17,
+                        "percent_min": 15,
+                        "percent_max": 19
+                    },
+                    "fat": {
+                        "percent_nom": 0.1,
+                        "percent_min": 0,
+                        "percent_max": 1
+                    },
+                    "proteins": {
+                        "percent_nom": 2,
+                        "percent_min": 1.5,
+                        "percent_max": 2.5
+                    },
+                    "water": {
+                        "percent_nom": 77,
+                        "percent_min": 75,
+                        "percent_max": 80
+                    }
+                }
+            },
+            {
+                "id": "en:sunflower-oil",
+                "nutrients": {
+                    "fat": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            },
+            {
+                "id": "en:iodised-salt",
+                "nutrients": {
+                    "salt": {
+                        "percent_nom": 100,
+                        "percent_min": 100,
+                        "percent_max": 100
+                    }
+                }
+            }
+        ],
+        "nutriments": {
+            "carbohydrates_100g": 55,
+            "fat_100g": 29,
+            "proteins_100g": 6.2,
+            "salt_100g": 1.5,
+            "sugars_100g": 0.5,
+            "saturated-fat_100g": 3.6,
+            "sodium_100g": 0.6,
+            "energy-kcal_100g": 516,
+            "energy-kj_100g": 2153
+        }
+    }
+]

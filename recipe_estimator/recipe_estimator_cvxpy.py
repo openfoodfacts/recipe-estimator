@@ -81,7 +81,7 @@ def add_ingredient_constraints(
             leaf_ingredients.append(ingredient)
             # Tried defaulting to a nominal value for water for unknown ingredients
             # but didn't seem to help
-            water_proportion = ingredient["nutrients"].get("water", {}).get("percent_nom", 0) * 0.01
+            water_proportion = ingredient.get("nutrients", {}).get("water", {}).get("percent_nom", 0) * 0.01
             water_proportions.append(water_proportion)
 
             if ingredient_percent is not None:
@@ -134,7 +134,7 @@ def estimate_percentages(
             )
         else:
             # If ingredient has no nutrient information then add an objective to keep close to the estimate
-            if len(ingredient["nutrients"]) == 0:
+            if len(ingredient.get("nutrients", {})) == 0:
                 percent_unknown += estimate
                 nutrient_objectives.append(
                     UNKNOWN_INGREDIENT_WEIGHTING
@@ -187,6 +187,10 @@ def estimate_recipe(product):
     recipe_estimator = product["recipe_estimator"]
     nutrients = recipe_estimator["nutrients"]
 
+    # Get categories early so we can use them for constraint decisions
+    product_categories = product.get("categories_tags", [])
+    is_high_water_loss_product = any(c in product_categories for c in ['en:salty-snacks', 'en:crisps', 'en:potato-crisps', 'en:chips-and-fries', 'en:corn-chips'])
+
     ingredients_nutrients = []
     product_nutrients = []
     leaf_ingredients = []
@@ -206,15 +210,30 @@ def estimate_recipe(product):
     )
 
     # Hard constraint: sum of ingredients less maximum water loss can't be greater than 100g
-    constraints.append(
-        cp.sum(ingredient_quantities) - (ingredient_quantities @ water_proportions)
-        <= 100
-    )
+    # For fried snacks with extreme water loss (75%+), we need to relax this constraint
+    # to allow raw ingredient masses to be 3-4x the final product mass.
+    if is_high_water_loss_product:
+        # Relax constraint: allow final product mass to be up to 300g due to water loss mismatches
+        constraints.append(
+            cp.sum(ingredient_quantities) - (ingredient_quantities @ water_proportions)
+            <= 300
+        )
+    else:
+        # Normal constraint for standard products
+        constraints.append(
+            cp.sum(ingredient_quantities) - (ingredient_quantities @ water_proportions)
+            <= 100
+        )
 
     for nutrient_key in nutrients:
         nutrient = nutrients[nutrient_key]
 
         weighting = nutrient.get("weighting", 0)
+
+        # Ensure salt is not ignored for high-water-loss products, even if the nutrient map missed it
+        if is_high_water_loss_product and nutrient_key == "salt" and weighting == 0:
+            weighting = 1.0
+        
         # Skip nutrients that don't have a weighting
         if weighting == 0:
             continue
@@ -259,10 +278,28 @@ def estimate_recipe(product):
     # Don't bother with the nutrient approach if the first ingredient is unknown or too many others are unknown
     objectives = nutrient_objectives if try_nutrients else simple_objectives
     
+    # ---------------------------------------------------------
     # Get the ingredients to add up to close to 100g, which effectively adds a cost for evaporation.
-    # Could potentially adjust the weighting here depending on the food category
-    evaporation_cost = EVAPORATION_COST * cp.square(sum(ingredient_quantities) - 100)
+    # Adjust the weighting for food categories with high expected water loss (e.g. fried snacks).
+    # Note: product_categories already defined at the start of estimate_recipe()
+    
+    evaporation_multiplier = 1.0
+    
+    # Check if any of the target categories are in the product_categories list
+    if is_high_water_loss_product:
+        evaporation_multiplier = 0.001  # Reduced from 0.01 to allow larger evaporation for high water-loss foods
+
+    # Apply the multiplier to the standard cost
+    evaporation_cost = (EVAPORATION_COST * evaporation_multiplier) * cp.square(sum(ingredient_quantities) - 100)
     objectives.append(evaporation_cost)
+    
+    # Relax the fallback threshold for fried snacks to allow higher nutrient variance
+    # For products with extreme water loss (300g raw -> 100g final), nutrient variance will be high
+    # even with optimal solutions due to the massive scaling required
+    fallback_threshold = 2500
+    if is_high_water_loss_product:
+        fallback_threshold = 250000  # Allow much higher variance for foods with extreme water loss (75%+ evaporation)
+    # ---------------------------------------------------------
 
     objective = cp.Minimize(sum(objectives))
     prob = cp.Problem(objective, constraints)
@@ -274,7 +311,7 @@ def estimate_recipe(product):
             recipe_estimator["nutrient_variance"] = nutrient_variance_value
 
         # If nutrient variance is too much then try again with the simple approach
-        if try_nutrients and (prob.status != cp.OPTIMAL or nutrient_variance_value > 2500):
+        if try_nutrients and (prob.status != cp.OPTIMAL or nutrient_variance_value > fallback_threshold):
             objectives = simple_objectives
             objective = cp.Minimize(sum(objectives))
             prob = cp.Problem(objective, constraints)
@@ -283,7 +320,6 @@ def estimate_recipe(product):
                 recipe_estimator["nutrient_variance_simple"] = nutrient_variance.value.item()
 
     solution_x = ingredient_quantities.value if prob.status == cp.OPTIMAL else simple_estimates
-        
     # In the UK/EU the percentage is the weight of raw product needed to produce 100g divided by the final weight (100g)
     # In the US it is the weight of raw ingredient divided by the total weight of all raw ingredients
     product_total_quantity = sum(solution_x) if recipe_estimator.get('might_be_us') else 100
