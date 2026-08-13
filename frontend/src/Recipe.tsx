@@ -86,7 +86,7 @@ export default function Recipe({product}: RecipeProps) {
       setPenalties(resultingProduct.recipe_estimator.penalties)
     }
     fetchData();
-  }, [algorithm]);
+  }, [algorithm, useSimpleEstimates]);
 
   const refreshPenalties = useCallback((product: any) => {
     async function fetchData() {
