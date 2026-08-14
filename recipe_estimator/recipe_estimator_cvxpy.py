@@ -5,6 +5,7 @@ import numpy as np
 from .fitness import get_objective_function_args, objective as objective_function
 
 from .prepare_nutrients import prepare_nutrients
+from .nutrients import ensure_float
 
 POWER = -1.7
 EVAPORATION_COST = 0.01
@@ -107,7 +108,7 @@ def add_ingredient_constraints(
 
 
 def estimate_percentages(
-    ingredient_quantities, nutrient_objectives, simple_objectives, ingredients, simple_estimates, total=100.0, index=0, percent_unknown = 0
+    ingredient_quantities, nutrient_objectives, simple_objectives, ingredients, simple_estimates, total=100.0, index=0, percent_unknown=0, constraints=None, nutriments=None, is_first_product_ingredient=True, expressions=None
 ):
     # Each ingredient quantity = a * n ^ p
     # where p is the POWER constant, n is the ingredient number and a is the percentage of the first ingredient
@@ -115,6 +116,14 @@ def estimate_percentages(
     num_ingredients = len(ingredients)
     if num_ingredients < 1:
         return 0, 100
+
+    is_top_level = expressions is None
+    if is_top_level:
+        expressions = {
+            'salt': cp.Constant(0),
+            'sugars': cp.Constant(0),
+            'fat': cp.Constant(0),
+        }
 
     raw_sum = sum([(n + 1.0) ** POWER for n in range(num_ingredients)])
     a = total / raw_sum
@@ -130,7 +139,11 @@ def estimate_percentages(
                 simple_estimates,
                 estimate,
                 index,
-                percent_unknown
+                percent_unknown,
+                constraints,
+                nutriments,
+                is_first_product_ingredient and n == 0,
+                expressions
             )
         else:
             # If ingredient has no nutrient information then add an objective to keep close to the estimate
@@ -143,7 +156,51 @@ def estimate_percentages(
             # Simple objectives are used if we find that going by nutrients doesn't work
             simple_objectives.append(cp.square(ingredient_quantities[index] - estimate))
             simple_estimates.append(estimate)
+
+            ingredient_id = ingredient.get("id", "")
+            
+            # Add constraint for flavour ingredients and food additives, except for first product ingredient
+            if constraints is not None and not is_first_product_ingredient:
+                if "flavour" in ingredient_id or (ingredient_id.startswith("en:e") and len(ingredient_id) > 4 and ingredient_id[4].isdigit()):
+                    constraints.append(ingredient_quantities[index] <= 2.0)
+
+            # If we are certain the ingredient contains a minimum amount of salt, sugar or fat
+            # we add it to the expressions so that we can add constraints to keep the total below the product's nutritional information
+            if ingredient_id == 'en:salt' or ingredient_id.endswith('-salt'):
+                expressions['salt'] += ingredient_quantities[index]
+            elif ingredient_id == 'en:sugar' or ingredient_id.endswith('-sugar'):
+                expressions['sugars'] += ingredient_quantities[index]
+            elif ingredient_id == 'en:honey' or ingredient_id.endswith('-honey'):
+                expressions['sugars'] += 0.6 * ingredient_quantities[index]
+            elif ingredient_id.endswith('-oil') or ingredient_id == 'en:cocoa-butter':
+                expressions['fat'] += ingredient_quantities[index]
+            elif ingredient_id.endswith('-fat'):
+                expressions['fat'] += 0.8 * ingredient_quantities[index]
+            elif ingredient_id == 'en:butter':
+                expressions['fat'] += 0.8 * ingredient_quantities[index]
+            elif ingredient_id == 'en:butterfat':
+                expressions['fat'] += 0.9 * ingredient_quantities[index]
+            
             index += 1
+
+    # If we are at the top level and we have nutritional information for the product
+    # we add constraints to keep the total salt, sugar and fat below the product's nutritional information
+    # We do this because processing (e.g. evaporation) should not reduce the total amount of salt, sugar or fat in the product
+    if is_top_level and constraints is not None and nutriments is not None:
+        salt = nutriments.get('salt_100g')
+        if salt is not None:
+            constraints.append(expressions['salt'] <= ensure_float(salt))
+            print(f"Adding constraint: salt <= {salt}")
+
+        sugars = nutriments.get('sugars_100g')
+        if sugars is not None:
+            constraints.append(expressions['sugars'] <= ensure_float(sugars))
+            print(f"Adding constraint: sugars <= {sugars}")
+
+        fat = nutriments.get('fat_100g')
+        if fat is not None:
+            constraints.append(expressions['fat'] <= ensure_float(fat))
+            print(f"Adding constraint: fat <= {fat}")
 
     return index, percent_unknown
 
@@ -242,7 +299,7 @@ def estimate_recipe(product, use_simple_estimates=False):
 
     # Add objective to keep unknown ingredients close to the inverse power series
     # simple_objectives does this for all ingredients
-    _, percent_unknown = estimate_percentages(ingredient_quantities, nutrient_objectives, simple_objectives, ingredients, simple_estimates)
+    _, percent_unknown = estimate_percentages(ingredient_quantities, nutrient_objectives, simple_objectives, ingredients, simple_estimates, constraints=constraints, nutriments=product.get('nutriments', {}))
 
     # Main objective to match ingredient nutrients to product nutrients
     if product_nutrients:
