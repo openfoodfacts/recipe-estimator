@@ -190,17 +190,14 @@ def estimate_percentages(
         salt = nutriments.get('salt_100g')
         if salt is not None:
             constraints.append(expressions['salt'] <= ensure_float(salt))
-            print(f"Adding constraint: salt <= {salt}")
 
         sugars = nutriments.get('sugars_100g')
         if sugars is not None:
             constraints.append(expressions['sugars'] <= ensure_float(sugars))
-            print(f"Adding constraint: sugars <= {sugars}")
 
         fat = nutriments.get('fat_100g')
         if fat is not None:
             constraints.append(expressions['fat'] <= ensure_float(fat))
-            print(f"Adding constraint: fat <= {fat}")
 
     return index, percent_unknown
 
