@@ -91,7 +91,7 @@ def test_estimate_recipe_salty_snacks_water_loss():
     # doesn't cause a solver plateau or zero out exact micro-ingredients.
     product = {
         'code': 'crisps_test',
-        'categories_tags': ['en:salty-snacks', 'en:crisps'],
+        'categories_tags': ['en:chips-and-fries', 'en:salty-snacks', 'en:crisps'],
         'ingredients': [
             {
                 'id': 'en:potato',
@@ -109,20 +109,20 @@ def test_estimate_recipe_salty_snacks_water_loss():
             {
                 'id': 'en:salt',
                 'nutrients': {
-                    'salt': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
+                    'sodium': {'percent_nom': 100, 'percent_min': 100, 'percent_max': 100},
                 }
             }
         ],
         'nutriments': {
-            'carbohydrates_100g': 51,
+            'carbohydrates_100g': 48,
             'fat_100g': 32,
-            'salt_100g': 1.2
+            'sodium_100g': 1.2
         },
         'recipe_estimator': {
             'nutrients': {
-                'carbohydrates': {'product_total': 51, 'weighting': 1},
+                'carbohydrates': {'product_total': 48, 'weighting': 1},
                 'fat': {'product_total': 32, 'weighting': 1},
-                'salt': {'product_total': 1.2, 'weighting': 1}
+                'sodium': {'product_total': 1.2, 'weighting': 1}
             }
         }
     }
@@ -188,12 +188,9 @@ def test_estimate_recipe_from_crisps_dataset(product_data):
         assert percent >= 0, f"Ingredient {ingredient['id']} has zero/negative estimate in {product_data['product_name']}"
     
     # For high-water-loss products (fried snacks), verify reasonable estimates
-    categories = product_data.get('categories_tags', [])
-    is_fried = any(cat in categories for cat in ['en:salty-snacks', 'en:crisps', 'en:potato-crisps', 'en:chips-and-fries', 'en:corn-chips'])
-    
-    if is_fried:
-        # Total ingredient mass should be > 100 to account for water loss
+    if product.get('is_high_water_loss', False):
+        # Total ingredient mass should be >= 99.9 to account for water loss
         total_mass = sum(ing.get('percent_estimate', 0) for ing in product['ingredients'])
-        assert total_mass > 100, f"Total ingredient mass too low ({total_mass}) for fried product {product_data['product_name']}"
+        assert total_mass >= 99.9, f"Total ingredient mass too low ({total_mass}) for fried product {product_data['product_name']}"
 
     

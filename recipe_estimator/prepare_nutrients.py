@@ -83,20 +83,12 @@ def assign_weightings(product, scipy):
                 carbohydrates['notes'] = 'Might be total carbs'
                 might_be_us = True
 
-    return might_be_us
-
-    # For high-water-loss products (fried snacks, etc), ensure salt is included in the objective
-    # even though the nutrient_map marks it as "Sodium is used instead"
+    # Set a centralized flag for products expected to have massive water loss.
+    # Currently limited to en:chips-and-fries, but designed to easily append categories (e.g. cheeses) later.
     categories_tags = product.get('categories_tags', [])
-    is_fried_snack = any(cat in categories_tags for cat in ['en:salty-snacks', 'en:crisps', 'en:potato-crisps', 'en:chips-and-fries'])
-    
-    if is_fried_snack:
-        salt = computed_nutrients.get('salt')
-        if salt and salt.get('product_total') and salt.get('ingredient_count', 0) > 0:
-            # Override the empty weighting from nutrient_map to include salt in the objective
-            if salt.get('weighting', 0) == 0 and 'Sodium is used instead' in salt.get('notes', ''):
-                salt['weighting'] = 1.0  # Give salt same default weighting as other micronutrients
-                salt.pop('notes', None)  # Remove the "Sodium is used instead" note
+    product['is_high_water_loss'] = any(cat in categories_tags for cat in ['en:chips-and-fries'])
+
+    return might_be_us
 
 def prepare_nutrients(product, scipy = False):
     nutrients = {}

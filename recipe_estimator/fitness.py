@@ -216,8 +216,8 @@ def get_objective_function_args(product):
     #     total_mass_multipliers[i] = -1 if i % 2 else 1
 
     penalties = {} # Need this if using numba: Dict.empty(key_type=types.unicode_type, value_type=types.float64)
-    categories = product.get("categories_tags", [])
-    args = [penalties, np.array(product_nutrients), np.array(nutrient_ingredients_nom), np.array(nutrient_ingredients_min), np.array(nutrient_ingredients_max), np.array(nutrient_weightings), ingredient_order_previous_indices, ingredient_order_this_indices, leaf_ingredient_count, categories]
+    is_high_water_loss = product.get("is_high_water_loss", False)
+    args = [penalties, np.array(product_nutrients), np.array(nutrient_ingredients_nom), np.array(nutrient_ingredients_min), np.array(nutrient_ingredients_max), np.array(nutrient_weightings), ingredient_order_previous_indices, ingredient_order_this_indices, leaf_ingredient_count, is_high_water_loss]
     return [bounds, leaf_ingredients, args]
 
 
@@ -231,7 +231,7 @@ TOTAL_MASS_MORE_THAN_100_PENALTY = 100
 # TODO: Try using quadratic / cubic penalty functions so that gradients are smoother and may be easier for optimizer to spot path to minimum
 # TODO: Use matrix libraries for objective calculations to speed things up
 # @jit # pre-compile with numba
-def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ingredients_nom, nutrient_ingredients_min, nutrient_ingredients_max, nutrient_weightings, ingredient_order_previous_indices, ingredient_order_this_indices, leaf_ingredient_count, categories):
+def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ingredients_nom, nutrient_ingredients_min, nutrient_ingredients_max, nutrient_weightings, ingredient_order_previous_indices, ingredient_order_this_indices, leaf_ingredient_count, is_high_water_loss):
     nutrient_variance = 0
     # This seems to be a bit faster than for n, nutrient_total in enumerate(product_nutrients)
     num_nutrients = len(product_nutrients)
@@ -261,7 +261,7 @@ def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ing
     # For fried snacks with extreme evaporation (75%+ water loss), the nutrient variance will be naturally high
     # even with optimal solutions because raw ingredients scale 3-4x. Reduce the penalty multiplier.
     nutrient_penalty_multiplier = 1.0
-    if any(cat in categories for cat in ['en:salty-snacks', 'en:crisps', 'en:potato-crisps', 'en:chips-and-fries']):
+    if is_high_water_loss:
         nutrient_penalty_multiplier = 0.01  # Reduce nutrient penalty 100x for high water-loss products
     
     nutrient_penalty = NUTRIENT_OUTSIDE_BOUNDS_PENALTY * nutrient_variance * nutrient_penalty_multiplier
@@ -272,7 +272,7 @@ def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ing
     # Conditionally relax progression penalty for fried snacks with high water loss
     # These categories allow raw ingredients to be much larger than final product
     progression_penalty_multiplier = 1.0
-    if any(cat in categories for cat in ['en:salty-snacks', 'en:crisps', 'en:potato-crisps', 'en:chips-and-fries']):
+    if is_high_water_loss:
         progression_penalty_multiplier = 0.001  # Allow extreme deviations from 50% geometric progression
     
     # Now add a penalty for the constraints
@@ -326,10 +326,10 @@ def objective(ingredient_percentages, penalties, product_nutrients, nutrient_ing
     mass_more_than_100_penalty = 0
     mass_less_than_100_penalty = 0
     
-    # Determine mass penalty multiplier based on product categories
+    # Determine mass penalty multiplier based on the high water-loss flag
     # REDUCE penalty drastically for fried/dehydrated categories to avoid solver plateaus
     mass_penalty_multiplier = 1.0
-    if any(cat in categories for cat in ['en:salty-snacks', 'en:crisps', 'en:potato-crisps', 'en:chips-and-fries']):
+    if is_high_water_loss:
         mass_penalty_multiplier = 0.01  # Allow much larger evaporation for high water-loss products
     
     if total_mass < 100:

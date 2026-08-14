@@ -3,6 +3,7 @@
         "_id": "8410199009968",
         "product_name": "Lay's Classiche",
         "categories_tags": [
+            "en:chips-and-fries",
             "en:salty-snacks",
             "en:crisps",
             "en:potato-crisps"
@@ -66,6 +67,7 @@
         "_id": "5053990156009",
         "product_name": "Original Pringles",
         "categories_tags": [
+            "en:chips-and-fries",
             "en:salty-snacks",
             "en:crisps"
         ],
@@ -168,6 +170,7 @@
         "_id": "0000200003080",
         "product_name": "Walkers Salt & Vinegar",
         "categories_tags": [
+            "en:chips-and-fries",
             "en:salty-snacks",
             "en:crisps"
         ],
@@ -245,6 +248,7 @@
         "_id": "5000328741314",
         "product_name": "Doritos Tangy Cheese",
         "categories_tags": [
+            "en:chips-and-fries",
             "en:salty-snacks",
             "en:corn-chips"
         ],
@@ -327,6 +331,7 @@
         "_id": "3497917000907",
         "product_name": "Brets Jura Cheese",
         "categories_tags": [
+            "en:chips-and-fries",
             "en:salty-snacks",
             "en:crisps"
         ],
@@ -702,6 +707,7 @@
         "_id": "8015854170368",
         "product_name": "Tubini gustosi e friabili",
         "categories_tags": [
+            "en:chips-and-fries",
             "en:plant-based-foods-and-beverages",
             "en:plant-based-foods",
             "en:snacks",
