@@ -108,7 +108,7 @@ def add_ingredient_constraints(
 
 
 def estimate_percentages(
-    ingredient_quantities, nutrient_objectives, simple_objectives, ingredients, simple_estimates, total=100.0, index=0, percent_unknown=0, constraints=None, nutriments=None, is_first_product_ingredient=True, expressions=None
+    ingredient_quantities, nutrient_objectives, simple_objectives, ingredients, simple_estimates, total=100.0, index=0, percent_unknown=0, constraints=None, product_nutrients=None, is_first_product_ingredient=True, expressions=None
 ):
     # Each ingredient quantity = a * n ^ p
     # where p is the POWER constant, n is the ingredient number and a is the percentage of the first ingredient
