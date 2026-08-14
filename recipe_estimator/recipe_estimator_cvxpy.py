@@ -108,8 +108,9 @@ def add_ingredient_constraints(
 
 
 def estimate_percentages(
-    ingredient_quantities, nutrient_objectives, simple_objectives, ingredients, simple_estimates, total=100.0, index=0, percent_unknown=0, constraints=None, product_nutrients=None, is_first_product_ingredient=True, expressions=None
+    ingredient_quantities, nutrient_objectives, simple_objectives, ingredients, simple_estimates, total=100.0, index=0, percent_unknown=0, constraints=None, product_nutrients=None, is_first_product_ingredient=True, expressions=None, custom_estimates=None
 ):
+    # If called without custom estimates then we use a power-law series to estimate the percentages of each ingredient based on its position in the list of ingredients
     # Each ingredient quantity = a * n ^ p
     # where p is the POWER constant, n is the ingredient number and a is the percentage of the first ingredient
     # We work out a by adding up all the results of the series with a = 1 and then factor a so that the total adds up to 100% (total)
@@ -128,7 +129,10 @@ def estimate_percentages(
     raw_sum = sum([(n + 1.0) ** POWER for n in range(num_ingredients)])
     a = total / raw_sum
     for n, ingredient in enumerate(ingredients):
-        estimate = round(a * (n + 1.0) ** POWER, 2)
+        if custom_estimates is not None:
+            estimate = custom_estimates[index]
+        else:
+            estimate = round(a * (n + 1.0) ** POWER, 2)
 
         if "ingredients" in ingredient and len(ingredient["ingredients"]) > 0:
             index, percent_unknown = estimate_percentages(
@@ -141,9 +145,10 @@ def estimate_percentages(
                 index,
                 percent_unknown,
                 constraints,
-                nutriments,
+                product_nutrients,
                 is_first_product_ingredient and n == 0,
-                expressions
+                expressions,
+                custom_estimates
             )
         else:
             # If ingredient has no nutrient information then add an objective to keep close to the estimate
@@ -186,16 +191,16 @@ def estimate_percentages(
     # If we are at the top level and we have nutritional information for the product
     # we add constraints to keep the total salt, sugar and fat below the product's nutritional information
     # We do this because processing (e.g. evaporation) should not reduce the total amount of salt, sugar or fat in the product
-    if is_top_level and constraints is not None and nutriments is not None:
-        salt = nutriments.get('salt_100g')
+    if is_top_level and constraints is not None and product_nutrients is not None:
+        salt = product_nutrients.get('salt_100g')
         if salt is not None:
             constraints.append(expressions['salt'] <= ensure_float(salt))
 
-        sugars = nutriments.get('sugars_100g')
+        sugars = product_nutrients.get('sugars_100g')
         if sugars is not None:
             constraints.append(expressions['sugars'] <= ensure_float(sugars))
 
-        fat = nutriments.get('fat_100g')
+        fat = product_nutrients.get('fat_100g')
         if fat is not None:
             constraints.append(expressions['fat'] <= ensure_float(fat))
 
@@ -290,73 +295,96 @@ def estimate_recipe(product, use_simple_estimates=False):
     
     # Need an np.array in the matrix multiplication below
     ingredients_nutrients = np.array(ingredients_nutrients)
-    nutrient_objectives = []
-    simple_objectives = []
-    simple_estimates = []
 
-    # Add objective to keep unknown ingredients close to the inverse power series
-    # simple_objectives does this for all ingredients
-    _, percent_unknown = estimate_percentages(ingredient_quantities, nutrient_objectives, simple_objectives, ingredients, simple_estimates, constraints=constraints, nutriments=product.get('nutriments', {}))
+    # Pass 1A: Run estimate_percentages to get initial estimates for the ingredient quantities and objectives
+    # Initial estimates are based on a power-law series.
+    nutrient_objectives1 = []
+    simple_objectives1 = []
+    simple_estimates1 = []
+    _, _ = estimate_percentages(
+        ingredient_quantities, nutrient_objectives1, simple_objectives1, ingredients, simple_estimates1,
+        constraints=constraints, product_nutrients=product.get('nutriments', {})
+    )
 
-    # Main objective to match ingredient nutrients to product nutrients
-    if product_nutrients:
+    # Pass 1B: Run the solver with simple objectives
+
+    evaporation_cost = EVAPORATION_COST * cp.square(sum(ingredient_quantities) - 100)
+    objectives1 = list(simple_objectives1)
+    objectives1.append(evaporation_cost)
+
+    prob1 = cp.Problem(cp.Minimize(sum(objectives1)), constraints)
+    prob1.solve()
+
+    pass1_solution = ingredient_quantities.value if prob1.status == cp.OPTIMAL else simple_estimates1
+
+    # Pass 2A: Run estimate_percentages again to get updated objectives + new percent unknown based on the solution from pass 1B (if we have one)
+
+    nutrient_objectives2 = []
+    simple_objectives2 = []
+    simple_estimates2 = []
+
+    custom_estimates = pass1_solution if pass1_solution is not None else None
+
+    _, percent_unknown2 = estimate_percentages(
+        ingredient_quantities, nutrient_objectives2, simple_objectives2, ingredients, simple_estimates2,
+        custom_estimates=custom_estimates,
+        constraints=constraints, product_nutrients=product.get('nutriments', {})
+    )
+
+    # Pass 2B (optional): If we have nutrient information for the product and the ingredients,
+    # and if the percent unknown is low, then we try to solve with nutrient objectives
+
+    try_nutrients = False if use_simple_estimates else (percent_unknown2 < 10 and len(leaf_ingredients[0]["nutrients"]))
+
+    final_solution = pass1_solution
+    final_prob = prob1
+    nutrient_variance_value = None
+
+    if try_nutrients and product_nutrients:
         residual = ingredients_nutrients @ ingredient_quantities - product_nutrients
         nutrient_variance = cp.sum(nutrient_weightings @ cp.square(residual))
-        nutrient_objectives.append(nutrient_variance)
+        nutrient_objectives2.append(nutrient_variance)
 
-        # Tried adding a penalty if not all ingredients are known to penalize results where
-        # the ingredient nutrients are greater than the product nutrients
-        # But it didn't offer any significant improvement
+        objectives2 = list(nutrient_objectives2)
+        objectives2.append(evaporation_cost)
 
-    try_nutrients = False if use_simple_estimates else (percent_unknown < 10 and len(leaf_ingredients[0]["nutrients"]))
+        prob2 = cp.Problem(cp.Minimize(sum(objectives2)), constraints)
+        prob2.solve()
 
-    # Don't bother with the nutrient approach if the first ingredient is unknown or too many others are unknown
-    objectives = nutrient_objectives if try_nutrients else simple_objectives
-    
-    # Get the ingredients to add up to close to 100g, which effectively adds a cost for evaporation.
-    # Could potentially adjust the weighting here depending on the food category
-    evaporation_cost = EVAPORATION_COST * cp.square(sum(ingredient_quantities) - 100)
-    objectives.append(evaporation_cost)
-
-    objective = cp.Minimize(sum(objectives))
-    prob = cp.Problem(objective, constraints)
-    prob.solve()
-
-    if product_nutrients:
-        if prob.status == cp.OPTIMAL:
+        if prob2.status == cp.OPTIMAL:
             nutrient_variance_value = nutrient_variance.value.item()
             recipe_estimator["nutrient_variance"] = nutrient_variance_value
 
-        # If nutrient variance is too much then try again with the simple approach
-        if try_nutrients and (prob.status != cp.OPTIMAL or nutrient_variance_value > 2500):
-            objectives = simple_objectives
-            objective = cp.Minimize(sum(objectives))
-            prob = cp.Problem(objective, constraints)
-            prob.solve()
-            if prob.status == cp.OPTIMAL:
-                recipe_estimator["nutrient_variance_simple"] = nutrient_variance.value.item()
+            if nutrient_variance_value <= 2500:
+                final_solution = ingredient_quantities.value
+                final_prob = prob2
+            else:
+                final_solution = pass1_solution
+                final_prob = prob1
+        else:
+            final_solution = pass1_solution
+            final_prob = prob1
 
-    solution_x = ingredient_quantities.value if prob.status == cp.OPTIMAL else simple_estimates
-        
-    # In the UK/EU the percentage is the weight of raw product needed to produce 100g divided by the final weight (100g)
-    # In the US it is the weight of raw ingredient divided by the total weight of all raw ingredients
-    product_total_quantity = sum(solution_x) if recipe_estimator.get('might_be_us') else 100
+    if try_nutrients and product_nutrients and final_prob is prob1 and prob1.status == cp.OPTIMAL:
+        product_nutrients_arr = np.array(product_nutrients)
+        nutrient_weightings_arr = np.array(nutrient_weightings)
+        residual1 = ingredients_nutrients @ np.array(pass1_solution) - product_nutrients_arr
+        recipe_estimator["nutrient_variance_simple"] = float(np.sum(nutrient_weightings_arr @ np.square(residual1)))
 
-    set_percentages(solution_x, ingredient_vars, product_total_quantity)
+    if final_solution is not None:
+        product_total_quantity = sum(final_solution) if recipe_estimator.get('might_be_us') else 100
 
-    # Calculate objective function so we can compare with SciPy
-    quantities = np.array(
-        [float(ingredient["quantity_estimate"]) for ingredient in leaf_ingredients]
-    )
-    [_, _, args] = get_objective_function_args(product)
-    objective_function(quantities, *args)
-    recipe_estimator["penalties"] = args[0]
+        set_percentages(final_solution, ingredient_vars, product_total_quantity)
 
-    recipe_estimator["status"] = 0 # TODO: Should probably have different status codes for different failure modes, e.g. not optimal vs unbounded vs infeasible
-    recipe_estimator["status_message"] = prob.status
+        quantities = np.array(
+            [float(ingredient["quantity_estimate"]) for ingredient in leaf_ingredients]
+        )
+        [_, _, args] = get_objective_function_args(product)
+        objective_function(quantities, *args)
+        recipe_estimator["penalties"] = args[0]
+
+    recipe_estimator["status"] = 0
+    recipe_estimator["status_message"] = final_prob.status
     recipe_estimator["time"] = round(time.perf_counter() - current, 2)
-
-    # Tried re-running the solver multiple times to get the minimum and maximum of each ingredient
-    # But it had a significant performance penalty
 
     return
