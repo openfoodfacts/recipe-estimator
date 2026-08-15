@@ -270,7 +270,7 @@ def estimate_recipe(product):
     evaporation_multiplier = 1.0
     
     if is_high_water_loss:
-        evaporation_multiplier = 0.001  # Reduced from 0.01 to allow larger evaporation for high water-loss foods
+        evaporation_multiplier = 0.001  # Lower multiplier to allow significant evaporation for high water-loss foods
 
     # Apply the multiplier to the standard cost
     evaporation_cost = (EVAPORATION_COST * evaporation_multiplier) * cp.square(sum(ingredient_quantities) - 100)
