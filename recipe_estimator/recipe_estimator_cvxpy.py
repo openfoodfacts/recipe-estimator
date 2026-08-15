@@ -81,7 +81,7 @@ def add_ingredient_constraints(
             leaf_ingredients.append(ingredient)
             # Tried defaulting to a nominal value for water for unknown ingredients
             # but didn't seem to help
-            water_proportion = ingredient["nutrients"].get("water", {}).get("percent_nom", 0) * 0.01
+            water_proportion = ingredient.get("nutrients", {}).get("water", {}).get("percent_nom", 0) * 0.01
             water_proportions.append(water_proportion)
 
             if ingredient_percent is not None:
@@ -134,7 +134,7 @@ def estimate_percentages(
             )
         else:
             # If ingredient has no nutrient information then add an objective to keep close to the estimate
-            if len(ingredient["nutrients"]) == 0:
+            if len(ingredient.get("nutrients", {})) == 0:
                 percent_unknown += estimate
                 nutrient_objectives.append(
                     UNKNOWN_INGREDIENT_WEIGHTING
@@ -187,6 +187,9 @@ def estimate_recipe(product):
     recipe_estimator = product["recipe_estimator"]
     nutrients = recipe_estimator["nutrients"]
 
+    # Check if this is a high water-loss product (flag set in prepare_nutrients.py)
+    is_high_water_loss = product.get("is_high_water_loss", False)
+
     ingredients_nutrients = []
     product_nutrients = []
     leaf_ingredients = []
@@ -205,7 +208,7 @@ def estimate_recipe(product):
         ingredient_vars,
     )
 
-    # Hard constraint: sum of ingredients less maximum water loss can't be greater than 100g
+    # Hard constraint: dry mass (raw mass minus evaporated water) cannot exceed 100g
     constraints.append(
         cp.sum(ingredient_quantities) - (ingredient_quantities @ water_proportions)
         <= 100
@@ -215,6 +218,7 @@ def estimate_recipe(product):
         nutrient = nutrients[nutrient_key]
 
         weighting = nutrient.get("weighting", 0)
+        
         # Skip nutrients that don't have a weighting
         if weighting == 0:
             continue
@@ -259,10 +263,22 @@ def estimate_recipe(product):
     # Don't bother with the nutrient approach if the first ingredient is unknown or too many others are unknown
     objectives = nutrient_objectives if try_nutrients else simple_objectives
     
+    # ---------------------------------------------------------
     # Get the ingredients to add up to close to 100g, which effectively adds a cost for evaporation.
-    # Could potentially adjust the weighting here depending on the food category
-    evaporation_cost = EVAPORATION_COST * cp.square(sum(ingredient_quantities) - 100)
+    # Adjust the weighting for food categories with high expected water loss (e.g. fried snacks).
+    
+    evaporation_multiplier = 1.0
+    
+    if is_high_water_loss:
+        evaporation_multiplier = 0.001  # Lower multiplier to allow significant evaporation for high water-loss foods
+
+    # Apply the multiplier to the standard cost
+    evaporation_cost = (EVAPORATION_COST * evaporation_multiplier) * cp.square(sum(ingredient_quantities) - 100)
     objectives.append(evaporation_cost)
+    
+    fallback_threshold = 2500
+
+    # ---------------------------------------------------------
 
     objective = cp.Minimize(sum(objectives))
     prob = cp.Problem(objective, constraints)
@@ -274,7 +290,7 @@ def estimate_recipe(product):
             recipe_estimator["nutrient_variance"] = nutrient_variance_value
 
         # If nutrient variance is too much then try again with the simple approach
-        if try_nutrients and (prob.status != cp.OPTIMAL or nutrient_variance_value > 2500):
+        if try_nutrients and (prob.status != cp.OPTIMAL or nutrient_variance_value > fallback_threshold):
             objectives = simple_objectives
             objective = cp.Minimize(sum(objectives))
             prob = cp.Problem(objective, constraints)
@@ -283,7 +299,6 @@ def estimate_recipe(product):
                 recipe_estimator["nutrient_variance_simple"] = nutrient_variance.value.item()
 
     solution_x = ingredient_quantities.value if prob.status == cp.OPTIMAL else simple_estimates
-        
     # In the UK/EU the percentage is the weight of raw product needed to produce 100g divided by the final weight (100g)
     # In the US it is the weight of raw ingredient divided by the total weight of all raw ingredients
     product_total_quantity = sum(solution_x) if recipe_estimator.get('might_be_us') else 100
