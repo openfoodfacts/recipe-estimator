@@ -144,15 +144,15 @@ def add_ingredient_constraints(
     # we add constraints to keep the total salt, sugar and fat below the product's nutritional information
     # We do this because processing (e.g. evaporation) should not reduce the total amount of salt, sugar or fat in the product
     if is_top_level and constraints is not None and nutrients is not None:
-        salt = nutrients.get('salt')
+        salt = nutrients.get('salt',{}).get('product_total')
         if salt is not None:
             constraints.append(nutrients_from_ingredients['salt'] <= ensure_float(salt))
 
-        sugars = nutrients.get('sugars')
+        sugars = nutrients.get('sugars',{}).get('product_total')
         if sugars is not None:
             constraints.append(nutrients_from_ingredients['sugars'] <= ensure_float(sugars))
 
-        fat = nutrients.get('fat')
+        fat = nutrients.get('fat',{}).get('product_total')
         if fat is not None:
             constraints.append(nutrients_from_ingredients['fat'] <= ensure_float(fat))
 
