@@ -115,12 +115,12 @@ def _product_response(product, options=None):
 
 # generic function to use in estimate_recipe_* endpoints that only differ by the estimation method used
 # read the product and options from the request, prepare the product, call the estimation function and return the response
-async def estimate_recipe_generic(request: Request, estimation_function):
+async def estimate_recipe_generic(request: Request, estimation_function, **kwargs):
     product, options, error_response = await _read_product(request)
     if error_response:
         return error_response
     prepare_product(product)
-    estimation_function(product)
+    estimation_function(product, **kwargs)
     if not bool(options.get("debug")):
         remove_temporary_ingredients_fields(product.get("ingredients", []))
     return _product_response(product, options)
@@ -157,7 +157,20 @@ async def recipe(request: Request):
 
 @app.post("/api/v3/estimate_recipe_cvxpy")
 async def recipe(request: Request):
-    return await estimate_recipe_generic(request, estimate_recipe_cvxpy)
+    errors = []
+    warnings = []
+    try:
+        payload = await request.json()
+    except Exception:
+        add_error(errors, "body", "invalid_json", "Invalid JSON")
+        return _failure_response(errors, warnings)
+
+    if not isinstance(payload, dict):
+        add_error(errors, "body", "invalid_json", "Invalid JSON")
+        return _failure_response(errors, warnings)
+
+    use_simple = payload.get("options", {}).get("use_simple_estimates", False)
+    return await estimate_recipe_generic(request, estimate_recipe_cvxpy, use_simple_estimates=use_simple)
 
 @app.post("/api/v3/get_penalties")
 async def recipe(request: Request):

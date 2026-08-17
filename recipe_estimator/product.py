@@ -45,10 +45,15 @@ def get_product(id):
         headers={
             "User-Agent": "recipe-estimator/0.1 (recipe-estimator.openfoodfacts.org)"
         },
-    ).json()
-    if not "product" in response:
+    )
+    try:
+        data = response.json()
+    except ValueError:
         return {}
 
-    product = response["product"]
+    if not isinstance(data, dict) or "product" not in data:
+        return {}
+
+    product = data["product"]
     fix_ingredients(product["ingredients"])
     return product
