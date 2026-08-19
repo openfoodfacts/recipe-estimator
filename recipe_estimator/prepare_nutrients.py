@@ -83,6 +83,11 @@ def assign_weightings(product, scipy):
                 carbohydrates['notes'] = 'Might be total carbs'
                 might_be_us = True
 
+    # Set a centralized flag for products expected to have massive water loss.
+    # Currently limited to en:chips-and-fries, but designed to easily append categories (e.g. cheeses) later.
+    categories_tags = product.get('categories_tags', [])
+    product['is_high_water_loss'] = any(cat in categories_tags for cat in ['en:chips-and-fries'])
+
     return might_be_us
 
 def prepare_nutrients(product, scipy = False):

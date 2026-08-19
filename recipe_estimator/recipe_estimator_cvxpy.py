@@ -94,7 +94,7 @@ def add_ingredient_constraints(
             leaf_ingredients.append(ingredient)
             # Tried defaulting to a nominal value for water for unknown ingredients
             # but didn't seem to help
-            water_proportion = ingredient["nutrients"].get("water", {}).get("percent_nom", 0) * 0.01
+            water_proportion = ingredient.get("nutrients", {}).get("water", {}).get("percent_nom", 0) * 0.01
             water_proportions.append(water_proportion)
 
             if ingredient_percent is not None:
@@ -201,7 +201,7 @@ def estimate_percentages(
             )
         else:
             # If ingredient has no nutrient information then add an objective to keep close to the initial estimate
-            if len(ingredient["nutrients"]) == 0:
+            if len(ingredient.get("nutrients", {})) == 0:
                 percent_unknown += initial_estimate
                 nutrient_optimization_objectives.append(
                     UNKNOWN_INGREDIENT_WEIGHTING
@@ -256,6 +256,9 @@ def estimate_recipe(product, use_simple_estimates=False):
     recipe_estimator = product["recipe_estimator"]
     nutrients = recipe_estimator["nutrients"]
 
+    # Check if this is a high water-loss product (flag set in prepare_nutrients.py)
+    is_high_water_loss = product.get("is_high_water_loss", False)
+
     leaf_ingredients = []
     water_proportions = []
 
@@ -273,7 +276,7 @@ def estimate_recipe(product, use_simple_estimates=False):
         ingredient_vars,
     )
 
-    # Hard constraint: sum of ingredients less maximum water loss can't be greater than 100g
+    # Hard constraint: dry mass (raw mass minus evaporated water) cannot exceed 100g
     constraints.append(
         cp.sum(ingredient_quantities) - (ingredient_quantities @ water_proportions)
         <= 100
@@ -289,7 +292,14 @@ def estimate_recipe(product, use_simple_estimates=False):
 
     # Pass 1B: Run the solver with simple objectives
 
-    evaporation_cost = EVAPORATION_COST * cp.square(sum(ingredient_quantities) - 100)
+    evaporation_multiplier = 1.0
+    
+    if is_high_water_loss:
+        evaporation_multiplier = 0.001  # Lower multiplier to allow significant evaporation for high water-loss foods
+
+    # Apply the multiplier to the standard cost
+    evaporation_cost = (EVAPORATION_COST * evaporation_multiplier) * cp.square(sum(ingredient_quantities) - 100)
+
     objectives1 = list(simple_objectives1)
     objectives1.append(evaporation_cost)
 
