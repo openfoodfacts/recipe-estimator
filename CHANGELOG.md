@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/openfoodfacts/recipe-estimator/compare/v0.4.1...v0.4.2) (2026-08-19)
+
+
+### Bug Fixes
+
+* add a hard constraint in cvxpy to have at least 100g of ingredients ([#174](https://github.com/openfoodfacts/recipe-estimator/issues/174)) ([a752219](https://github.com/openfoodfacts/recipe-estimator/commit/a75221957a5e5e1681be97ee76a00ca4cbf27297))
+
 ## [0.4.1](https://github.com/openfoodfacts/recipe-estimator/compare/v0.4.0...v0.4.1) (2026-08-17)
 
 
