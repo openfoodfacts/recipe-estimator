@@ -273,6 +273,11 @@ def estimate_recipe(product, use_simple_estimates=False):
         ingredient_vars,
     )
 
+    # Hard constraint: sum of ingredients must be at least 100g
+    constraints.append(
+        cp.sum(ingredient_quantities) >= 100
+    )
+
     # Hard constraint: sum of ingredients less maximum water loss can't be greater than 100g
     constraints.append(
         cp.sum(ingredient_quantities) - (ingredient_quantities @ water_proportions)
