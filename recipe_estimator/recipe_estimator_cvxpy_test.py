@@ -82,3 +82,30 @@ def test_estimate_recipe_subingredient_limits():
     proteins = product['ingredients'][1]
     # Percent estimate is as high a possible
     assert abs(50 - proteins.get('percent_estimate')) < 2
+
+
+def test_ingredients_sum_to_at_least_100():
+    product = {
+        'code': 'test',
+        'ingredients': [
+            {
+                'id':'A',
+                'nutrients': {
+                    'fiber': {'percent_nom': 15, 'percent_min': 15, 'percent_max': 15},
+                }
+            },
+            {
+                'id':'B',
+                'nutrients': {
+                    'fiber': {'percent_nom': 10, 'percent_min': 10, 'percent_max': 10},
+                }
+            }
+        ],
+        'nutriments': {
+            'fiber_100g': 10,
+        }}
+
+    estimate_recipe(product)
+
+    total_quantity = sum(ingredient['quantity_estimate'] for ingredient in product['ingredients'])
+    assert total_quantity >= 100
