@@ -51,6 +51,15 @@ def setup_ingredients(ingredients, nutrients):
                 ciqual_code, ciqual_proxy_code = get_ciqual_code(ingredient['id'])
                 ciqual_code = ciqual_code or ciqual_proxy_code
 
+                # Quick override mapping for ingredient id -> CIQUAL code.
+                # These entries should be added to the ingredients taxonomy instead.
+                # Remove entries from this mapping once taxonomy changes have propagated to production and test sets.
+                ciqual_code_overrides = {
+                    'en:potato-flakes': '4022', # Potato flakes, dehydrated, plain
+                }
+                if ingredient['id'] in ciqual_code_overrides:
+                    ciqual_code = ciqual_code_overrides[ingredient['id']]
+
                 # Add the ciqual code or proxy code if we have one
                 if ciqual_code:
                     ingredient['ciqual_food_code'] = ciqual_code
