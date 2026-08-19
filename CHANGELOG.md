@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/openfoodfacts/recipe-estimator/compare/v0.4.0...v0.4.1) (2026-08-17)
+
+
+### Bug Fixes
+
+* add salt/sugar/fat + small quantity ingredient in cvxpy simple estimates ([#172](https://github.com/openfoodfacts/recipe-estimator/issues/172)) ([2f2ede6](https://github.com/openfoodfacts/recipe-estimator/commit/2f2ede69acb3ebac44617fdbeb330be28753e989))
+
 ## [0.4.0](https://github.com/openfoodfacts/recipe-estimator/compare/v0.3.1...v0.4.0) (2026-06-05)
 
 
