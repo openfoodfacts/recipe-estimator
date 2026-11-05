@@ -109,3 +109,7 @@ def test_ingredients_sum_to_at_least_100():
 
     total_quantity = sum(ingredient['quantity_estimate'] for ingredient in product['ingredients'])
     assert total_quantity >= 100
+
+    # percent_estimate is the share in the recipe, so it sums to 100% even if more than 100 g of ingredients are used
+    total_percent = sum(ingredient['percent_estimate'] for ingredient in product['ingredients'])
+    assert abs(total_percent - 100) < 0.1
