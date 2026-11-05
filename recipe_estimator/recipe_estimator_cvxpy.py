@@ -376,9 +376,14 @@ def estimate_recipe(product, use_simple_estimates=False):
         recipe_estimator["nutrient_variance_simple"] = float(np.sum(nutrient_weightings_arr @ np.square(residual1)))
 
     if final_solution is not None:
-        product_total_quantity = sum(final_solution) if recipe_estimator.get('might_be_us') else 100
-
-        set_percentages(final_solution, ingredient_vars, product_total_quantity)
+        # percent_estimate is the share of the ingredient in the recipe at the time the ingredients are added
+        # (the mixing bowl), so that percent estimates sum to 100% (EU regulation 1169/2011 Annex VIII point 3).
+        # quantity_estimate is the quantity of ingredient used for 100 g of finished product, which can sum to more
+        # than 100 g for products that lost water (Annex VIII point 4(a)).
+        # We first compute the total quantity in the mixing bowl, then compute the percentages relative to it.
+        _, total_mixing_bowl_quantity, _ = set_percentages(final_solution, ingredient_vars, 100)
+        if total_mixing_bowl_quantity > 0:
+            set_percentages(final_solution, ingredient_vars, total_mixing_bowl_quantity)
 
         quantities = np.array(
             [float(ingredient["quantity_estimate"]) for ingredient in leaf_ingredients]
