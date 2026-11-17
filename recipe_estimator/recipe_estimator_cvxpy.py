@@ -10,6 +10,10 @@ from .nutrients import ensure_float
 POWER = -1.7
 EVAPORATION_COST = 0.01
 UNKNOWN_INGREDIENT_WEIGHTING = 0.002
+# Tolerance for rounding when checking if the percents specified on the label sum to more than 100%
+SPECIFIED_PERCENTS_SUM_TOLERANCE = 1
+# Ingredients under 2% can be listed in any order (EU regulation 1169/2011 Article 18 and Annex VII part A)
+ANY_ORDER_PERCENT = 2
 
 
 def get_ingredient_range(ingredient_percentage):
@@ -30,7 +34,12 @@ def add_ingredient_constraints(
     water_proportions,
     ingredient_vars,
     nutrients_from_ingredients = None,
+    percent_constraints = None,
 ):
+    """Add constraints for the ingredients and return the list of expressions of their mixing bowl weights.
+    For ingredients with a percent specified on the label, (mixing bowl weight expression, percent min, percent max)
+    is added to percent_constraints: the constraints are added by add_percent_constraints() once the total mixing bowl
+    weight of the product is known."""
     is_top_level = nutrients_from_ingredients is None
     if is_top_level:
         nutrients_from_ingredients = {
@@ -40,6 +49,9 @@ def add_ingredient_constraints(
         }
 
     previous_ingredient_mixing_bowl_weight = None
+    # Once an ingredient with a specified percent under 2% is listed, the following ingredients are also under 2%
+    # and can be listed in any order
+    any_order = False
     total_mixing_bowl_weight = []
     for ingredient in ingredients:
         # TODO: Remove hidden eventually
@@ -63,6 +75,7 @@ def add_ingredient_constraints(
                 water_proportions,
                 ingredient_var["ingredients"],
                 nutrients_from_ingredients,
+                percent_constraints,
             )
             # Keep a note of how many child ingredients make up the total for this parent ingredient
             last_child_index = len(leaf_ingredients)
@@ -75,10 +88,8 @@ def add_ingredient_constraints(
                 pre_mixing_bowl_water_loss = cp.Variable(nonneg=True)
                 # For UK/EU quantity of raw ingredient less pre-mixing bowl water should correspond to the percentage on the packaging
                 percent_min, percent_max = get_ingredient_range(ingredient_percent)
-                constraints.extend([
-                    (cp.sum(my_mixing_bowl_weight) - pre_mixing_bowl_water_loss) >= percent_min,
-                    (cp.sum(my_mixing_bowl_weight) - pre_mixing_bowl_water_loss) <= percent_max
-                ])
+                if percent_constraints is not None:
+                    percent_constraints.append((cp.sum(my_mixing_bowl_weight) - pre_mixing_bowl_water_loss, percent_min, percent_max))
                 my_mixing_bowl_weight.append(-pre_mixing_bowl_water_loss)
                 ingredient_var["pre_mixing_bowl_water_loss"] = pre_mixing_bowl_water_loss
 
@@ -103,11 +114,9 @@ def add_ingredient_constraints(
                 ingredient_var["pre_mixing_bowl_water_loss"] = pre_mixing_bowl_water_loss
                 # For UK/EU quantity of raw ingredient less pre-mixing bowl water should correspond to the percentage on the packaging
                 percent_min, percent_max = get_ingredient_range(ingredient_percent)
-                constraints.extend([
-                    pre_mixing_bowl_water_loss <= my_quantity * water_proportion,
-                    (my_quantity - pre_mixing_bowl_water_loss) >= percent_min,
-                    (my_quantity - pre_mixing_bowl_water_loss) <= percent_max
-                ])
+                constraints.append(pre_mixing_bowl_water_loss <= my_quantity * water_proportion)
+                if percent_constraints is not None:
+                    percent_constraints.append((my_quantity - pre_mixing_bowl_water_loss, percent_min, percent_max))
                 my_mixing_bowl_weight.append(-pre_mixing_bowl_water_loss)
 
             ingredient_id = ingredient.get("id", "")
@@ -134,8 +143,14 @@ def add_ingredient_constraints(
             elif ingredient_id == 'en:butterfat':
                 nutrients_from_ingredients['fat'] += 0.9 * my_quantity
 
-        if previous_ingredient_mixing_bowl_weight and my_mixing_bowl_weight:
+        if any_order:
+            # Instead of the order constraint, the ingredient is under 2%
+            if percent_constraints is not None and my_mixing_bowl_weight:
+                percent_constraints.append((sum(my_mixing_bowl_weight), 0, ANY_ORDER_PERCENT))
+        elif previous_ingredient_mixing_bowl_weight and my_mixing_bowl_weight:
             constraints.append(sum(previous_ingredient_mixing_bowl_weight) >= sum(my_mixing_bowl_weight))
+        if ingredient_percent is not None and ingredient_percent < ANY_ORDER_PERCENT:
+            any_order = True
 
         total_mixing_bowl_weight.extend(my_mixing_bowl_weight)
         previous_ingredient_mixing_bowl_weight = my_mixing_bowl_weight
@@ -157,6 +172,59 @@ def add_ingredient_constraints(
             constraints.append(nutrients_from_ingredients['fat'] <= ensure_float(fat))
 
     return total_mixing_bowl_weight
+
+
+def specified_percents_sum_over_100(ingredients):
+    specified_percents = [ingredient["percent"] for ingredient in ingredients if isinstance(ingredient.get("percent"), (int, float))]
+    return sum(specified_percents) > 100 + SPECIFIED_PERCENTS_SUM_TOLERANCE
+
+
+def get_percent_constraints(percent_constraints, total_mixing_bowl_weight, basis):
+    """Return the constraints for the percents specified on the label, for the given basis:
+    - recipe_share: percent of the total mixing bowl weight
+    - per_100g: mixing bowl weight for 100 g of finished product"""
+    constraints = []
+    if basis == "per_100g":
+        for mixing_bowl_weight, percent_min, percent_max in percent_constraints:
+            constraints.extend([mixing_bowl_weight >= percent_min, mixing_bowl_weight <= percent_max])
+    else:
+        total_mixing_bowl_weight = sum(total_mixing_bowl_weight)
+        for mixing_bowl_weight, percent_min, percent_max in percent_constraints:
+            constraints.extend([
+                mixing_bowl_weight >= percent_min * 0.01 * total_mixing_bowl_weight,
+                mixing_bowl_weight <= percent_max * 0.01 * total_mixing_bowl_weight,
+            ])
+    return constraints
+
+
+def add_percent_constraints(ingredients, constraints, percent_constraints, total_mixing_bowl_weight):
+    """Add constraints for the percents specified on the label, and return the basis used.
+
+    Following EU regulation 1169/2011 Annex VIII point 3, a specified percent is in general the share of the ingredient
+    in the recipe at the time the ingredients are added (mixing bowl), which is what percent_estimate is,
+    so that specified percents are kept by the estimation even if water is lost after the mixing bowl (e.g. cooking).
+
+    For foods that lost moisture, labels can instead indicate the quantity used related to the finished product
+    (point 4(a), e.g. 50 g of butter in a recipe that gives 170 g of cookies: 29.4%). We can only tell when the
+    specified percents sum to more than 100%, and in that case they constrain the mixing bowl weights for 100 g of product.
+
+    Recipe shares must sum to 100%, which is not always possible with the other constraints (e.g. the order of ingredients
+    when the label specifies the percents of the main ingredients and the remaining ingredients are under 2%, which
+    can be listed in any order). In that case, we use the mixing bowl weights for 100 g of product.
+
+    Must be called after all other constraints have been added.
+    """
+    if not percent_constraints:
+        return None
+    if not specified_percents_sum_over_100(ingredients):
+        recipe_share_constraints = get_percent_constraints(percent_constraints, total_mixing_bowl_weight, "recipe_share")
+        feasibility = cp.Problem(cp.Minimize(0), constraints + recipe_share_constraints)
+        feasibility.solve()
+        if feasibility.status == cp.OPTIMAL:
+            constraints.extend(recipe_share_constraints)
+            return "recipe_share"
+    constraints.extend(get_percent_constraints(percent_constraints, total_mixing_bowl_weight, "per_100g"))
+    return "per_100g"
 
 
 def estimate_percentages(
@@ -217,18 +285,28 @@ def estimate_percentages(
     return index, percent_unknown
 
 
+def save_pre_mixing_bowl_water_loss_values(ingredient_vars, solved):
+    """Save the pre-mixing bowl water loss values of the solution that we use, as the values of the variables
+    are overwritten by the next solves (or are not meaningful if the solver did not find an optimal solution)"""
+    for ingredient_var in ingredient_vars:
+        pre_mixing_bowl_water_loss = ingredient_var.get("pre_mixing_bowl_water_loss")
+        ingredient_var["pre_mixing_bowl_water_loss_value"] = (
+            pre_mixing_bowl_water_loss.value
+            if solved
+            and pre_mixing_bowl_water_loss is not None
+            and pre_mixing_bowl_water_loss.value is not None
+            else 0
+        )
+        if "ingredients" in ingredient_var:
+            save_pre_mixing_bowl_water_loss_values(ingredient_var["ingredients"], solved)
+
+
 def set_percentages(solution_x, ingredient_vars, product_total_quantity):
     total_mixing_bowl_quantity = 0
     total_original_quantity = 0
     for ingredient_var in ingredient_vars:
         ingredient = ingredient_var["ingredient"]
-        pre_mixing_bowl_water_loss = ingredient_var.get("pre_mixing_bowl_water_loss")
-        pre_mixing_bowl_water_loss_value = (
-            pre_mixing_bowl_water_loss.value
-            if pre_mixing_bowl_water_loss is not None
-            and pre_mixing_bowl_water_loss.value is not None
-            else 0
-        )
+        pre_mixing_bowl_water_loss_value = ingredient_var.get("pre_mixing_bowl_water_loss_value", 0)
         if "ingredients" in ingredient_var:
             index, mixing_bowl_quantity_estimate, original_quantity_estimate = set_percentages(
                 solution_x, ingredient_var["ingredients"], product_total_quantity
@@ -263,7 +341,8 @@ def estimate_recipe(product, use_simple_estimates=False):
     constraints = []
     nutrient_weightings = []
     ingredient_vars = []
-    add_ingredient_constraints(
+    percent_constraints = []
+    total_mixing_bowl_weight = add_ingredient_constraints(
         ingredients,
         nutrients,
         constraints,
@@ -271,6 +350,7 @@ def estimate_recipe(product, use_simple_estimates=False):
         ingredient_quantities,
         water_proportions,
         ingredient_vars,
+        percent_constraints=percent_constraints,
     )
 
     # Hard constraint: sum of ingredients must be at least 100g
@@ -283,6 +363,11 @@ def estimate_recipe(product, use_simple_estimates=False):
         cp.sum(ingredient_quantities) - (ingredient_quantities @ water_proportions)
         <= 100
     )
+
+    # Constraints for the percents specified on the label (needs all other constraints)
+    specified_percents_basis = add_percent_constraints(ingredients, constraints, percent_constraints, total_mixing_bowl_weight)
+    if specified_percents_basis:
+        recipe_estimator["specified_percents_basis"] = specified_percents_basis
 
     # Pass 1A: Run estimate_percentages to get initial estimates for the ingredient quantities and objectives
     # Initial estimates are based on a power-law series.
@@ -302,6 +387,7 @@ def estimate_recipe(product, use_simple_estimates=False):
     prob1.solve()
 
     pass1_solution = ingredient_quantities.value if prob1.status == cp.OPTIMAL else initial_estimates
+    save_pre_mixing_bowl_water_loss_values(ingredient_vars, prob1.status == cp.OPTIMAL)
 
     # Pass 2A: Run estimate_percentages again to get updated objectives + new percent unknown based on the solution from pass 1B (if we have one)
 
@@ -368,6 +454,7 @@ def estimate_recipe(product, use_simple_estimates=False):
                 if nutrient_variance_value <= 2500:
                     final_solution = ingredient_quantities.value
                     final_prob = prob2
+                    save_pre_mixing_bowl_water_loss_values(ingredient_vars, True)
 
     if try_nutrients and product_nutrients and final_prob is prob1 and prob1.status == cp.OPTIMAL:
         product_nutrients_arr = np.array(product_nutrients)
