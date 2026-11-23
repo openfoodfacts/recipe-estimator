@@ -4,4 +4,35 @@ github_actions:
 
 javascript:
 - changed-files:
-  - any-glob-to-any-file: 'frontend/package-lock.json'
+  - any-glob-to-any-file: 'frontend/**/*'
+
+python:
+- changed-files:
+  - any-glob-to-any-file:
+    - '**/*.py'
+    - 'requirements.txt'
+
+'📚 documentation':
+- changed-files:
+  - any-glob-to-any-file:
+    - 'docs/**/*'
+    - '**/*.md'
+
+dependencies:
+- changed-files:
+  - any-glob-to-any-file:
+    - 'requirements.txt'
+    - 'frontend/package.json'
+    - 'frontend/package-lock.json'
+    - '.github/dependabot.yml'
+
+infrastructure:
+- changed-files:
+  - any-glob-to-any-file:
+    - 'Dockerfile'
+    - 'docker-compose.yml'
+    - 'docker/**/*'
+    - '.dockerignore'
+    - 'Makefile'
+    - 'release-please-config.json'
+    - '.release-please-manifest.json'
