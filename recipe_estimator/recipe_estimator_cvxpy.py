@@ -6,6 +6,7 @@ from .fitness import get_objective_function_args, objective as objective_functio
 
 from .prepare_nutrients import prepare_nutrients
 from .nutrients import ensure_float
+from .ingredient_limits import get_quantity_max
 
 POWER = -1.7
 EVAPORATION_COST = 0.01
@@ -35,11 +36,29 @@ def add_ingredient_constraints(
     ingredient_vars,
     nutrients_from_ingredients = None,
     percent_constraints = None,
+    any_order = False,
+    quantity_max_constraints = None,
 ):
     """Add constraints for the ingredients and return the list of expressions of their mixing bowl weights.
-    For ingredients with a percent specified on the label, (mixing bowl weight expression, percent min, percent max)
-    is added to percent_constraints: the constraints are added by add_percent_constraints() once the total mixing bowl
-    weight of the product is known."""
+
+    Constraints that do not depend on the basis of the percents specified on the label are added immediately to constraints:
+    - order of ingredients (descending mixing bowl weight), except for ingredients under 2% that can be in any order
+    - pre-mixing bowl water loss of an ingredient can't be greater than its water content
+    - known amounts of salt, sugars and fat in ingredients can't exceed the product's nutritional information
+
+    Constraints that are expressed as a percent are stored in percent_constraints as
+    (mixing bowl weight expression, percent min, percent max):
+    - percents specified on the label
+    - at most 2% for ingredients listed after an ingredient under 2% (any order)
+    add_percent_constraints() adds them once all the other constraints are known, as a share of the total mixing bowl
+    weight of the product (recipe share) or as a quantity for 100 g of product, depending on which is feasible.
+
+    Maximum quantities of ingredients that are always used in small amounts (flavourings, additives, ferments...,
+    see ingredient_limits.py) are stored in quantity_max_constraints as (ingredient id, constraint), except for the first
+    ingredient and for ingredients with a percent specified on the label.
+    add_quantity_max_constraints() adds the ones that are feasible with the other constraints.
+
+    any_order is True for the sub-ingredients of an ingredient under 2%: they are also under 2% and can be listed in any order."""
     is_top_level = nutrients_from_ingredients is None
     if is_top_level:
         nutrients_from_ingredients = {
@@ -51,7 +70,6 @@ def add_ingredient_constraints(
     previous_ingredient_mixing_bowl_weight = None
     # Once an ingredient with a specified percent under 2% is listed, the following ingredients are also under 2%
     # and can be listed in any order
-    any_order = False
     total_mixing_bowl_weight = []
     for ingredient in ingredients:
         # TODO: Remove hidden eventually
@@ -76,6 +94,9 @@ def add_ingredient_constraints(
                 ingredient_var["ingredients"],
                 nutrients_from_ingredients,
                 percent_constraints,
+                # Sub-ingredients of an ingredient under 2% are also under 2% and can be listed in any order
+                any_order or (ingredient_percent is not None and ingredient_percent < ANY_ORDER_PERCENT),
+                quantity_max_constraints,
             )
             # Keep a note of how many child ingredients make up the total for this parent ingredient
             last_child_index = len(leaf_ingredients)
@@ -121,10 +142,12 @@ def add_ingredient_constraints(
 
             ingredient_id = ingredient.get("id", "")
 
-            # Add constraint for flavour ingredients and food additives, except for first leaf ingredient
-            if my_index > 0:
-                if "flavour" in ingredient_id or (ingredient_id.startswith("en:e") and len(ingredient_id) > 4 and ingredient_id[4].isdigit()):
-                    constraints.append(my_quantity <= 2.0)
+            # Maximum quantity for ingredients like flavourings, additives and ferments, except for the first leaf ingredient
+            # and if the label specifies the percent of the ingredient
+            if my_index > 0 and ingredient_percent is None and quantity_max_constraints is not None:
+                quantity_max = get_quantity_max(ingredient_id)
+                if quantity_max is not None:
+                    quantity_max_constraints.append((ingredient_id, my_quantity <= quantity_max))
 
             # If we are certain the ingredient contains a minimum amount of salt, sugar or fat
             # we add it to the expressions so that we can add constraints to keep the total below the product's nutritional information
@@ -146,9 +169,9 @@ def add_ingredient_constraints(
         if any_order:
             # Instead of the order constraint, the ingredient is under 2%
             if percent_constraints is not None and my_mixing_bowl_weight:
-                percent_constraints.append((sum(my_mixing_bowl_weight), 0, ANY_ORDER_PERCENT))
+                percent_constraints.append((cp.sum(my_mixing_bowl_weight), 0, ANY_ORDER_PERCENT))
         elif previous_ingredient_mixing_bowl_weight and my_mixing_bowl_weight:
-            constraints.append(sum(previous_ingredient_mixing_bowl_weight) >= sum(my_mixing_bowl_weight))
+            constraints.append(cp.sum(previous_ingredient_mixing_bowl_weight) >= cp.sum(my_mixing_bowl_weight))
         if ingredient_percent is not None and ingredient_percent < ANY_ORDER_PERCENT:
             any_order = True
 
@@ -188,13 +211,63 @@ def get_percent_constraints(percent_constraints, total_mixing_bowl_weight, basis
         for mixing_bowl_weight, percent_min, percent_max in percent_constraints:
             constraints.extend([mixing_bowl_weight >= percent_min, mixing_bowl_weight <= percent_max])
     else:
-        total_mixing_bowl_weight = sum(total_mixing_bowl_weight)
+        # cvxpy expression of the total mixing bowl weight, the actual value is determined by the solver
+        total_mixing_bowl_weight_sum = cp.sum(total_mixing_bowl_weight)
         for mixing_bowl_weight, percent_min, percent_max in percent_constraints:
             constraints.extend([
-                mixing_bowl_weight >= percent_min * 0.01 * total_mixing_bowl_weight,
-                mixing_bowl_weight <= percent_max * 0.01 * total_mixing_bowl_weight,
+                mixing_bowl_weight >= percent_min * 0.01 * total_mixing_bowl_weight_sum,
+                mixing_bowl_weight <= percent_max * 0.01 * total_mixing_bowl_weight_sum,
             ])
     return constraints
+
+
+def is_feasible(constraints):
+    problem = cp.Problem(cp.Minimize(0), constraints)
+    problem.solve()
+    return problem.status == cp.OPTIMAL
+
+
+def add_quantity_max_constraints(ingredients, constraints, quantity_max_constraints, percent_constraints, total_mixing_bowl_weight):
+    """Add the maximum quantities of ingredients (flavourings, additives, ferments...) that are feasible with the other
+    constraints, including the percents specified on the label (with either basis), and return the ids of the ingredients
+    whose maximum quantity was not applied.
+
+    A maximum can be infeasible, e.g. if an ingredient listed after the restricted ingredient has a higher percent on the label.
+    Like in Product Opener's set_percent_max_from_taxonomy, we then keep the order of the ingredients and the percents of the label.
+
+    Must be called after all other constraints except the percent constraints have been added."""
+    if not quantity_max_constraints:
+        return []
+
+    if not percent_constraints:
+        bases = [None]
+    elif specified_percents_sum_over_100(ingredients):
+        bases = ["per_100g"]
+    else:
+        bases = ["recipe_share", "per_100g"]
+
+    def feasible(candidate_constraints):
+        for basis in bases:
+            basis_constraints = [] if basis is None else get_percent_constraints(percent_constraints, total_mixing_bowl_weight, basis)
+            if is_feasible(constraints + candidate_constraints + basis_constraints):
+                return True
+        return False
+
+    all_constraints = [constraint for _, constraint in quantity_max_constraints]
+    if feasible(all_constraints):
+        constraints.extend(all_constraints)
+        return []
+
+    # Add the maximums one by one, in the order of the ingredients, and skip the ones that make the problem infeasible
+    kept = []
+    skipped = []
+    for ingredient_id, constraint in quantity_max_constraints:
+        if feasible(kept + [constraint]):
+            kept.append(constraint)
+        else:
+            skipped.append(ingredient_id)
+    constraints.extend(kept)
+    return skipped
 
 
 def add_percent_constraints(ingredients, constraints, percent_constraints, total_mixing_bowl_weight):
@@ -342,6 +415,7 @@ def estimate_recipe(product, use_simple_estimates=False):
     nutrient_weightings = []
     ingredient_vars = []
     percent_constraints = []
+    quantity_max_constraints = []
     total_mixing_bowl_weight = add_ingredient_constraints(
         ingredients,
         nutrients,
@@ -351,6 +425,7 @@ def estimate_recipe(product, use_simple_estimates=False):
         water_proportions,
         ingredient_vars,
         percent_constraints=percent_constraints,
+        quantity_max_constraints=quantity_max_constraints,
     )
 
     # Hard constraint: sum of ingredients must be at least 100g
@@ -363,6 +438,13 @@ def estimate_recipe(product, use_simple_estimates=False):
         cp.sum(ingredient_quantities) - (ingredient_quantities @ water_proportions)
         <= 100
     )
+
+    # Maximum quantities of ingredients like flavourings, additives and ferments (needs all other constraints except percents)
+    skipped_quantity_max = add_quantity_max_constraints(
+        ingredients, constraints, quantity_max_constraints, percent_constraints, total_mixing_bowl_weight
+    )
+    if skipped_quantity_max:
+        recipe_estimator["skipped_quantity_max"] = skipped_quantity_max
 
     # Constraints for the percents specified on the label (needs all other constraints)
     specified_percents_basis = add_percent_constraints(ingredients, constraints, percent_constraints, total_mixing_bowl_weight)

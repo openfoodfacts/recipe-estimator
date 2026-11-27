@@ -1,3 +1,5 @@
+import pytest
+
 
 from recipe_estimator.recipe_estimator_cvxpy import estimate_recipe
 
@@ -219,3 +221,101 @@ def test_ingredients_after_an_ingredient_under_2_percent_can_be_in_any_order():
     assert abs(b['percent_estimate'] - 1) <= 0.5
     assert c['percent_estimate'] > b['percent_estimate']
     assert c['percent_estimate'] <= 2.01
+
+
+def test_sub_ingredients_of_an_ingredient_under_2_percent_can_be_in_any_order():
+    # "A 99%, B 1% (B1, B2)": B1 and B2 are under 2% of the product, so B2 can be bigger than B1
+    def ingredient(id, fiber, percent=None):
+        ingredient = {
+            'id': id,
+            'nutrients': {
+                'water': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+                'fiber': {'percent_nom': fiber, 'percent_min': fiber, 'percent_max': fiber},
+            }
+        }
+        if percent is not None:
+            ingredient['percent'] = percent
+        return ingredient
+
+    b = {'id': 'B', 'percent': 1, 'ingredients': [ingredient('B1', 0), ingredient('B2', 100)]}
+    product = {
+        'code': 'test',
+        'ingredients': [ingredient('A', 0, 99), b],
+        'nutriments': {
+            'fiber_100g': 0.8,
+        }}
+
+    estimate_recipe(product)
+
+    b1, b2 = product['ingredients'][1]['ingredients']
+    assert b2['percent_estimate'] > b1['percent_estimate']
+    assert abs(b2['percent_estimate'] - 0.8) <= 0.1
+
+
+def fiber_ingredient(id, fiber, percent=None):
+    ingredient = {
+        'id': id,
+        'nutrients': {
+            'water': {'percent_nom': 0, 'percent_min': 0, 'percent_max': 0},
+            'fiber': {'percent_nom': fiber, 'percent_min': fiber, 'percent_max': fiber},
+        }
+    }
+    if percent is not None:
+        ingredient['percent'] = percent
+    return ingredient
+
+
+@pytest.mark.parametrize('ingredient_id, quantity_max', [
+    ('en:lactic-ferments', 1),  # ferments
+    ('en:e202', 0.5),  # preservative E-number
+    ('en:preservative', 0.5),  # additive class without E-number
+    ('en:flavouring', 5),  # percent_max:en in the ingredients taxonomy
+    ('en:e965', None),  # maltitol: polyols can be used in large quantities
+])
+def test_quantity_max_of_additives_and_ferments(ingredient_id, quantity_max):
+    # The nutrients would give 40 g of the second ingredient, unless it has a maximum quantity
+    product = {
+        'code': 'test',
+        'ingredients': [fiber_ingredient('A', 0), fiber_ingredient(ingredient_id, 100)],
+        'nutriments': {
+            'fiber_100g': 40,
+        }}
+
+    estimate_recipe(product)
+
+    quantity_estimate = product['ingredients'][1]['quantity_estimate']
+    if quantity_max is None:
+        assert abs(quantity_estimate - 40) < 1
+    else:
+        assert quantity_estimate <= quantity_max + 0.01
+    assert 'skipped_quantity_max' not in product['recipe_estimator']
+
+
+def test_quantity_max_does_not_apply_to_the_first_ingredient():
+    product = {
+        'code': 'test',
+        'ingredients': [fiber_ingredient('en:lactic-ferments', 100), fiber_ingredient('A', 0)],
+        'nutriments': {
+            'fiber_100g': 60,
+        }}
+
+    estimate_recipe(product)
+
+    assert abs(product['ingredients'][0]['quantity_estimate'] - 60) < 1
+
+
+def test_quantity_max_is_skipped_if_infeasible_with_the_label():
+    # "A, preservative, B 10%": the preservative is listed before B, so it is at least 10%
+    product = {
+        'code': 'test',
+        'ingredients': [fiber_ingredient('A', 0), fiber_ingredient('en:preservative', 0), fiber_ingredient('B', 0, 10)],
+        'nutriments': {
+            'fiber_100g': 0,
+        }}
+
+    estimate_recipe(product)
+
+    a, preservative, b = product['ingredients']
+    assert product['recipe_estimator']['skipped_quantity_max'] == ['en:preservative']
+    assert abs(b['percent_estimate'] - 10) <= 0.5
+    assert preservative['percent_estimate'] >= b['percent_estimate'] - 0.01
