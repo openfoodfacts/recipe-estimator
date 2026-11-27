@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/openfoodfacts/recipe-estimator/compare/v0.4.2...v0.4.3) (2026-11-27)
+
+
+### Bug Fixes
+
+* cvxpy percent_estimate is the recipe share, quantity_estimate the quantity per 100 g ([#177](https://github.com/openfoodfacts/recipe-estimator/issues/177)) ([50c1a4c](https://github.com/openfoodfacts/recipe-estimator/commit/50c1a4cd2b5fddbe188f0d65153effaf81b8ece9))
+
 ## [0.4.2](https://github.com/openfoodfacts/recipe-estimator/compare/v0.4.1...v0.4.2) (2026-08-19)
 
 
